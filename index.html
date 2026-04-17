@@ -200,14 +200,15 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   left: 0;
   width: 100%;
   height: 100%;
+  height: -webkit-fill-available;
   background: #0a0a0f;
-  /* overflow: hidden; REMOVED - this was breaking position:fixed children on mobile browsers */
   z-index: 100;
 }
 .minigame-container {
   position: relative;
   width: 100%;
   height: 100%;
+  height: -webkit-fill-available;
   background: #1a1a2a;
 }
 .minigame-canvas {
@@ -430,6 +431,46 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   margin: 6px;
   cursor: pointer;
 }
+
+/* Force landscape orientation for mini-game */
+@media (orientation: portrait) {
+  .portrait-warning {
+    display: flex;
+  }
+  .minigame-container {
+    display: none;
+  }
+}
+
+.portrait-warning {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #080608;
+  z-index: 1000;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  font-family: 'Cinzel', serif;
+  color: var(--gold2);
+}
+.portrait-warning span {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+.portrait-warning p {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+.portrait-warning small {
+  font-size: 14px;
+  color: var(--parch3);
+}
 </style>
 </head>
 <body>
@@ -538,8 +579,13 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   <div class="brow"><button class="bgold" onclick="showScreen('s-title')">← Back</button></div>
 </div>
 
-<!-- MINI-GAME (Android Optimized) -->
+<!-- MINI-GAME (Android Optimized with Touch-Drag) -->
 <div id="s-minigame" class="screen">
+  <div class="portrait-warning" id="portraitWarning">
+    <span>📱↻</span>
+    <p>Please rotate your device</p>
+    <small>This game is best played in landscape mode</small>
+  </div>
   <div class="minigame-container">
     <canvas id="mgCanvas" class="minigame-canvas"></canvas>
     <div class="mg-ui-overlay">
@@ -896,7 +942,7 @@ function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
 
 // ═══════════════════════════════════════════════════════════════
-//  MINI-GAME (Android Optimized - Simplified but Fully Functional)
+//  MINI-GAME (Android Optimized with Touch-Drag)
 // ═══════════════════════════════════════════════════════════════
 
 let mgCanvas, mgCtx, mgWidth, mgHeight;
@@ -929,6 +975,27 @@ function setBodyScrollLock(lock) {
 }
 
 function startMiniGame() {
+  // Check if username exists
+  if (!username || username.trim() === '') {
+    // Show warning and return to title screen
+    const inp = document.getElementById('username-inp');
+    const greet = document.getElementById('ugreet');
+    if (inp) {
+      inp.classList.add('error');
+      greet.className = 'ugreet err';
+      greet.textContent = 'Please enter your name before battling Goliath!';
+      inp.focus();
+      setTimeout(() => {
+        inp.classList.remove('error');
+        greet.className = 'ugreet';
+        if (!username.trim()) greet.textContent = '';
+      }, 3000);
+    }
+    // Switch to title screen
+    showScreen('s-title');
+    return;
+  }
+  
   console.log("startMiniGame called");
   showScreen('s-minigame');
   setBodyScrollLock(true);
@@ -936,6 +1003,48 @@ function startMiniGame() {
   mgCanvas = document.getElementById('mgCanvas');
   if (!mgCanvas) {
     console.error("Canvas not found!");
+    return;
+  }
+  
+  // Check orientation and show warning if needed
+  function checkOrientation() {
+    const warning = document.getElementById('portraitWarning');
+    if (window.matchMedia("(orientation: portrait)").matches) {
+      if (warning) warning.style.display = 'flex';
+      return false;
+    } else {
+      if (warning) warning.style.display = 'none';
+      return true;
+    }
+  }
+  
+  // Initial orientation check
+  if (!checkOrientation()) {
+    // Still initialize but with warning visible
+    mgWidth = window.innerWidth;
+    mgHeight = window.innerHeight;
+    mgCanvas.width = mgWidth;
+    mgCanvas.height = mgHeight;
+    mgCtx = mgCanvas.getContext('2d');
+    resizeMGCanvas();
+    resetMG();
+    bindMGButtons();
+    // Listen for orientation change
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => {
+        resizeMGCanvas();
+        if (checkOrientation() && mgPhase === 'play') {
+          // Resume game if it was paused
+        }
+      }, 100);
+    });
+    // Show overlay but player must rotate first
+    const ov = document.querySelector('.mg-full-overlay');
+    if (!ov) {
+      setTimeout(() => {
+        showMGOverlay('start');
+      }, 100);
+    }
     return;
   }
   
@@ -963,10 +1072,23 @@ function startMiniGame() {
   
   window.addEventListener('resize', () => {
     resizeMGCanvas();
+    checkOrientation();
+  });
+  
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      resizeMGCanvas();
+      checkOrientation();
+    }, 100);
   });
 }
 
 function resizeMGCanvas() {
+  // Check orientation and adjust if needed
+  if (window.matchMedia("(orientation: portrait)").matches) {
+    // Still resize but warning will be shown
+  }
+  
   mgWidth = window.innerWidth;
   mgHeight = window.innerHeight;
   
@@ -1071,7 +1193,7 @@ function showMGOverlay(type) {
 }
 
 function bindMGButtons() {
-  console.log("bindMGButtons called with FIXED touch-drag");
+  console.log("bindMGButtons called with touch-drag");
   
   const btnUp = document.getElementById('mgBtnUp');
   const btnDown = document.getElementById('mgBtnDown');
@@ -1083,7 +1205,7 @@ function bindMGButtons() {
   const dodgeBtn = document.getElementById('mgDodgeBtn');
   const quitBtn = document.getElementById('mgQuitBtn');
   
-  // ========== FIXED TOUCH-DRAG (Android compatible) ==========
+  // ========== TOUCH-DRAG (SLIDING FINGER) SUPPORT ==========
   
   let currentActiveButton = null;
   let currentFireActive = false;
@@ -1138,7 +1260,6 @@ function bindMGButtons() {
     return null;
   }
   
-  // Only activate touchmove tracking when a button is touched
   function startDrag(e) {
     isDragging = true;
     const touch = e.touches[0];
@@ -1181,7 +1302,6 @@ function bindMGButtons() {
     }
   }
   
-  // Fire button handlers
   function handleFireStart(e) {
     e.preventDefault();
     currentFireActive = true;
@@ -1201,7 +1321,6 @@ function bindMGButtons() {
     }
   }
   
-  // Slide buttons (D-pad, angle, dodge) - using touchstart to start drag tracking
   const dpadButtons = [btnUp, btnDown, btnLeft, btnRight];
   const angleButtons = [anglePlus, angleMinus];
   const allSlideButtons = [...dpadButtons, ...angleButtons, dodgeBtn];
@@ -1235,7 +1354,6 @@ function bindMGButtons() {
     });
   });
   
-  // Global touchmove only when dragging
   document.addEventListener('touchmove', handleTouchMove, { passive: false });
   document.addEventListener('touchend', endDrag);
   document.addEventListener('touchcancel', endDrag);
