@@ -193,7 +193,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .lbbd{font-size:10px;color:var(--parch3);text-align:right;}
 .lbts{font-size:10px;color:rgba(184,168,128,.5);text-align:right;}
 
-/* ========== MINI-GAME STYLES (Standalone Version) ========== */
+/* ========== MINI-GAME STYLES ========== */
 #s-minigame {
   position: fixed;
   top: 0;
@@ -201,6 +201,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   width: 100%;
   height: 100%;
   background: #0a0a0f;
+  /* overflow: hidden; REMOVED - this was breaking position:fixed children on mobile browsers */
   z-index: 100;
 }
 .minigame-container {
@@ -400,13 +401,14 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   transition: 0.05s linear;
 }
 .mg-dodge-btn:active { transform: scale(0.96); background: #4a9eff; }
+/* OVERLAY - positioned on body with highest z-index to avoid clipping */
 .mg-full-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.88);
+  background: rgba(0,0,0,0.85);
   backdrop-filter: blur(8px);
   display: flex;
   flex-direction: column;
@@ -417,16 +419,6 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   text-align: center;
   color: #e8c96a;
   gap: 20px;
-  padding: 20px;
-  box-sizing: border-box;
-}
-.mg-full-overlay button {
-  pointer-events: auto !important;
-  cursor: pointer;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(255,255,255,0.2);
-  position: relative;
-  z-index: 10000;
 }
 .mg-full-overlay button {
   background: #e8c96a;
@@ -959,12 +951,20 @@ function startMiniGame() {
   mgCanvas = document.getElementById('mgCanvas');
   mgCtx = mgCanvas.getContext('2d');
   
-  // Ensure canvas has valid dimensions before proceeding
-  ensureCanvasSize().then(() => {
+  // Force a resize with a small delay for mobile
+  setTimeout(() => {
+    resizeMGCanvas();
+    if (mgWidth === 0 || mgHeight === 0) {
+      // Fallback to client dimensions
+      mgWidth = mgCanvas.clientWidth || 800;
+      mgHeight = mgCanvas.clientHeight || 500;
+      mgCanvas.width = mgWidth;
+      mgCanvas.height = mgHeight;
+    }
     resetMG();
     bindMGButtons();
     showMGOverlay('start');
-  });
+  }, 50);
   
   window.addEventListener('resize', () => {
     requestAnimationFrame(() => resizeMGCanvas());
@@ -972,8 +972,8 @@ function startMiniGame() {
 }
 
 function resizeMGCanvas() {
-  mgWidth = window.innerWidth || document.documentElement.clientWidth || 800;
-  mgHeight = window.innerHeight || document.documentElement.clientHeight || 500;
+  mgWidth = window.innerWidth;
+  mgHeight = window.innerHeight;
   mgCanvas.width = mgWidth;
   mgCanvas.height = mgHeight;
   mgDavid.x = Math.min(Math.max(mgDavid.x, 40), mgWidth - mgDavid.w - 40);
