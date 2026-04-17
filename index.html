@@ -1071,7 +1071,7 @@ function showMGOverlay(type) {
 }
 
 function bindMGButtons() {
-  console.log("bindMGButtons called with touch-drag");
+  console.log("bindMGButtons called with FIXED touch-drag");
   
   const btnUp = document.getElementById('mgBtnUp');
   const btnDown = document.getElementById('mgBtnDown');
@@ -1083,10 +1083,11 @@ function bindMGButtons() {
   const dodgeBtn = document.getElementById('mgDodgeBtn');
   const quitBtn = document.getElementById('mgQuitBtn');
   
-  // ========== TOUCH-DRAG (SLIDING FINGER) SUPPORT ==========
+  // ========== FIXED TOUCH-DRAG (Android compatible) ==========
   
   let currentActiveButton = null;
   let currentFireActive = false;
+  let isDragging = false;
   
   function activateButton(button, type) {
     if (currentActiveButton === button) return;
@@ -1137,7 +1138,20 @@ function bindMGButtons() {
     return null;
   }
   
+  // Only activate touchmove tracking when a button is touched
+  function startDrag(e) {
+    isDragging = true;
+    const touch = e.touches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    const button = element?.closest('.mg-dpad button, .mg-angle-row button, .mg-dodge-btn');
+    if (button) {
+      const type = getButtonType(button);
+      if (type) activateButton(button, type);
+    }
+  }
+  
   function handleTouchMove(e) {
+    if (!isDragging) return;
     e.preventDefault();
     const touch = e.touches[0];
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -1152,8 +1166,8 @@ function bindMGButtons() {
     }
   }
   
-  function handleTouchEnd(e) {
-    e.preventDefault();
+  function endDrag(e) {
+    isDragging = false;
     if (currentActiveButton) {
       deactivateButton(currentActiveButton);
       currentActiveButton = null;
@@ -1187,7 +1201,7 @@ function bindMGButtons() {
     }
   }
   
-  // Slide buttons (D-pad, angle, dodge)
+  // Slide buttons (D-pad, angle, dodge) - using touchstart to start drag tracking
   const dpadButtons = [btnUp, btnDown, btnLeft, btnRight];
   const angleButtons = [anglePlus, angleMinus];
   const allSlideButtons = [...dpadButtons, ...angleButtons, dodgeBtn];
@@ -1196,16 +1210,37 @@ function bindMGButtons() {
     if (!btn) return;
     btn.addEventListener('touchstart', (e) => {
       e.preventDefault();
+      startDrag(e);
+    });
+    btn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      endDrag(e);
+    });
+    // Simple tap support
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
       const type = getButtonType(btn);
-      if (type) activateButton(btn, type);
+      if (type === 'up') { mgMoveUp = true; setTimeout(() => { mgMoveUp = false; }, 100); SoundFX.beep(1000, 0.05); }
+      if (type === 'down') { mgMoveDown = true; setTimeout(() => { mgMoveDown = false; }, 100); SoundFX.beep(300, 0.05); }
+      if (type === 'left') { mgMoveLeft = true; setTimeout(() => { mgMoveLeft = false; }, 100); SoundFX.beep(500, 0.05); }
+      if (type === 'right') { mgMoveRight = true; setTimeout(() => { mgMoveRight = false; }, 100); SoundFX.beep(700, 0.05); }
+      if (type === 'angleUp') { mgAngleAdjust = 1; setTimeout(() => { mgAngleAdjust = 0; }, 150); SoundFX.beep(650, 0.04); }
+      if (type === 'angleDown') { mgAngleAdjust = -1; setTimeout(() => { mgAngleAdjust = 0; }, 150); SoundFX.beep(550, 0.04); }
+      if (type === 'dodge') {
+        if (mgDodgeCooldown <= 0 && !mgDodgeActive && mgPhase === 'play') {
+          mgDodgeActive = true;
+          SoundFX.beep(550, 0.15);
+        }
+      }
     });
   });
   
+  // Global touchmove only when dragging
   document.addEventListener('touchmove', handleTouchMove, { passive: false });
-  document.addEventListener('touchend', handleTouchEnd);
-  document.addEventListener('touchcancel', handleTouchEnd);
+  document.addEventListener('touchend', endDrag);
+  document.addEventListener('touchcancel', endDrag);
   
-  // Mouse support (for desktop testing)
+  // Mouse support (for desktop)
   allSlideButtons.forEach(btn => {
     if (!btn) return;
     btn.addEventListener('mousedown', (e) => {
