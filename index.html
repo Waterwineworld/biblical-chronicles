@@ -13,6 +13,8 @@
 :root{--bg:#080608;--bg2:#100d14;--gold:#c9a84c;--gold2:#e8c96a;--gold3:#f5e0a0;--gold-dim:#6b5a28;--red2:#c0392b;--ember:#d4541a;--parch:#f0e4c8;--parch2:#d4c4a0;--parch3:#b8a880;--blue2:#2e6da4;--green2:#27ae60;--white:#fff8f0;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);font-family:'Libre Baskerville',serif;color:var(--parch);min-height:100vh;overflow-x:hidden;}
+/* Prevent body scroll when mini-game is active */
+body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 #bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
 #atm{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;transition:background 1.5s;}
 #app{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:0 16px 40px;min-height:100vh;}
@@ -199,7 +201,6 @@ body{background:var(--bg);font-family:'Libre Baskerville',serif;color:var(--parc
   width: 100%;
   height: 100%;
   background: #0a0a0f;
-  overflow: hidden;
   z-index: 100;
 }
 .minigame-container {
@@ -228,9 +229,9 @@ body{background:var(--bg);font-family:'Libre Baskerville',serif;color:var(--parc
 }
 .mg-top-bar {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
+  top: max(10px, env(safe-area-inset-top));
+  left: max(10px, env(safe-area-inset-left));
+  right: max(10px, env(safe-area-inset-right));
   background: rgba(0,0,0,0.6);
   backdrop-filter: blur(5px);
   border-radius: 40px;
@@ -277,7 +278,7 @@ body{background:var(--bg);font-family:'Libre Baskerville',serif;color:var(--parc
 }
 .mg-dodge-indicator {
   position: absolute;
-  bottom: 10px;
+  bottom: max(10px, env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   background: #000000aa;
@@ -291,13 +292,12 @@ body{background:var(--bg);font-family:'Libre Baskerville',serif;color:var(--parc
 }
 .mg-buttons {
   position: absolute;
-  bottom: 20px;
-  left: 0;
-  right: 0;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  padding: 0 16px;
   pointer-events: none;
   z-index: 30;
 }
@@ -351,6 +351,7 @@ body{background:var(--bg);font-family:'Libre Baskerville',serif;color:var(--parc
   font-weight: bold;
   color: #ffaa66;
   cursor: pointer;
+  touch-action: manipulation;
 }
 .mg-angle-value {
   background: #000000aa;
@@ -380,6 +381,7 @@ body{background:var(--bg);font-family:'Libre Baskerville',serif;color:var(--parc
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  touch-action: manipulation;
   box-shadow: 0 0 10px rgba(255,50,0,0.5);
   transition: 0.05s linear;
 }
@@ -393,27 +395,38 @@ body{background:var(--bg);font-family:'Libre Baskerville',serif;color:var(--parc
   font-weight: bold;
   color: white;
   cursor: pointer;
+  touch-action: manipulation;
   text-align: center;
   transition: 0.05s linear;
 }
 .mg-dodge-btn:active { transform: scale(0.96); background: #4a9eff; }
 .mg-full-overlay {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0,0,0,0.88);
   backdrop-filter: blur(8px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 9999;
   font-family: monospace;
   text-align: center;
   color: #e8c96a;
   gap: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.mg-full-overlay button {
+  pointer-events: auto !important;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(255,255,255,0.2);
+  position: relative;
+  z-index: 10000;
 }
 .mg-full-overlay button {
   background: #e8c96a;
@@ -507,6 +520,12 @@ body{background:var(--bg);font-family:'Libre Baskerville',serif;color:var(--parc
     <button class="bghost" onclick="showScreen('s-leaderboard');loadLB('all')">🏆 Leaderboard</button>
   </div>
   <div class="divider"></div>
+  <div id="battle-btn-wrap" style="display:none;margin-bottom:12px;">
+    <button class="bgold" onclick="startMiniGame()" style="background:linear-gradient(135deg,#6b1a00,#c0392b,#6b1a00);border-color:#c0392b;font-size:13px;letter-spacing:2px;">
+      ⚔️ Take Up Your Sling — Battle Goliath!
+    </button>
+    <p style="font-size:11px;color:var(--parch3);font-style:italic;margin-top:8px;">You know the story. Now live it.</p>
+  </div>
   <div class="brow">
     <button class="bgold" onclick="showScreen('s-title')">Choose Episode</button>
     <button class="bghost" onclick="replay()">Play Again</button>
@@ -840,7 +859,11 @@ function spawn(em,n){for(let i=0;i<n;i++)setTimeout(()=>{const p=document.create
 function spawnConfetti(){const cols=['#ffd700','#c9a84c','#ff6b6b','#4ecdc4','#45b7d1','#96ceb4','#ffeaa7'];for(let i=0;i<80;i++){setTimeout(()=>{const p=document.createElement('div');p.className='confetti-piece';p.style.left=Math.random()*100+'%';p.style.top='-10px';p.style.background=cols[Math.floor(Math.random()*cols.length)];p.style.transform=`rotate(${Math.random()*360}deg)`;p.style.animationDuration=(2+Math.random()*3)+'s';p.style.animationDelay=(Math.random()*1)+'s';document.body.appendChild(p);setTimeout(()=>p.remove(),5000);},i*30);}}
 const RANKS=[{min:0,name:'Novice',crown:'📖',cls:'novice',sub:'Keep reading — every scripture is a step forward.'},{min:40,name:'Scribe',crown:'✍️',cls:'scribe',sub:'You know the stories well. The Word is taking root.'},{min:70,name:'Prophet',crown:'🌟',cls:'prophet',sub:'Remarkable! The Spirit is teaching you.'},{min:90,name:'Apostle',crown:'👑',cls:'apostle',sub:'Extraordinary! You have hidden His Word in your heart.'}];
 const VVERSES=[{text:'"I have hidden your word in my heart that I might not sin against you."',ref:'Psalm 119:11'},{text:'"Your word is a lamp to my feet and a light to my path."',ref:'Psalm 119:105'},{text:'"Faith comes from hearing the message, and the message is heard through the word about Christ."',ref:'Romans 10:17'},{text:'"Do not merely listen to the word. Do what it says."',ref:'James 1:22'}];
-function showVerdict(){clearInterval(G.timer);SoundFX.stopAmbient();setPhase('verdict');const tot=G.ep.questions.length;const pct=tot>0?Math.round(G.correct/tot*100):0;const rank=RANKS.slice().reverse().find(r=>pct>=r.min)||RANKS[0];const v=VVERSES[Math.floor(Math.random()*VVERSES.length)];G.pendingSave={score:G.score,epId:G.ep.id,rank:rank.name,correct:G.correct,total:tot,speedPts:G.speedPts,streak:G.bestStreak};document.getElementById('vcrown').textContent=rank.crown;document.getElementById('vplayer').textContent='👤 '+getUsername();document.getElementById('vrank').textContent=rank.name;document.getElementById('vrank').className=`vrank ${rank.cls}`;document.getElementById('vsub').textContent=rank.sub;document.getElementById('vscore').textContent=G.score;document.getElementById('vcor').textContent=G.correct+'/'+tot;document.getElementById('vtot').textContent=pct+'%';document.getElementById('vspd').textContent=G.speedPts;document.getElementById('vstr').textContent=G.bestStreak;document.getElementById('vverse').innerHTML=`"${v.text}"<cite>— ${v.ref}</cite>`;completedEpisodes.add(G.ep.id);localStorage.setItem('bc_completed',JSON.stringify([...completedEpisodes]));if(pct>=90){spawn('✨',8);spawnConfetti();}else if(pct>=70)spawn('🌟',5);showScreen('s-verdict');}
+function showVerdict(){clearInterval(G.timer);SoundFX.stopAmbient();setPhase('verdict');const tot=G.ep.questions.length;const pct=tot>0?Math.round(G.correct/tot*100):0;const rank=RANKS.slice().reverse().find(r=>pct>=r.min)||RANKS[0];const v=VVERSES[Math.floor(Math.random()*VVERSES.length)];G.pendingSave={score:G.score,epId:G.ep.id,rank:rank.name,correct:G.correct,total:tot,speedPts:G.speedPts,streak:G.bestStreak};document.getElementById('vcrown').textContent=rank.crown;document.getElementById('vplayer').textContent='👤 '+getUsername();document.getElementById('vrank').textContent=rank.name;document.getElementById('vrank').className=`vrank ${rank.cls}`;document.getElementById('vsub').textContent=rank.sub;document.getElementById('vscore').textContent=G.score;document.getElementById('vcor').textContent=G.correct+'/'+tot;document.getElementById('vtot').textContent=pct+'%';document.getElementById('vspd').textContent=G.speedPts;document.getElementById('vstr').textContent=G.bestStreak;document.getElementById('vverse').innerHTML=`"${v.text}"<cite>— ${v.ref}</cite>`;completedEpisodes.add(G.ep.id);localStorage.setItem('bc_completed',JSON.stringify([...completedEpisodes]));if(pct>=90){spawn('✨',8);spawnConfetti();}else if(pct>=70)spawn('🌟',5);showScreen('s-verdict');
+  // Show battle button only for David & Goliath episode
+  const battleWrap=document.getElementById('battle-btn-wrap');
+  if(battleWrap)battleWrap.style.display=G.ep.id==='david-goliath'?'block':'none';
+}
 async function autoSaveScore(btn){
   if(G.saved){btn.textContent='✅ Already Saved';return;}
   if(!G.pendingSave)return;
@@ -905,22 +928,52 @@ let mgBatchSize = 0, mgBatchCooldown = 0;
 let mgMoveLeft = false, mgMoveRight = false, mgMoveUp = false, mgMoveDown = false;
 let mgAngleAdjust = 0;
 
+// --- Helper to prevent body scroll when mini-game is active ---
+function setBodyScrollLock(lock) {
+  if (lock) {
+    document.body.classList.add('mg-active');
+  } else {
+    document.body.classList.remove('mg-active');
+  }
+}
+
+// --- Reliable canvas sizing using requestAnimationFrame ---
+function ensureCanvasSize() {
+  return new Promise((resolve) => {
+    const check = () => {
+      resizeMGCanvas();
+      if (mgWidth > 0 && mgHeight > 0) {
+        resolve();
+      } else {
+        requestAnimationFrame(check);
+      }
+    };
+    requestAnimationFrame(check);
+  });
+}
+
 function startMiniGame() {
   showScreen('s-minigame');
+  setBodyScrollLock(true);
   SoundFX.init();
   mgCanvas = document.getElementById('mgCanvas');
   mgCtx = mgCanvas.getContext('2d');
-  resizeMGCanvas();
-  window.addEventListener('resize', resizeMGCanvas);
-  resetMG();
-  bindMGButtons();
-  showMGOverlay('start');
   
+  // Ensure canvas has valid dimensions before proceeding
+  ensureCanvasSize().then(() => {
+    resetMG();
+    bindMGButtons();
+    showMGOverlay('start');
+  });
+  
+  window.addEventListener('resize', () => {
+    requestAnimationFrame(() => resizeMGCanvas());
+  });
 }
 
 function resizeMGCanvas() {
-  mgWidth = window.innerWidth;
-  mgHeight = window.innerHeight;
+  mgWidth = window.innerWidth || document.documentElement.clientWidth || 800;
+  mgHeight = window.innerHeight || document.documentElement.clientHeight || 500;
   mgCanvas.width = mgWidth;
   mgCanvas.height = mgHeight;
   mgDavid.x = Math.min(Math.max(mgDavid.x, 40), mgWidth - mgDavid.w - 40);
@@ -969,15 +1022,15 @@ function showMGOverlay(type) {
       <button id="mgStartBtn">⚔️ BEGIN BATTLE</button>`;
     document.body.appendChild(ov);
     document.getElementById('mgStartBtn').onclick = () => {
-  ov.remove();
-  resetMG();
-  mgPhase = 'play';
-  updateMGUI();
-  // START THE GAME LOOP HERE
-  if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
-  mgLastTimestamp = 0;
-  mgAnimationId = requestAnimationFrame(mgGameLoop);
-};
+      ov.remove();
+      resetMG();
+      mgPhase = 'play';
+      updateMGUI();
+      // START THE GAME LOOP HERE
+      if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
+      mgLastTimestamp = 0;
+      mgAnimationId = requestAnimationFrame(mgGameLoop);
+    };
   } else if (type === 'victory') {
     ov.innerHTML = `<h2>🏆 VICTORY!</h2><p>Score: ${mgScore}<br>Max Combo: ${mgMaxCombo}x</p><button id="mgSaveBtn">💾 Save Score</button><button id="mgRestartBtn">Play Again</button><button id="mgMenuBtn">Back to Menu</button>`;
     document.body.appendChild(ov);
@@ -1005,12 +1058,12 @@ function showMGOverlay(type) {
       setTimeout(()=>{ov.remove();showScreen('s-leaderboard');loadLB('minigame');},1500);
     };
     document.getElementById('mgRestartBtn').onclick = () => { ov.remove(); resetMG(); showMGOverlay('start'); };
-    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); showScreen('s-title'); };
+    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); setBodyScrollLock(false); showScreen('s-title'); };
   } else if (type === 'gameover') {
     ov.innerHTML = `<h2>💀 DEFEATED</h2><p>Score: ${mgScore}</p><button id="mgRestartBtn">Try Again</button><button id="mgMenuBtn">Back to Menu</button>`;
     document.body.appendChild(ov);
     document.getElementById('mgRestartBtn').onclick = () => { ov.remove(); resetMG(); showMGOverlay('start'); };
-    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); showScreen('s-title'); };
+    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); setBodyScrollLock(false); showScreen('s-title'); };
   }
 }
 
@@ -1199,6 +1252,7 @@ function bindMGButtons() {
   // ========== QUIT BUTTON ==========
   quitBtn.addEventListener('click', () => {
     if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
+    setBodyScrollLock(false);
     showScreen('s-title');
   });
   
