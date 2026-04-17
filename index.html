@@ -977,7 +977,6 @@ function setBodyScrollLock(lock) {
 function startMiniGame() {
   // Check if username exists
   if (!username || username.trim() === '') {
-    // Show warning and return to title screen
     const inp = document.getElementById('username-inp');
     const greet = document.getElementById('ugreet');
     if (inp) {
@@ -991,13 +990,51 @@ function startMiniGame() {
         if (!username.trim()) greet.textContent = '';
       }, 3000);
     }
-    // Switch to title screen
     showScreen('s-title');
     return;
   }
   
   console.log("startMiniGame called");
   showScreen('s-minigame');
+  
+  // Function to check orientation and show/hide warning
+  function checkAndInit() {
+    if (window.matchMedia("(orientation: portrait)").matches) {
+      // Portrait mode - show warning, hide game container
+      const warning = document.getElementById('portraitWarning');
+      if (warning) warning.style.display = 'flex';
+      const container = document.querySelector('.minigame-container');
+      if (container) container.style.display = 'none';
+      return false;
+    } else {
+      // Landscape mode - hide warning, show game container
+      const warning = document.getElementById('portraitWarning');
+      if (warning) warning.style.display = 'none';
+      const container = document.querySelector('.minigame-container');
+      if (container) container.style.display = 'block';
+      return true;
+    }
+  }
+  
+  // Initial check - if portrait, don't initialize, just show warning and wait
+  if (!checkAndInit()) {
+    // Listen for orientation change to initialize when rotated
+    const orientationHandler = () => {
+      if (checkAndInit()) {
+        // Now landscape - initialize the game
+        initializeMiniGame();
+        window.removeEventListener('orientationchange', orientationHandler);
+        window.removeEventListener('resize', orientationHandler);
+      }
+    };
+    window.addEventListener('orientationchange', orientationHandler);
+    window.addEventListener('resize', orientationHandler);
+    return; // Stop here - don't initialize yet
+  }
+  
+  // If we get here, device is already in landscape - initialize normally
+  
+function initializeMiniGame() {
   setBodyScrollLock(true);
   
   mgCanvas = document.getElementById('mgCanvas');
@@ -1006,49 +1043,6 @@ function startMiniGame() {
     return;
   }
   
-  // Check orientation and show warning if needed
-  function checkOrientation() {
-    const warning = document.getElementById('portraitWarning');
-    if (window.matchMedia("(orientation: portrait)").matches) {
-      if (warning) warning.style.display = 'flex';
-      return false;
-    } else {
-      if (warning) warning.style.display = 'none';
-      return true;
-    }
-  }
-  
-  // Initial orientation check
-  if (!checkOrientation()) {
-    // Still initialize but with warning visible
-    mgWidth = window.innerWidth;
-    mgHeight = window.innerHeight;
-    mgCanvas.width = mgWidth;
-    mgCanvas.height = mgHeight;
-    mgCtx = mgCanvas.getContext('2d');
-    resizeMGCanvas();
-    resetMG();
-    bindMGButtons();
-    // Listen for orientation change
-    window.addEventListener('orientationchange', () => {
-      setTimeout(() => {
-        resizeMGCanvas();
-        if (checkOrientation() && mgPhase === 'play') {
-          // Resume game if it was paused
-        }
-      }, 100);
-    });
-    // Show overlay but player must rotate first
-    const ov = document.querySelector('.mg-full-overlay');
-    if (!ov) {
-      setTimeout(() => {
-        showMGOverlay('start');
-      }, 100);
-    }
-    return;
-  }
-  
-  // Force immediate resize
   mgWidth = window.innerWidth;
   mgHeight = window.innerHeight;
   mgCanvas.width = mgWidth;
@@ -1072,15 +1066,14 @@ function startMiniGame() {
   
   window.addEventListener('resize', () => {
     resizeMGCanvas();
-    checkOrientation();
   });
   
   window.addEventListener('orientationchange', () => {
     setTimeout(() => {
       resizeMGCanvas();
-      checkOrientation();
     }, 100);
   });
+
 }
 
 function resizeMGCanvas() {
@@ -1107,6 +1100,8 @@ function resizeMGCanvas() {
     mgGoliath.y = mgHeight - 180;
   }
 }
+
+
 
 function resetMG() {
   mgDavid = { x: 100, y: mgHeight / 2, w: 40, h: 60, speed: 6 };
