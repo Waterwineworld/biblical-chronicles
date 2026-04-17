@@ -538,7 +538,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   <div class="brow"><button class="bgold" onclick="showScreen('s-title')">← Back</button></div>
 </div>
 
-<!-- MINI-GAME (Standalone Version - Fully Working) -->
+<!-- MINI-GAME (Android Optimized) -->
 <div id="s-minigame" class="screen">
   <div class="minigame-container">
     <canvas id="mgCanvas" class="minigame-canvas"></canvas>
@@ -896,7 +896,7 @@ function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
 
 // ═══════════════════════════════════════════════════════════════
-//  MINI-GAME (Standalone Version - Fully Working)
+//  MINI-GAME (Android Optimized - Simplified but Fully Functional)
 // ═══════════════════════════════════════════════════════════════
 
 let mgCanvas, mgCtx, mgWidth, mgHeight;
@@ -920,7 +920,6 @@ let mgBatchSize = 0, mgBatchCooldown = 0;
 let mgMoveLeft = false, mgMoveRight = false, mgMoveUp = false, mgMoveDown = false;
 let mgAngleAdjust = 0;
 
-// --- Helper to prevent body scroll when mini-game is active ---
 function setBodyScrollLock(lock) {
   if (lock) {
     document.body.classList.add('mg-active');
@@ -929,57 +928,62 @@ function setBodyScrollLock(lock) {
   }
 }
 
-// --- Reliable canvas sizing using requestAnimationFrame ---
-function ensureCanvasSize() {
-  return new Promise((resolve) => {
-    const check = () => {
-      resizeMGCanvas();
-      if (mgWidth > 0 && mgHeight > 0) {
-        resolve();
-      } else {
-        requestAnimationFrame(check);
-      }
-    };
-    requestAnimationFrame(check);
-  });
-}
-
 function startMiniGame() {
+  console.log("startMiniGame called");
   showScreen('s-minigame');
   setBodyScrollLock(true);
-  SoundFX.init();
-  mgCanvas = document.getElementById('mgCanvas');
-  mgCtx = mgCanvas.getContext('2d');
   
-  // Force a resize with a small delay for mobile
+  mgCanvas = document.getElementById('mgCanvas');
+  if (!mgCanvas) {
+    console.error("Canvas not found!");
+    return;
+  }
+  
+  // Force immediate resize
+  mgWidth = window.innerWidth;
+  mgHeight = window.innerHeight;
+  mgCanvas.width = mgWidth;
+  mgCanvas.height = mgHeight;
+  
+  mgCtx = mgCanvas.getContext('2d');
+  if (!mgCtx) {
+    console.error("Cannot get 2D context!");
+    return;
+  }
+  
+  console.log("Canvas size:", mgWidth, mgHeight);
+  
+  resizeMGCanvas();
+  resetMG();
+  bindMGButtons();
+  
   setTimeout(() => {
-    resizeMGCanvas();
-    if (mgWidth === 0 || mgHeight === 0) {
-      // Fallback to client dimensions
-      mgWidth = mgCanvas.clientWidth || 800;
-      mgHeight = mgCanvas.clientHeight || 500;
-      mgCanvas.width = mgWidth;
-      mgCanvas.height = mgHeight;
-    }
-    resetMG();
-    bindMGButtons();
     showMGOverlay('start');
-  }, 50);
+  }, 100);
   
   window.addEventListener('resize', () => {
-    requestAnimationFrame(() => resizeMGCanvas());
+    resizeMGCanvas();
   });
 }
 
 function resizeMGCanvas() {
   mgWidth = window.innerWidth;
   mgHeight = window.innerHeight;
+  
+  if (mgWidth < 100) mgWidth = 800;
+  if (mgHeight < 100) mgHeight = 500;
+  
   mgCanvas.width = mgWidth;
   mgCanvas.height = mgHeight;
-  mgDavid.x = Math.min(Math.max(mgDavid.x, 40), mgWidth - mgDavid.w - 40);
-  mgDavid.y = Math.min(Math.max(mgDavid.y, 60), mgHeight - mgDavid.h - 60);
-  mgGoliath.x = Math.min(mgWidth - 100, Math.max(100, mgGoliath.x));
-  mgGoliath.y = mgHeight - 180;
+  
+  if (mgDavid) {
+    mgDavid.x = Math.min(Math.max(mgDavid.x, 40), mgWidth - mgDavid.w - 40);
+    mgDavid.y = Math.min(Math.max(mgDavid.y, 60), mgHeight - mgDavid.h - 60);
+  }
+  if (mgGoliath) {
+    mgGoliath.x = Math.min(mgWidth - 100, Math.max(100, mgGoliath.x));
+    mgGoliath.y = mgHeight - 180;
+  }
 }
 
 function resetMG() {
@@ -1026,7 +1030,6 @@ function showMGOverlay(type) {
       resetMG();
       mgPhase = 'play';
       updateMGUI();
-      // START THE GAME LOOP HERE
       if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
       mgLastTimestamp = 0;
       mgAnimationId = requestAnimationFrame(mgGameLoop);
@@ -1068,6 +1071,8 @@ function showMGOverlay(type) {
 }
 
 function bindMGButtons() {
+  console.log("bindMGButtons called");
+  
   const btnUp = document.getElementById('mgBtnUp');
   const btnDown = document.getElementById('mgBtnDown');
   const btnLeft = document.getElementById('mgBtnLeft');
@@ -1078,188 +1083,82 @@ function bindMGButtons() {
   const dodgeBtn = document.getElementById('mgDodgeBtn');
   const quitBtn = document.getElementById('mgQuitBtn');
   
-  // ========== TOUCH-DRAG (SLIDING FINGER) SUPPORT ==========
+  function setMoveFlag(flag, value) {
+    if (flag === 'left') mgMoveLeft = value;
+    if (flag === 'right') mgMoveRight = value;
+    if (flag === 'up') mgMoveUp = value;
+    if (flag === 'down') mgMoveDown = value;
+  }
   
-  // Track currently active button to avoid repeated triggers
-  let currentActiveButton = null;
-  let currentFireActive = false;
+  if (btnLeft) {
+    btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); setMoveFlag('left', true); });
+    btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); setMoveFlag('left', false); });
+    btnLeft.addEventListener('mousedown', () => setMoveFlag('left', true));
+    btnLeft.addEventListener('mouseup', () => setMoveFlag('left', false));
+  }
   
-  // Helper to activate a button
-  function activateButton(button, type) {
-    if (currentActiveButton === button) return; // Already active
-    if (currentActiveButton) deactivateButton(currentActiveButton);
-    currentActiveButton = button;
-    
-    // Visual feedback
-    button.style.transform = 'scale(0.92)';
-    button.style.background = '#e8c96a';
-    if (button.classList.contains('fire-btn')) button.style.background = '#e05a4a';
-    if (button.classList.contains('dodge-btn')) button.style.background = '#4a9eff';
-    
-    // Action based on button type
-    if (type === 'up') { mgMoveUp = true; SoundFX.beep(1000, 0.05); }
-    if (type === 'down') { mgMoveDown = true; SoundFX.beep(300, 0.05); }
-    if (type === 'left') { mgMoveLeft = true; SoundFX.beep(500, 0.05); }
-    if (type === 'right') { mgMoveRight = true; SoundFX.beep(700, 0.05); }
-    if (type === 'angleUp') { mgAngleAdjust = 1; SoundFX.beep(650, 0.04); }
-    if (type === 'angleDown') { mgAngleAdjust = -1; SoundFX.beep(550, 0.04); }
-    if (type === 'dodge') {
+  if (btnRight) {
+    btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); setMoveFlag('right', true); });
+    btnRight.addEventListener('touchend', (e) => { e.preventDefault(); setMoveFlag('right', false); });
+    btnRight.addEventListener('mousedown', () => setMoveFlag('right', true));
+    btnRight.addEventListener('mouseup', () => setMoveFlag('right', false));
+  }
+  
+  if (btnUp) {
+    btnUp.addEventListener('touchstart', (e) => { e.preventDefault(); setMoveFlag('up', true); });
+    btnUp.addEventListener('touchend', (e) => { e.preventDefault(); setMoveFlag('up', false); });
+    btnUp.addEventListener('mousedown', () => setMoveFlag('up', true));
+    btnUp.addEventListener('mouseup', () => setMoveFlag('up', false));
+  }
+  
+  if (btnDown) {
+    btnDown.addEventListener('touchstart', (e) => { e.preventDefault(); setMoveFlag('down', true); });
+    btnDown.addEventListener('touchend', (e) => { e.preventDefault(); setMoveFlag('down', false); });
+    btnDown.addEventListener('mousedown', () => setMoveFlag('down', true));
+    btnDown.addEventListener('mouseup', () => setMoveFlag('down', false));
+  }
+  
+  if (anglePlus) {
+    anglePlus.addEventListener('touchstart', (e) => { e.preventDefault(); mgAngleAdjust = 1; });
+    anglePlus.addEventListener('touchend', (e) => { e.preventDefault(); mgAngleAdjust = 0; });
+    anglePlus.addEventListener('mousedown', () => { mgAngleAdjust = 1; });
+    anglePlus.addEventListener('mouseup', () => { mgAngleAdjust = 0; });
+  }
+  
+  if (angleMinus) {
+    angleMinus.addEventListener('touchstart', (e) => { e.preventDefault(); mgAngleAdjust = -1; });
+    angleMinus.addEventListener('touchend', (e) => { e.preventDefault(); mgAngleAdjust = 0; });
+    angleMinus.addEventListener('mousedown', () => { mgAngleAdjust = -1; });
+    angleMinus.addEventListener('mouseup', () => { mgAngleAdjust = 0; });
+  }
+  
+  if (fireBtn) {
+    fireBtn.addEventListener('touchstart', (e) => { e.preventDefault(); mgChargeActive = true; });
+    fireBtn.addEventListener('touchend', (e) => { e.preventDefault(); if (mgChargeActive && !mgStone.active) fireMGStone(); mgChargeActive = false; });
+    fireBtn.addEventListener('mousedown', () => { mgChargeActive = true; });
+    fireBtn.addEventListener('mouseup', () => { if (mgChargeActive && !mgStone.active) fireMGStone(); mgChargeActive = false; });
+  }
+  
+  if (dodgeBtn) {
+    dodgeBtn.addEventListener('click', () => {
       if (mgDodgeCooldown <= 0 && !mgDodgeActive && mgPhase === 'play') {
         mgDodgeActive = true;
-        SoundFX.beep(550, 0.15);
+        if (SoundFX && SoundFX.beep) SoundFX.beep(550, 0.15);
       }
-    }
-  }
-  
-  // Helper to deactivate a button
-  function deactivateButton(button) {
-    if (!button) return;
-    button.style.transform = '';
-    button.style.background = '';
-    if (button.classList.contains('fire-btn')) button.style.background = '';
-    if (button.classList.contains('dodge-btn')) button.style.background = '';
-    
-    // Deactivate movement based on which button was active
-    if (button.id === 'mgBtnUp') mgMoveUp = false;
-    if (button.id === 'mgBtnDown') mgMoveDown = false;
-    if (button.id === 'mgBtnLeft') mgMoveLeft = false;
-    if (button.id === 'mgBtnRight') mgMoveRight = false;
-    if (button.id === 'mgAnglePlus' || button.id === 'mgAngleMinus') mgAngleAdjust = 0;
-  }
-  
-  // Helper to get button type from element
-  function getButtonType(btn) {
-    if (btn.id === 'mgBtnUp') return 'up';
-    if (btn.id === 'mgBtnDown') return 'down';
-    if (btn.id === 'mgBtnLeft') return 'left';
-    if (btn.id === 'mgBtnRight') return 'right';
-    if (btn.id === 'mgAnglePlus') return 'angleUp';
-    if (btn.id === 'mgAngleMinus') return 'angleDown';
-    if (btn.id === 'mgDodgeBtn') return 'dodge';
-    return null;
-  }
-  
-  // Handle touchmove (sliding finger over buttons)
-  function handleTouchMove(e) {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    const button = element?.closest('.mg-dpad button, .mg-angle-row button, .mg-dodge-btn');
-    
-    if (button && button !== currentActiveButton) {
-      const type = getButtonType(button);
-      if (type) activateButton(button, type);
-    } else if (!button && currentActiveButton) {
-      deactivateButton(currentActiveButton);
-      currentActiveButton = null;
-    }
-  }
-  
-  // Handle touchend (finger lifted)
-  function handleTouchEnd(e) {
-    e.preventDefault();
-    if (currentActiveButton) {
-      deactivateButton(currentActiveButton);
-      currentActiveButton = null;
-    }
-    // Also release fire if active
-    if (currentFireActive) {
-      if (mgChargeActive && !mgStone.active) fireMGStone();
-      mgChargeActive = false;
-      currentFireActive = false;
-      fireBtn.style.transform = '';
-      fireBtn.style.background = '';
-    }
-  }
-  
-  // ========== FIRE BUTTON (Special: requires hold, not just slide) ==========
-  function handleFireStart(e) {
-    e.preventDefault();
-    currentFireActive = true;
-    mgChargeActive = true;
-    fireBtn.style.transform = 'scale(0.94)';
-    fireBtn.style.background = '#e05a4a';
-  }
-  
-  function handleFireEnd(e) {
-    e.preventDefault();
-    if (currentFireActive) {
-      if (mgChargeActive && !mgStone.active) fireMGStone();
-      mgChargeActive = false;
-      currentFireActive = false;
-      fireBtn.style.transform = '';
-      fireBtn.style.background = '';
-    }
-  }
-  
-  // ========== D-PAD BUTTONS (Touch-drag enabled) ==========
-  const dpadButtons = [btnUp, btnDown, btnLeft, btnRight];
-  const angleButtons = [anglePlus, angleMinus];
-  const allSlideButtons = [...dpadButtons, ...angleButtons, dodgeBtn];
-  
-  // Add touchstart for initial contact (activates immediately)
-  allSlideButtons.forEach(btn => {
-    btn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      const type = getButtonType(btn);
-      if (type) activateButton(btn, type);
     });
-  });
+  }
   
-  // Add touchmove for sliding (global on document)
-  document.addEventListener('touchmove', handleTouchMove, { passive: false });
-  document.addEventListener('touchend', handleTouchEnd);
-  document.addEventListener('touchcancel', handleTouchEnd);
-  
-  // ========== MOUSE SUPPORT (for desktop testing) ==========
-  // For mouse, we keep simple click/drag support
-  allSlideButtons.forEach(btn => {
-    btn.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      const type = getButtonType(btn);
-      if (type) activateButton(btn, type);
+  if (quitBtn) {
+    quitBtn.addEventListener('click', () => {
+      if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
+      setBodyScrollLock(false);
+      showScreen('s-title');
     });
-  });
+  }
   
-  document.addEventListener('mouseup', () => {
-    if (currentActiveButton) {
-      deactivateButton(currentActiveButton);
-      currentActiveButton = null;
-    }
-  });
-  
-  // Mouse move for drag (simulate sliding)
-  document.addEventListener('mousemove', (e) => {
-    if (e.buttons !== 1) return; // Only when left mouse button is held
-    const element = document.elementFromPoint(e.clientX, e.clientY);
-    const button = element?.closest('.mg-dpad button, .mg-angle-row button, .mg-dodge-btn');
-    if (button && button !== currentActiveButton) {
-      const type = getButtonType(button);
-      if (type) activateButton(button, type);
-    } else if (!button && currentActiveButton) {
-      deactivateButton(currentActiveButton);
-      currentActiveButton = null;
-    }
-  });
-  
-  // ========== FIRE BUTTON EVENTS ==========
-  fireBtn.addEventListener('touchstart', handleFireStart);
-  fireBtn.addEventListener('touchend', handleFireEnd);
-  fireBtn.addEventListener('touchcancel', handleFireEnd);
-  fireBtn.addEventListener('mousedown', handleFireStart);
-  fireBtn.addEventListener('mouseup', handleFireEnd);
-  
-  // ========== QUIT BUTTON ==========
-  quitBtn.addEventListener('click', () => {
-    if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
-    setBodyScrollLock(false);
-    showScreen('s-title');
-  });
-  
-  // ========== KEYBOARD SUPPORT (keep existing) ==========
+  // Keyboard support
   let keyUp = false, keyDown = false, keyLeft = false, keyRight = false;
   let spacePressed = false;
-  let keyAngleAdjust = 0;
   
   function updateMovementFromKeys() {
     mgMoveUp = keyUp;
@@ -1270,25 +1169,17 @@ function bindMGButtons() {
   
   window.addEventListener('keydown', (e) => {
     const key = e.key;
-    if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight' || key === ' ' || key === 'Space' || key === 'b' || key === 'B') {
+    if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight' || key === ' ' || key === 'Space') {
       e.preventDefault();
     }
     if (key === 'ArrowUp') { keyUp = true; updateMovementFromKeys(); }
     if (key === 'ArrowDown') { keyDown = true; updateMovementFromKeys(); }
     if (key === 'ArrowLeft') { keyLeft = true; updateMovementFromKeys(); }
     if (key === 'ArrowRight') { keyRight = true; updateMovementFromKeys(); }
-    if (key === 'q' || key === 'Q') { keyAngleAdjust = 1; }
-    if (key === 'e' || key === 'E') { keyAngleAdjust = -1; }
     if (key === ' ' || key === 'Space') {
       if (!spacePressed) {
         spacePressed = true;
         mgChargeActive = true;
-      }
-    }
-    if (key === 'b' || key === 'B') {
-      if (mgDodgeCooldown <= 0 && !mgDodgeActive && mgPhase === 'play') {
-        mgDodgeActive = true;
-        SoundFX.beep(550, 0.15);
       }
     }
   });
@@ -1299,8 +1190,6 @@ function bindMGButtons() {
     if (key === 'ArrowDown') { keyDown = false; updateMovementFromKeys(); }
     if (key === 'ArrowLeft') { keyLeft = false; updateMovementFromKeys(); }
     if (key === 'ArrowRight') { keyRight = false; updateMovementFromKeys(); }
-    if (key === 'q' || key === 'Q') { keyAngleAdjust = 0; }
-    if (key === 'e' || key === 'E') { keyAngleAdjust = 0; }
     if (key === ' ' || key === 'Space') {
       if (spacePressed) {
         spacePressed = false;
@@ -1309,8 +1198,6 @@ function bindMGButtons() {
       }
     }
   });
-  
-  window.mgKeyboardAngleAdjust = () => keyAngleAdjust;
 }
 
 function fireMGStone() {
@@ -1328,27 +1215,22 @@ function fireMGStone() {
 function updateMG(delta) {
   if (mgPhase !== 'play') return;
 
-  // Movement
   if (mgMoveLeft) mgDavid.x = Math.max(40, mgDavid.x - mgDavid.speed);
   if (mgMoveRight) mgDavid.x = Math.min(mgWidth - mgDavid.w - 40, mgDavid.x + mgDavid.speed);
   if (mgMoveUp) mgDavid.y = Math.max(60, mgDavid.y - mgDavid.speed);
   if (mgMoveDown) mgDavid.y = Math.min(mgHeight - mgDavid.h - 60, mgDavid.y + mgDavid.speed);
 
-  // Angle adjustment while charging (from both touch buttons AND keyboard)
-let totalAngleAdjust = mgAngleAdjust;
-if (window.mgKeyboardAngleAdjust) totalAngleAdjust += window.mgKeyboardAngleAdjust();
-if (mgChargeActive && totalAngleAdjust !== 0) {
+  let totalAngleAdjust = mgAngleAdjust;
+  if (mgChargeActive && totalAngleAdjust !== 0) {
     mgAngle += totalAngleAdjust * 0.04;
     mgAngle = Math.max(-0.9, Math.min(0.9, mgAngle));
     updateMGUI();
-}
+  }
 
-  // Charge increment
   if (mgChargeActive && !mgStone.active) {
     mgStone.charge = Math.min(60, (mgStone.charge || 0) + 1.5);
   }
 
-  // Goliath state
   if (mgGoliath.stateTimer > 0) mgGoliath.stateTimer -= delta;
   else {
     let rand = Math.random();
@@ -1358,13 +1240,11 @@ if (mgChargeActive && totalAngleAdjust !== 0) {
     updateMGUI();
   }
 
-  // Goliath movement
   mgGoliath.x += mgGoliath.walkDir * mgGoliath.speed;
   if (mgGoliath.x < mgWidth - 250) mgGoliath.walkDir = 1;
   if (mgGoliath.x > mgWidth - 100) mgGoliath.walkDir = -1;
   mgGoliath.y = mgHeight - 180;
 
-  // Batch javelins
   if (mgBatchCooldown > 0) mgBatchCooldown -= delta;
   else if (mgBatchSize <= 0) {
     mgBatchSize = mgGoliath.rage ? 4 : Math.floor(Math.random() * 3) + 2;
@@ -1380,7 +1260,6 @@ if (mgChargeActive && totalAngleAdjust !== 0) {
     if (mgBatchSize === 0) mgBatchCooldown = 1800;
   }
 
-  // Update javelins
   for (let i = 0; i < mgJavelins.length; i++) {
     let j = mgJavelins[i];
     j.x += j.vx;
@@ -1408,7 +1287,6 @@ if (mgChargeActive && totalAngleAdjust !== 0) {
     }
   }
 
-  // Stone physics
   if (mgStone.active) {
     mgStone.x += mgStone.vx;
     mgStone.vy += 0.3;
@@ -1470,7 +1348,6 @@ if (mgChargeActive && totalAngleAdjust !== 0) {
     }
   }
 
-  // Dodge cooldown
   if (mgDodgeActive) {
     mgDodgeActive = false;
     mgDodgeCooldown = 2000;
@@ -1486,7 +1363,6 @@ function drawMG() {
     mgShake *= 0.9;
   }
 
-  // ========== SKY & BACKGROUND ==========
   const skyGrad = mgCtx.createLinearGradient(0, 0, 0, mgHeight);
   skyGrad.addColorStop(0, mgGoliath.rage ? '#2a0000' : '#1a2a1a');
   skyGrad.addColorStop(0.6, mgGoliath.rage ? '#3d1500' : '#2a3a1a');
@@ -1494,7 +1370,6 @@ function drawMG() {
   mgCtx.fillStyle = skyGrad;
   mgCtx.fillRect(0, 0, mgWidth, mgHeight);
   
-  // Sun
   const sunGrad = mgCtx.createRadialGradient(mgWidth - 60, 60, 0, mgWidth - 60, 60, 80);
   sunGrad.addColorStop(0, '#ffdd88');
   sunGrad.addColorStop(0.5, '#ffaa44');
@@ -1502,14 +1377,12 @@ function drawMG() {
   mgCtx.fillStyle = sunGrad;
   mgCtx.fillRect(0, 0, mgWidth, mgHeight);
   
-  // Ground
   const groundGrad = mgCtx.createLinearGradient(0, mgHeight - 80, 0, mgHeight);
   groundGrad.addColorStop(0, '#5a3a1a');
   groundGrad.addColorStop(1, '#3a1a00');
   mgCtx.fillStyle = groundGrad;
   mgCtx.fillRect(0, mgHeight - 80, mgWidth, 80);
   
-  // Distant hills
   mgCtx.fillStyle = 'rgba(70,50,20,0.5)';
   mgCtx.beginPath();
   mgCtx.ellipse(120, mgHeight - 85, 150, 40, 0, 0, Math.PI * 2);
@@ -1518,48 +1391,39 @@ function drawMG() {
   mgCtx.ellipse(550, mgHeight - 90, 200, 45, 0, 0, Math.PI * 2);
   mgCtx.fill();
 
-  // ========== DAVID (DETAILED) ==========
   const d = mgDavid;
   
-  // Shadow
   mgCtx.fillStyle = 'rgba(0,0,0,0.3)';
   mgCtx.beginPath();
   mgCtx.ellipse(d.x + d.w / 2, d.y + d.h + 4, 20, 6, 0, 0, Math.PI * 2);
   mgCtx.fill();
   
-  // Robe
   mgCtx.fillStyle = '#8b6914';
   mgCtx.beginPath();
   mgCtx.roundRect(d.x + 5, d.y + 22, d.w - 10, d.h - 22, 4);
   mgCtx.fill();
   
-  // Belt
   mgCtx.fillStyle = '#a07820';
   mgCtx.fillRect(d.x + 5, d.y + 22, d.w - 10, 8);
   
-  // Arms
   mgCtx.fillStyle = '#c8a060';
   mgCtx.fillRect(d.x - 5, d.y + 24, 10, 20);
   mgCtx.fillRect(d.x + d.w - 5, d.y + 24, 10, 20);
   
-  // Head
   mgCtx.fillStyle = '#c8a060';
   mgCtx.beginPath();
   mgCtx.arc(d.x + d.w / 2, d.y + 12, 14, 0, Math.PI * 2);
   mgCtx.fill();
   
-  // Hair
   mgCtx.fillStyle = '#5a3010';
   mgCtx.beginPath();
   mgCtx.arc(d.x + d.w / 2, d.y + 6, 14, Math.PI, 2 * Math.PI);
   mgCtx.fill();
   
-  // Eyes (determined look)
   mgCtx.fillStyle = '#2a1800';
   mgCtx.fillRect(d.x + d.w / 2 - 6, d.y + 11, 4, 3);
   mgCtx.fillRect(d.x + d.w / 2 + 2, d.y + 11, 4, 3);
   
-  // Sling in hand (glows when charging)
   mgCtx.strokeStyle = mgChargeActive ? '#ffaa00' : '#8b6914';
   mgCtx.lineWidth = 2;
   mgCtx.beginPath();
@@ -1569,27 +1433,22 @@ function drawMG() {
   mgCtx.fillStyle = mgChargeActive ? '#ffaa00' : '#a07820';
   mgCtx.fillRect(d.x + d.w + 10, d.y + 21, 8, 6);
   
-  // Label
   mgCtx.fillStyle = 'rgba(255,220,100,0.9)';
   mgCtx.font = 'bold 11px "Cinzel", monospace';
   mgCtx.textAlign = 'center';
   mgCtx.fillText('DAVID', d.x + d.w / 2, d.y - 8);
 
-  // ========== GOLIATH (DETAILED) ==========
   const g = mgGoliath;
   
-  // Shadow
   mgCtx.fillStyle = 'rgba(0,0,0,0.4)';
   mgCtx.beginPath();
   mgCtx.ellipse(g.x + g.w / 2, g.y + g.h + 6, 32, 10, 0, 0, Math.PI * 2);
   mgCtx.fill();
   
-  // Legs
   mgCtx.fillStyle = '#4a3010';
   mgCtx.fillRect(g.x + 8, g.y + g.h - 20, 20, 20);
   mgCtx.fillRect(g.x + g.w - 28, g.y + g.h - 20, 20, 20);
   
-  // Body armour (color changes with rage)
   const bodyGrad = mgCtx.createLinearGradient(g.x, g.y + 25, g.x + g.w, g.y + 25);
   bodyGrad.addColorStop(0, '#8a7040');
   bodyGrad.addColorStop(0.5, g.rage ? '#d06020' : '#c0a050');
@@ -1599,7 +1458,6 @@ function drawMG() {
   mgCtx.roundRect(g.x + 4, g.y + 30, g.w - 8, g.h - 50, 6);
   mgCtx.fill();
   
-  // Armour scales
   mgCtx.strokeStyle = 'rgba(100,80,20,0.4)';
   mgCtx.lineWidth = 1;
   for (let row = 0; row < 4; row++) {
@@ -1610,12 +1468,10 @@ function drawMG() {
     }
   }
   
-  // Arms
   mgCtx.fillStyle = '#b09040';
   mgCtx.fillRect(g.x - 8, g.y + 30, 14, 36);
   mgCtx.fillRect(g.x + g.w - 6, g.y + 30, 14, 36);
   
-  // Helmet
   const helmGrad = mgCtx.createLinearGradient(g.x, g.y, g.x + g.w, g.y);
   helmGrad.addColorStop(0, '#8a7040');
   helmGrad.addColorStop(0.5, '#d0b060');
@@ -1626,11 +1482,9 @@ function drawMG() {
   mgCtx.fill();
   mgCtx.fillRect(g.x + 4, g.y + 16, g.w - 8, 18);
   
-  // Face
   mgCtx.fillStyle = '#c09060';
   mgCtx.fillRect(g.x + 12, g.y + 16, g.w - 24, 22);
   
-  // Eyes (change color based on state and rage)
   let eyeRed = 30;
   if (g.rage) eyeRed = 255;
   else if (g.state === 'TAUNTING') eyeRed = 200;
@@ -1645,14 +1499,12 @@ function drawMG() {
   mgCtx.ellipse(g.x + g.w / 2 + 10, g.y + 24, 5, 4, 0, 0, Math.PI * 2);
   mgCtx.fill();
   
-  // Forehead hit zone (glowing outline)
   mgCtx.strokeStyle = `rgba(255, 100, 0, ${0.3 + Math.sin(mgFrame * 0.1) * 0.2})`;
   mgCtx.lineWidth = 2;
   mgCtx.setLineDash([4, 4]);
   mgCtx.strokeRect(g.x + 10, g.y + 2, g.w - 20, 22);
   mgCtx.setLineDash([]);
   
-  // Hit marks on forehead
   for (let h = 0; h < mgHits; h++) {
     mgCtx.fillStyle = '#cc2200';
     mgCtx.beginPath();
@@ -1660,7 +1512,6 @@ function drawMG() {
     mgCtx.fill();
   }
   
-  // Spear
   mgCtx.fillStyle = '#8b6914';
   mgCtx.fillRect(g.x - 12, g.y + 25, 6, 80);
   mgCtx.fillStyle = '#c0c0c0';
@@ -1671,18 +1522,15 @@ function drawMG() {
   mgCtx.closePath();
   mgCtx.fill();
   
-  // Label
   mgCtx.fillStyle = g.rage ? 'rgba(255,80,80,0.9)' : 'rgba(255,100,80,0.9)';
   mgCtx.font = 'bold 11px "Cinzel", monospace';
   mgCtx.textAlign = 'center';
   mgCtx.fillText(g.rage ? '⚡ GOLIATH ⚡' : 'GOLIATH', g.x + g.w / 2, g.y - 10);
   
-  // Aim hint
   mgCtx.fillStyle = 'rgba(255,200,100,0.7)';
   mgCtx.font = '9px "Cinzel", monospace';
   mgCtx.fillText('▲ AIM HERE', g.x + g.w / 2, g.y + 1);
 
-  // ========== JAVELINS ==========
   for (let j of mgJavelins) {
     mgCtx.save();
     mgCtx.translate(j.x, j.y);
@@ -1699,7 +1547,6 @@ function drawMG() {
     mgCtx.restore();
   }
 
-  // ========== STONE WITH TRAIL ==========
   if (mgStone.active) {
     for (let i = 0; i < mgStone.trail.length; i++) {
       mgCtx.globalAlpha = 0.6 - i * 0.1;
@@ -1719,16 +1566,11 @@ function drawMG() {
     mgCtx.fill();
   }
 
-    // ========== TRAJECTORY PREVIEW — colour-coded dots ==========
-  // 🟢 Green = stone will hit forehead & not blocked
-  // 🔴 Red   = will hit forehead but shield blocks it
-  // ⚪ Gold  = will miss entirely
   if (mgChargeActive && !mgStone.active && mgPhase === 'play') {
     const g2 = mgGoliath;
     const power = 7 + Math.min(mgStone.charge, 60) * 0.15;
     const fx = g2.x + 8, fy = g2.y + 2, fw = g2.w - 16, fh = 22;
 
-    // Simulate arc to detect forehead hit and incoming angle
     let svx = Math.cos(mgAngle) * power, svy = Math.sin(mgAngle) * power;
     let sx = mgDavid.x + mgDavid.w - 5, sy = mgDavid.y + 30;
     let willHit = false, hitVy = svy;
@@ -1740,7 +1582,6 @@ function drawMG() {
       if (sx > mgWidth + 60 || sy > mgHeight + 60 || sy < -60) break;
     }
 
-    // Determine colour based on state + angle
     const isStraight = Math.abs(Math.atan2(hitVy, Math.cos(mgAngle) * power)) < 0.3;
     const st = g2.state;
     const canHit = willHit && (
@@ -1749,13 +1590,12 @@ function drawMG() {
     );
     const dotColor = willHit ? (canHit ? '#44ff88' : '#ff4444') : '#ffdd88';
 
-    // Draw dots — same physics as actual stone
     let vx = Math.cos(mgAngle) * power, vy = Math.sin(mgAngle) * power;
     let x = mgDavid.x + mgDavid.w - 5, y = mgDavid.y + 30;
     mgCtx.save();
     for (let i = 0; i < 70; i++) {
       vy += 0.3; x += vx; y += vy;
-      if (i % 2 === 0) { // every other step = dotted look
+      if (i % 2 === 0) {
         mgCtx.globalAlpha = Math.max(0.08, 0.75 - i * 0.012);
         mgCtx.fillStyle = dotColor;
         mgCtx.beginPath();
@@ -1764,7 +1604,6 @@ function drawMG() {
       }
       if (x > mgWidth + 60 || y > mgHeight + 60 || y < -60) break;
     }
-    // Landing circle
     mgCtx.globalAlpha = 0.45;
     mgCtx.strokeStyle = dotColor;
     mgCtx.lineWidth = 1.5;
@@ -1775,7 +1614,6 @@ function drawMG() {
     mgCtx.restore();
   }
 
-  // ========== CHARGE BAR ==========
   if (mgChargeActive && !mgStone.active) {
     let pct = (mgStone.charge || 0) / 60;
     mgCtx.fillStyle = `rgba(255, ${200 - Math.round(pct * 200)}, 0, 0.9)`;
@@ -1788,7 +1626,6 @@ function drawMG() {
     mgCtx.fillText(`⚡ ${Math.round(pct * 100)}%`, mgDavid.x + 25, mgDavid.y - 25);
   }
 
-  // ========== DODGE ROLL EFFECT ==========
   if (mgDodgeActive) {
     mgCtx.save();
     mgCtx.globalAlpha = 0.4 + Math.sin(mgFrame * 0.3) * 0.2;
@@ -1802,6 +1639,7 @@ function drawMG() {
 
   mgCtx.globalAlpha = 1;
 }
+
 function mgGameLoop(now) {
   if (!mgCanvas || !document.getElementById('s-minigame').classList.contains('active')) {
     if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
@@ -1816,7 +1654,6 @@ function mgGameLoop(now) {
   drawMG();
 }
 
-// Start the game
 setTimeout(() => { showScreen('s-title'); renderEpisodes(); checkCompleteBadge(); document.getElementById('username-inp').focus(); }, 2200);
 </script>
 </body>
