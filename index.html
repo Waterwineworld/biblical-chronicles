@@ -1071,7 +1071,7 @@ function showMGOverlay(type) {
 }
 
 function bindMGButtons() {
-  console.log("bindMGButtons called");
+  console.log("bindMGButtons called with touch-drag");
   
   const btnUp = document.getElementById('mgBtnUp');
   const btnDown = document.getElementById('mgBtnDown');
@@ -1083,71 +1083,168 @@ function bindMGButtons() {
   const dodgeBtn = document.getElementById('mgDodgeBtn');
   const quitBtn = document.getElementById('mgQuitBtn');
   
-  function setMoveFlag(flag, value) {
-    if (flag === 'left') mgMoveLeft = value;
-    if (flag === 'right') mgMoveRight = value;
-    if (flag === 'up') mgMoveUp = value;
-    if (flag === 'down') mgMoveDown = value;
-  }
+  // ========== TOUCH-DRAG (SLIDING FINGER) SUPPORT ==========
   
-  if (btnLeft) {
-    btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); setMoveFlag('left', true); });
-    btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); setMoveFlag('left', false); });
-    btnLeft.addEventListener('mousedown', () => setMoveFlag('left', true));
-    btnLeft.addEventListener('mouseup', () => setMoveFlag('left', false));
-  }
+  let currentActiveButton = null;
+  let currentFireActive = false;
   
-  if (btnRight) {
-    btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); setMoveFlag('right', true); });
-    btnRight.addEventListener('touchend', (e) => { e.preventDefault(); setMoveFlag('right', false); });
-    btnRight.addEventListener('mousedown', () => setMoveFlag('right', true));
-    btnRight.addEventListener('mouseup', () => setMoveFlag('right', false));
-  }
-  
-  if (btnUp) {
-    btnUp.addEventListener('touchstart', (e) => { e.preventDefault(); setMoveFlag('up', true); });
-    btnUp.addEventListener('touchend', (e) => { e.preventDefault(); setMoveFlag('up', false); });
-    btnUp.addEventListener('mousedown', () => setMoveFlag('up', true));
-    btnUp.addEventListener('mouseup', () => setMoveFlag('up', false));
-  }
-  
-  if (btnDown) {
-    btnDown.addEventListener('touchstart', (e) => { e.preventDefault(); setMoveFlag('down', true); });
-    btnDown.addEventListener('touchend', (e) => { e.preventDefault(); setMoveFlag('down', false); });
-    btnDown.addEventListener('mousedown', () => setMoveFlag('down', true));
-    btnDown.addEventListener('mouseup', () => setMoveFlag('down', false));
-  }
-  
-  if (anglePlus) {
-    anglePlus.addEventListener('touchstart', (e) => { e.preventDefault(); mgAngleAdjust = 1; });
-    anglePlus.addEventListener('touchend', (e) => { e.preventDefault(); mgAngleAdjust = 0; });
-    anglePlus.addEventListener('mousedown', () => { mgAngleAdjust = 1; });
-    anglePlus.addEventListener('mouseup', () => { mgAngleAdjust = 0; });
-  }
-  
-  if (angleMinus) {
-    angleMinus.addEventListener('touchstart', (e) => { e.preventDefault(); mgAngleAdjust = -1; });
-    angleMinus.addEventListener('touchend', (e) => { e.preventDefault(); mgAngleAdjust = 0; });
-    angleMinus.addEventListener('mousedown', () => { mgAngleAdjust = -1; });
-    angleMinus.addEventListener('mouseup', () => { mgAngleAdjust = 0; });
-  }
-  
-  if (fireBtn) {
-    fireBtn.addEventListener('touchstart', (e) => { e.preventDefault(); mgChargeActive = true; });
-    fireBtn.addEventListener('touchend', (e) => { e.preventDefault(); if (mgChargeActive && !mgStone.active) fireMGStone(); mgChargeActive = false; });
-    fireBtn.addEventListener('mousedown', () => { mgChargeActive = true; });
-    fireBtn.addEventListener('mouseup', () => { if (mgChargeActive && !mgStone.active) fireMGStone(); mgChargeActive = false; });
-  }
-  
-  if (dodgeBtn) {
-    dodgeBtn.addEventListener('click', () => {
+  function activateButton(button, type) {
+    if (currentActiveButton === button) return;
+    if (currentActiveButton) deactivateButton(currentActiveButton);
+    currentActiveButton = button;
+    
+    button.style.transform = 'scale(0.92)';
+    button.style.background = '#e8c96a';
+    if (button.classList.contains('fire-btn')) button.style.background = '#e05a4a';
+    if (button.classList.contains('dodge-btn')) button.style.background = '#4a9eff';
+    
+    if (type === 'up') { mgMoveUp = true; SoundFX.beep(1000, 0.05); }
+    if (type === 'down') { mgMoveDown = true; SoundFX.beep(300, 0.05); }
+    if (type === 'left') { mgMoveLeft = true; SoundFX.beep(500, 0.05); }
+    if (type === 'right') { mgMoveRight = true; SoundFX.beep(700, 0.05); }
+    if (type === 'angleUp') { mgAngleAdjust = 1; SoundFX.beep(650, 0.04); }
+    if (type === 'angleDown') { mgAngleAdjust = -1; SoundFX.beep(550, 0.04); }
+    if (type === 'dodge') {
       if (mgDodgeCooldown <= 0 && !mgDodgeActive && mgPhase === 'play') {
         mgDodgeActive = true;
-        if (SoundFX && SoundFX.beep) SoundFX.beep(550, 0.15);
+        SoundFX.beep(550, 0.15);
       }
-    });
+    }
   }
   
+  function deactivateButton(button) {
+    if (!button) return;
+    button.style.transform = '';
+    button.style.background = '';
+    if (button.classList.contains('fire-btn')) button.style.background = '';
+    if (button.classList.contains('dodge-btn')) button.style.background = '';
+    
+    if (button.id === 'mgBtnUp') mgMoveUp = false;
+    if (button.id === 'mgBtnDown') mgMoveDown = false;
+    if (button.id === 'mgBtnLeft') mgMoveLeft = false;
+    if (button.id === 'mgBtnRight') mgMoveRight = false;
+    if (button.id === 'mgAnglePlus' || button.id === 'mgAngleMinus') mgAngleAdjust = 0;
+  }
+  
+  function getButtonType(btn) {
+    if (btn.id === 'mgBtnUp') return 'up';
+    if (btn.id === 'mgBtnDown') return 'down';
+    if (btn.id === 'mgBtnLeft') return 'left';
+    if (btn.id === 'mgBtnRight') return 'right';
+    if (btn.id === 'mgAnglePlus') return 'angleUp';
+    if (btn.id === 'mgAngleMinus') return 'angleDown';
+    if (btn.id === 'mgDodgeBtn') return 'dodge';
+    return null;
+  }
+  
+  function handleTouchMove(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    const button = element?.closest('.mg-dpad button, .mg-angle-row button, .mg-dodge-btn');
+    
+    if (button && button !== currentActiveButton) {
+      const type = getButtonType(button);
+      if (type) activateButton(button, type);
+    } else if (!button && currentActiveButton) {
+      deactivateButton(currentActiveButton);
+      currentActiveButton = null;
+    }
+  }
+  
+  function handleTouchEnd(e) {
+    e.preventDefault();
+    if (currentActiveButton) {
+      deactivateButton(currentActiveButton);
+      currentActiveButton = null;
+    }
+    if (currentFireActive) {
+      if (mgChargeActive && !mgStone.active) fireMGStone();
+      mgChargeActive = false;
+      currentFireActive = false;
+      fireBtn.style.transform = '';
+      fireBtn.style.background = '';
+    }
+  }
+  
+  // Fire button handlers
+  function handleFireStart(e) {
+    e.preventDefault();
+    currentFireActive = true;
+    mgChargeActive = true;
+    fireBtn.style.transform = 'scale(0.94)';
+    fireBtn.style.background = '#e05a4a';
+  }
+  
+  function handleFireEnd(e) {
+    e.preventDefault();
+    if (currentFireActive) {
+      if (mgChargeActive && !mgStone.active) fireMGStone();
+      mgChargeActive = false;
+      currentFireActive = false;
+      fireBtn.style.transform = '';
+      fireBtn.style.background = '';
+    }
+  }
+  
+  // Slide buttons (D-pad, angle, dodge)
+  const dpadButtons = [btnUp, btnDown, btnLeft, btnRight];
+  const angleButtons = [anglePlus, angleMinus];
+  const allSlideButtons = [...dpadButtons, ...angleButtons, dodgeBtn];
+  
+  allSlideButtons.forEach(btn => {
+    if (!btn) return;
+    btn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const type = getButtonType(btn);
+      if (type) activateButton(btn, type);
+    });
+  });
+  
+  document.addEventListener('touchmove', handleTouchMove, { passive: false });
+  document.addEventListener('touchend', handleTouchEnd);
+  document.addEventListener('touchcancel', handleTouchEnd);
+  
+  // Mouse support (for desktop testing)
+  allSlideButtons.forEach(btn => {
+    if (!btn) return;
+    btn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      const type = getButtonType(btn);
+      if (type) activateButton(btn, type);
+    });
+  });
+  
+  document.addEventListener('mouseup', () => {
+    if (currentActiveButton) {
+      deactivateButton(currentActiveButton);
+      currentActiveButton = null;
+    }
+  });
+  
+  document.addEventListener('mousemove', (e) => {
+    if (e.buttons !== 1) return;
+    const element = document.elementFromPoint(e.clientX, e.clientY);
+    const button = element?.closest('.mg-dpad button, .mg-angle-row button, .mg-dodge-btn');
+    if (button && button !== currentActiveButton) {
+      const type = getButtonType(button);
+      if (type) activateButton(button, type);
+    } else if (!button && currentActiveButton) {
+      deactivateButton(currentActiveButton);
+      currentActiveButton = null;
+    }
+  });
+  
+  // Fire button events
+  if (fireBtn) {
+    fireBtn.addEventListener('touchstart', handleFireStart);
+    fireBtn.addEventListener('touchend', handleFireEnd);
+    fireBtn.addEventListener('touchcancel', handleFireEnd);
+    fireBtn.addEventListener('mousedown', handleFireStart);
+    fireBtn.addEventListener('mouseup', handleFireEnd);
+  }
+  
+  // Quit button
   if (quitBtn) {
     quitBtn.addEventListener('click', () => {
       if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
@@ -1156,7 +1253,7 @@ function bindMGButtons() {
     });
   }
   
-  // Keyboard support
+  // ========== KEYBOARD SUPPORT ==========
   let keyUp = false, keyDown = false, keyLeft = false, keyRight = false;
   let spacePressed = false;
   
