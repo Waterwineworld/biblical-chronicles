@@ -1147,6 +1147,7 @@ function showMGOverlay(type) {
       resetMG();
       mgPhase = 'play';
       updateMGUI();
+      // Cancel any existing loop before starting a new one
       if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
       mgLastTimestamp = 0;
       mgAnimationId = requestAnimationFrame(mgGameLoop);
@@ -1177,13 +1178,47 @@ function showMGOverlay(type) {
       }
       setTimeout(()=>{ov.remove();showScreen('s-leaderboard');loadLB('minigame');},1500);
     };
-    document.getElementById('mgRestartBtn').onclick = () => { ov.remove(); resetMG(); showMGOverlay('start'); };
-    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); if(isFullscreen())exitFullscreen(); setBodyScrollLock(false); showScreen('s-title'); };
+    document.getElementById('mgRestartBtn').onclick = () => {
+      ov.remove();
+      // CRITICAL: Cancel the existing game loop
+      if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
+      mgAnimationId = null;
+      // Reset game state
+      resetMG();
+      mgPhase = 'play';
+      // Show start overlay WITHOUT starting the game loop
+      showMGOverlay('start');
+    };
+    document.getElementById('mgMenuBtn').onclick = () => {
+      ov.remove();
+      if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
+      mgAnimationId = null;
+      if(isFullscreen()) exitFullscreen();
+      setBodyScrollLock(false);
+      showScreen('s-title');
+    };
   } else if (type === 'gameover') {
     ov.innerHTML = `<h2>💀 DEFEATED</h2><p>Score: ${mgScore}</p><button id="mgRestartBtn">Try Again</button><button id="mgMenuBtn">Back to Menu</button>`;
     document.body.appendChild(ov);
-    document.getElementById('mgRestartBtn').onclick = () => { ov.remove(); resetMG(); showMGOverlay('start'); };
-    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); if(isFullscreen())exitFullscreen(); setBodyScrollLock(false); showScreen('s-title'); };
+    document.getElementById('mgRestartBtn').onclick = () => {
+      ov.remove();
+      // CRITICAL: Cancel the existing game loop
+      if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
+      mgAnimationId = null;
+      // Reset game state
+      resetMG();
+      mgPhase = 'play';
+      // Show start overlay WITHOUT starting the game loop
+      showMGOverlay('start');
+    };
+    document.getElementById('mgMenuBtn').onclick = () => {
+      ov.remove();
+      if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
+      mgAnimationId = null;
+      if(isFullscreen()) exitFullscreen();
+      setBodyScrollLock(false);
+      showScreen('s-title');
+    };
   }
 }
 
