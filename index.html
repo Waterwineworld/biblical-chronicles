@@ -629,6 +629,28 @@ const FC={apiKey:"AIzaSyAN3uy58I9BEmjfcjt9LMSbUR6N81Y8sjs",authDomain:"bible-gam
 let db=null;
 try{firebase.initializeApp(FC);try{firebase.analytics();}catch(e){}db=firebase.firestore();console.log('✅ Firebase OK');}catch(e){console.warn('Firebase:',e.message);}
 
+// ========== FULLSCREEN SUPPORT ==========
+function requestFullscreen(element) {
+  const el = element || document.documentElement;
+  const requestMethod = el.requestFullscreen ||
+                        el.webkitRequestFullscreen ||
+                        el.msRequestFullscreen;
+  if (requestMethod) {
+    requestMethod.call(el);
+  }
+}
+function exitFullscreen() {
+  const exitMethod = document.exitFullscreen ||
+                     document.webkitExitFullscreen ||
+                     document.msExitFullscreen;
+  if (exitMethod) {
+    exitMethod.call(document);
+  }
+}
+function isFullscreen() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement);
+}
+
 // ── Get a player's existing best score for one episode ──
 async function fsGetPersonalBest(name,epId){
   if(!db)return null;
@@ -644,20 +666,16 @@ async function fsGetPersonalBest(name,epId){
 }
 
 // ── Option A: delete old record, write new one (only if higher) ──
-// Returns: 'new_best' | 'not_best' | 'first' | 'error'
 async function fsSavePersonalBest(name,score,epId,rank,correct,total,speedPts,streak){
-  if(!db)return'error';
+  if(!db)return {status:'error'};
   try{
     const existing=await fsGetPersonalBest(name,epId);
     if(existing&&existing.score>=score){
-      // New score doesn't beat old best — don't save
       return{status:'not_best',best:existing.score};
     }
-    // Delete old record if it exists (Option A — clean leaderboard)
     if(existing){
       await db.collection('bc_scores').doc(existing.id).delete();
     }
-    // Write new best
     await db.collection('bc_scores').add({
       name:name.slice(0,25),score,episodeId:epId,
       episodeTitle:EPS.find(e=>e.id===epId)?.title||epId,
@@ -672,9 +690,12 @@ async function fsSavePersonalBest(name,score,epId,rank,correct,total,speedPts,st
 async function fsGet(epId){
   if(!db)return[];
   try{
-    let q=db.collection('bc_scores').orderBy('score','desc').limit(25);
+    let q=db.collection('bc_scores');
     if(epId!=='all')q=q.where('episodeId','==',epId);
-    const s=await q.get();return s.docs.map(d=>({...d.data(),id:d.id}));
+    const s=await q.get();
+    let scores=s.docs.map(d=>({...d.data(),id:d.id}));
+    scores.sort((a,b)=>b.score-a.score);
+    return scores.slice(0,25);
   }catch(e){console.error(e);return[];}
 }
 
@@ -804,7 +825,6 @@ let completedEpisodes=new Set(JSON.parse(localStorage.getItem('bc_completed')||'
 // ═══════════════════════════════════════════════════════════════
 setTimeout(()=>{
   showScreen('s-title');renderEpisodes();checkCompleteBadge();
-  // Pre-fill saved username (returning player)
   const saved=localStorage.getItem('bc_username');
   const inp=document.getElementById('username-inp');
   if(saved&&saved.trim()){
@@ -827,7 +847,6 @@ function onNameType(){
   const g=document.getElementById('ugreet');
   g.className='ugreet';
   if(v.length>1){
-    // Check if returning player
     const saved=localStorage.getItem('bc_username');
     if(saved&&saved.toLowerCase()===v.toLowerCase()){
       g.textContent=`Welcome back, ${v}! 🙏 Your progress is remembered.`;
@@ -873,7 +892,7 @@ function startEp(id){
 function renderLives(){document.getElementById('liveswrap').innerHTML=[1,2,3].map(i=>`<span class="life ${i>G.lives?'lost':''}">🕯️</span>`).join('');}
 function setPhase(ph){G.phase=ph;const idx=['story','challenge','verdict'].indexOf(ph);['ph0','ph1','ph2'].forEach((id,i)=>{const el=document.getElementById(id);if(!el)return;el.className='pstep';if(i<idx)el.classList.add('done');else if(i===idx)el.classList.add('active');});}
 function confirmQuit(){const ov=document.createElement('div');ov.className='modal-ov';ov.innerHTML=`<div class="modal-bx"><div class="mttl">⚠️ Quit Episode?</div><div class="msub2">Your current progress will be lost.</div><div class="mrow"><button class="bgold" onclick="doQuit()">Yes, Quit</button><button class="bghost" onclick="this.closest('.modal-ov').remove()">Keep Playing</button></div></div>`;document.body.appendChild(ov);}
-function doQuit(){clearInterval(G.timer);clearTimeout(G.lineTimer);SoundFX.stopAmbient();document.querySelector('.modal-ov')?.remove();document.getElementById('atm').style.background='transparent';showScreen('s-title');}
+function doQuit(){clearInterval(G.timer);clearTimeout(G.lineTimer);SoundFX.stopAmbient();document.querySelector('.modal-ov')?.remove();document.getElementById('atm').style.background='transparent';if(isFullscreen())exitFullscreen();showScreen('s-title');}
 function renderScene(){const area=document.getElementById('game-area');if(!area){setTimeout(()=>renderScene(),80);return;}const sc=G.ep.scenes[G.scene];clearTimeout(G.lineTimer);G.lineIdx=0;const total=G.ep.scenes.length;const dots=G.ep.scenes.map((_,i)=>`<span class="sdot ${i<G.scene?'done':i===G.scene?'active':''}"></span>`).join('');area.innerHTML=`<div class="spanel"><div class="shdr"><span class="sico">${sc.icon}</span><div><div class="slbl">Scene ${G.scene+1} of ${total}</div><div class="snm">${sc.name}</div></div></div><div class="sbody"><div id="stlines"></div>${sc.scripture?`<div class="screv" id="screv"><div class="sclbl">📖 Scripture</div><div class="sctxt">"${sc.scripture.text}"</div><div class="scref">— ${sc.scripture.ref}</div></div>`:''}</div><div class="snav"><div class="sdots">${dots}</div><div style="display:flex;align-items:center;gap:12px;"><span class="sklnk" onclick="skipAll()">Skip</span><button class="bcont" id="btnnext" onclick="nextScene()" style="display:none;">${G.scene<total-1?'Next Scene →':'Begin Challenge →'}</button></div></div></div>`;revealLines(sc);}
 function revealLines(sc){const c=document.getElementById('stlines');if(!c)return;if(G.lineIdx>=sc.lines.length){const r=document.getElementById('screv');if(r)setTimeout(()=>r.classList.add('vis'),400);setTimeout(()=>{const b=document.getElementById('btnnext');if(b)b.style.display='inline-flex';},r?1400:500);return;}const l=sc.lines[G.lineIdx];const d=document.createElement('div');d.className=`stline ${l.t}`;d.textContent=l.text;c.appendChild(d);requestAnimationFrame(()=>setTimeout(()=>d.classList.add('vis'),30));G.lineIdx++;const delay=l.t==='dramatic'?1200:l.t==='whisper'?950:720;G.lineTimer=setTimeout(()=>revealLines(sc),delay);}
 function skipAll(){clearTimeout(G.lineTimer);const c=document.getElementById('stlines');if(!c)return;const sc=G.ep.scenes[G.scene];while(G.lineIdx<sc.lines.length){const l=sc.lines[G.lineIdx];if(!c.children[G.lineIdx]){const d=document.createElement('div');d.className=`stline ${l.t} vis`;d.textContent=l.text;c.appendChild(d);}G.lineIdx++;}const r=document.getElementById('screv');if(r)r.classList.add('vis');const b=document.getElementById('btnnext');if(b)b.style.display='inline-flex';}
@@ -898,7 +917,6 @@ function spawnConfetti(){const cols=['#ffd700','#c9a84c','#ff6b6b','#4ecdc4','#4
 const RANKS=[{min:0,name:'Novice',crown:'📖',cls:'novice',sub:'Keep reading — every scripture is a step forward.'},{min:40,name:'Scribe',crown:'✍️',cls:'scribe',sub:'You know the stories well. The Word is taking root.'},{min:70,name:'Prophet',crown:'🌟',cls:'prophet',sub:'Remarkable! The Spirit is teaching you.'},{min:90,name:'Apostle',crown:'👑',cls:'apostle',sub:'Extraordinary! You have hidden His Word in your heart.'}];
 const VVERSES=[{text:'"I have hidden your word in my heart that I might not sin against you."',ref:'Psalm 119:11'},{text:'"Your word is a lamp to my feet and a light to my path."',ref:'Psalm 119:105'},{text:'"Faith comes from hearing the message, and the message is heard through the word about Christ."',ref:'Romans 10:17'},{text:'"Do not merely listen to the word. Do what it says."',ref:'James 1:22'}];
 function showVerdict(){clearInterval(G.timer);SoundFX.stopAmbient();setPhase('verdict');const tot=G.ep.questions.length;const pct=tot>0?Math.round(G.correct/tot*100):0;const rank=RANKS.slice().reverse().find(r=>pct>=r.min)||RANKS[0];const v=VVERSES[Math.floor(Math.random()*VVERSES.length)];G.pendingSave={score:G.score,epId:G.ep.id,rank:rank.name,correct:G.correct,total:tot,speedPts:G.speedPts,streak:G.bestStreak};document.getElementById('vcrown').textContent=rank.crown;document.getElementById('vplayer').textContent='👤 '+getUsername();document.getElementById('vrank').textContent=rank.name;document.getElementById('vrank').className=`vrank ${rank.cls}`;document.getElementById('vsub').textContent=rank.sub;document.getElementById('vscore').textContent=G.score;document.getElementById('vcor').textContent=G.correct+'/'+tot;document.getElementById('vtot').textContent=pct+'%';document.getElementById('vspd').textContent=G.speedPts;document.getElementById('vstr').textContent=G.bestStreak;document.getElementById('vverse').innerHTML=`"${v.text}"<cite>— ${v.ref}</cite>`;completedEpisodes.add(G.ep.id);localStorage.setItem('bc_completed',JSON.stringify([...completedEpisodes]));if(pct>=90){spawn('✨',8);spawnConfetti();}else if(pct>=70)spawn('🌟',5);showScreen('s-verdict');
-  // Show battle button only for David & Goliath episode
   const battleWrap=document.getElementById('battle-btn-wrap');
   if(battleWrap)battleWrap.style.display=G.ep.id==='david-goliath'?'block':'none';
 }
@@ -913,7 +931,6 @@ async function autoSaveScore(btn){
   }
   G.saved=true;
   G.lastSavedScore={name:getUsername(),score:s.score};
-  // Persist username for next visit
   localStorage.setItem('bc_username',getUsername());
   if(result.status==='new_best'){
     btn.textContent='🏆 New Personal Best!';
@@ -924,11 +941,9 @@ async function autoSaveScore(btn){
     btn.textContent='✅ Score Saved!';
     spawn('✨',4);
   }else{
-    // not_best
     btn.textContent=`Your best is still ${result.best} 💪`;
     const sub=document.getElementById('vsub');
     if(sub)sub.textContent=`Your personal best is ${result.best}. Keep going — you can beat it!`;
-    // Still go to leaderboard so they can see their standing
     setTimeout(()=>{showScreen('s-leaderboard');loadLB('all');},2000);
     return;
   }
@@ -959,7 +974,7 @@ let mgHits = 0, mgLives = 3, mgScore = 0, mgCombo = 0, mgMaxCombo = 0;
 let mgPhase = 'play';
 let mgAngle = 0;
 let mgChargeActive = false;
-let mgDodgeActive = false, mgDodgeCooldown = 0;
+let mgDodgeActive = false, mgDodgeCooldown = 0, mgDodgeTimer = 0;
 let mgShake = 0;
 let mgFrame = 0;
 let mgBatchSize = 0, mgBatchCooldown = 0;
@@ -974,9 +989,7 @@ function setBodyScrollLock(lock) {
   }
 }
 
-// ========== CORRECTED startMiniGame FUNCTION ==========
 function startMiniGame() {
-  // Check if username exists
   if (!username || username.trim() === '') {
     const inp = document.getElementById('username-inp');
     const greet = document.getElementById('ugreet');
@@ -998,17 +1011,14 @@ function startMiniGame() {
   console.log("startMiniGame called");
   showScreen('s-minigame');
   
-  // Function to check orientation and show/hide warning
   function checkAndInit() {
     if (window.matchMedia("(orientation: portrait)").matches) {
-      // Portrait mode - show warning, hide game container
       const warning = document.getElementById('portraitWarning');
       if (warning) warning.style.display = 'flex';
       const container = document.querySelector('.minigame-container');
       if (container) container.style.display = 'none';
       return false;
     } else {
-      // Landscape mode - hide warning, show game container
       const warning = document.getElementById('portraitWarning');
       if (warning) warning.style.display = 'none';
       const container = document.querySelector('.minigame-container');
@@ -1017,12 +1027,9 @@ function startMiniGame() {
     }
   }
   
-  // Initial check - if portrait, don't initialize, just show warning and wait
   if (!checkAndInit()) {
-    // Listen for orientation change to initialize when rotated
     const orientationHandler = () => {
       if (checkAndInit()) {
-        // Now landscape - initialize the game
         initializeMiniGame();
         window.removeEventListener('orientationchange', orientationHandler);
         window.removeEventListener('resize', orientationHandler);
@@ -1030,15 +1037,14 @@ function startMiniGame() {
     };
     window.addEventListener('orientationchange', orientationHandler);
     window.addEventListener('resize', orientationHandler);
-    return; // Stop here - don't initialize yet
+    return;
   }
   
-  // If we get here, device is already in landscape - initialize normally
   initializeMiniGame();
 }
 
-// ========== NEW initializeMiniGame FUNCTION (OUTSIDE startMiniGame) ==========
 function initializeMiniGame() {
+  requestFullscreen();
   setBodyScrollLock(true);
   
   mgCanvas = document.getElementById('mgCanvas');
@@ -1080,20 +1086,13 @@ function initializeMiniGame() {
 }
 
 function resizeMGCanvas() {
-  // Check orientation and adjust if needed
-  if (window.matchMedia("(orientation: portrait)").matches) {
-    // Still resize but warning will be shown
-  }
-  
+  if (window.matchMedia("(orientation: portrait)").matches) {}
   mgWidth = window.innerWidth;
   mgHeight = window.innerHeight;
-  
   if (mgWidth < 100) mgWidth = 800;
   if (mgHeight < 100) mgHeight = 500;
-  
   mgCanvas.width = mgWidth;
   mgCanvas.height = mgHeight;
-  
   if (mgDavid) {
     mgDavid.x = Math.min(Math.max(mgDavid.x, 40), mgWidth - mgDavid.w - 40);
     mgDavid.y = Math.min(Math.max(mgDavid.y, 60), mgHeight - mgDavid.h - 60);
@@ -1114,7 +1113,7 @@ function resetMG() {
   mgPhase = 'play';
   mgAngle = 0;
   mgChargeActive = false;
-  mgDodgeActive = false; mgDodgeCooldown = 0;
+  mgDodgeActive = false; mgDodgeCooldown = 0; mgDodgeTimer = 0;
   mgShake = 0;
   mgFrame = 0;
   mgBatchSize = 0; mgBatchCooldown = 0;
@@ -1179,12 +1178,12 @@ function showMGOverlay(type) {
       setTimeout(()=>{ov.remove();showScreen('s-leaderboard');loadLB('minigame');},1500);
     };
     document.getElementById('mgRestartBtn').onclick = () => { ov.remove(); resetMG(); showMGOverlay('start'); };
-    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); setBodyScrollLock(false); showScreen('s-title'); };
+    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); if(isFullscreen())exitFullscreen(); setBodyScrollLock(false); showScreen('s-title'); };
   } else if (type === 'gameover') {
     ov.innerHTML = `<h2>💀 DEFEATED</h2><p>Score: ${mgScore}</p><button id="mgRestartBtn">Try Again</button><button id="mgMenuBtn">Back to Menu</button>`;
     document.body.appendChild(ov);
     document.getElementById('mgRestartBtn').onclick = () => { ov.remove(); resetMG(); showMGOverlay('start'); };
-    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); setBodyScrollLock(false); showScreen('s-title'); };
+    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); if(isFullscreen())exitFullscreen(); setBodyScrollLock(false); showScreen('s-title'); };
   }
 }
 
@@ -1200,8 +1199,6 @@ function bindMGButtons() {
   const fireBtn = document.getElementById('mgFireBtn');
   const dodgeBtn = document.getElementById('mgDodgeBtn');
   const quitBtn = document.getElementById('mgQuitBtn');
-  
-  // ========== TOUCH-DRAG (SLIDING FINGER) SUPPORT ==========
   
   let currentActiveButton = null;
   let currentFireActive = false;
@@ -1226,6 +1223,7 @@ function bindMGButtons() {
     if (type === 'dodge') {
       if (mgDodgeCooldown <= 0 && !mgDodgeActive && mgPhase === 'play') {
         mgDodgeActive = true;
+        mgDodgeTimer = 400;
         SoundFX.beep(550, 0.15);
       }
     }
@@ -1273,7 +1271,6 @@ function bindMGButtons() {
     const touch = e.touches[0];
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
     const button = element?.closest('.mg-dpad button, .mg-angle-row button, .mg-dodge-btn');
-    
     if (button && button !== currentActiveButton) {
       const type = getButtonType(button);
       if (type) activateButton(button, type);
@@ -1331,7 +1328,6 @@ function bindMGButtons() {
       e.preventDefault();
       endDrag(e);
     });
-    // Simple tap support
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       const type = getButtonType(btn);
@@ -1344,6 +1340,7 @@ function bindMGButtons() {
       if (type === 'dodge') {
         if (mgDodgeCooldown <= 0 && !mgDodgeActive && mgPhase === 'play') {
           mgDodgeActive = true;
+          mgDodgeTimer = 400;
           SoundFX.beep(550, 0.15);
         }
       }
@@ -1354,7 +1351,6 @@ function bindMGButtons() {
   document.addEventListener('touchend', endDrag);
   document.addEventListener('touchcancel', endDrag);
   
-  // Mouse support (for desktop)
   allSlideButtons.forEach(btn => {
     if (!btn) return;
     btn.addEventListener('mousedown', (e) => {
@@ -1384,7 +1380,6 @@ function bindMGButtons() {
     }
   });
   
-  // Fire button events
   if (fireBtn) {
     fireBtn.addEventListener('touchstart', handleFireStart);
     fireBtn.addEventListener('touchend', handleFireEnd);
@@ -1393,16 +1388,15 @@ function bindMGButtons() {
     fireBtn.addEventListener('mouseup', handleFireEnd);
   }
   
-  // Quit button
   if (quitBtn) {
     quitBtn.addEventListener('click', () => {
       if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
       setBodyScrollLock(false);
+      if (isFullscreen()) exitFullscreen();
       showScreen('s-title');
     });
   }
   
-  // ========== KEYBOARD SUPPORT ==========
   let keyUp = false, keyDown = false, keyLeft = false, keyRight = false;
   let spacePressed = false;
   
@@ -1466,7 +1460,6 @@ function updateMG(delta) {
   if (mgMoveUp) mgDavid.y = Math.max(60, mgDavid.y - mgDavid.speed);
   if (mgMoveDown) mgDavid.y = Math.min(mgHeight - mgDavid.h - 60, mgDavid.y + mgDavid.speed);
 
-  // ========== FIXED ANGLE ADJUSTMENT (WORKS ANYTIME, NOT JUST WHILE CHARGING) ==========
   let totalAngleAdjust = mgAngleAdjust;
   if (totalAngleAdjust !== 0) {
     mgAngle += totalAngleAdjust * 0.04;
@@ -1596,8 +1589,11 @@ function updateMG(delta) {
   }
 
   if (mgDodgeActive) {
-    mgDodgeActive = false;
-    mgDodgeCooldown = 2000;
+    mgDodgeTimer -= delta;
+    if (mgDodgeTimer <= 0) {
+      mgDodgeActive = false;
+      mgDodgeCooldown = 2000;
+    }
   }
   if (mgDodgeCooldown > 0) mgDodgeCooldown -= delta;
   if (mgDodgeCooldown < 0) mgDodgeCooldown = 0;
