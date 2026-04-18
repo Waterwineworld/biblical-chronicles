@@ -1466,8 +1466,9 @@ function updateMG(delta) {
   if (mgMoveUp) mgDavid.y = Math.max(60, mgDavid.y - mgDavid.speed);
   if (mgMoveDown) mgDavid.y = Math.min(mgHeight - mgDavid.h - 60, mgDavid.y + mgDavid.speed);
 
+  // ========== FIXED ANGLE ADJUSTMENT (WORKS ANYTIME, NOT JUST WHILE CHARGING) ==========
   let totalAngleAdjust = mgAngleAdjust;
-  if (mgChargeActive && totalAngleAdjust !== 0) {
+  if (totalAngleAdjust !== 0) {
     mgAngle += totalAngleAdjust * 0.04;
     mgAngle = Math.max(-0.9, Math.min(0.9, mgAngle));
     updateMGUI();
