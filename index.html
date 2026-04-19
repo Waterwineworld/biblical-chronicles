@@ -193,7 +193,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .lbbd{font-size:10px;color:var(--parch3);text-align:right;}
 .lbts{font-size:10px;color:rgba(184,168,128,.5);text-align:right;}
 
-/* ========== MINI-GAME (COD-STYLE TOUCH CONTROLS) ========== */
+/* ========== MINI-GAME STYLES ========== */
 #s-minigame {
   position: fixed;
   top: 0;
@@ -266,22 +266,207 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   pointer-events: none;
   z-index: 15;
 }
-/* Touch control hints overlay */
-.mg-control-hint {
+.mg-powerups {
   position: absolute;
-  bottom: 30px;
-  left: 0;
-  right: 0;
-  text-align: center;
+  top: 70px;
+  right: 10px;
+  display: flex;
+  gap: 6px;
+  background: #00000066;
+  border-radius: 20px;
+  padding: 4px 8px;
+  pointer-events: none;
+  font-size: 12px;
+}
+.mg-dodge-indicator {
+  position: absolute;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  background: #000000aa;
+  padding: 4px 12px;
+  border-radius: 20px;
   font-size: 12px;
   font-family: monospace;
-  color: rgba(255,255,200,0.5);
-  background: rgba(0,0,0,0.4);
-  padding: 4px;
+  color: #ccc;
   pointer-events: none;
-  z-index: 20;
+  white-space: nowrap;
 }
-/* Force landscape orientation */
+.mg-buttons {
+  position: absolute;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+  z-index: 30;
+}
+.mg-buttons > div { pointer-events: auto; }
+/* ── Analog Joystick (CoD-style) ── */
+.mg-joystick-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.mg-joystick-touch-area {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.35);
+  border: 1.5px solid rgba(255,215,0,0.2);
+  backdrop-filter: blur(8px);
+  touch-action: none;
+  overflow: visible;
+}
+/* Subtle ring guides */
+.mg-joystick-touch-area::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,215,0,0.1);
+  pointer-events: none;
+}
+.mg-joystick-base {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  border: 2px solid rgba(255,215,0,0.45);
+  box-shadow: 0 0 18px rgba(201,168,76,0.15), inset 0 0 20px rgba(0,0,0,0.5);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  transform: translate(-50%,-50%);
+}
+.mg-joystick-base.visible { opacity: 1; }
+.mg-joystick-knob {
+  position: absolute;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 35%, #f5e4a0, #c9a84c 60%, #8a6820);
+  border: 2.5px solid rgba(255,220,100,0.8);
+  box-shadow: 0 0 14px rgba(255,200,60,0.5), inset 0 2px 4px rgba(255,255,200,0.3);
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  pointer-events: none;
+  transition: transform 0.05s;
+}
+/* Direction arrows faintly etched into knob */
+.mg-joystick-knob::after {
+  content: '✛';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  font-size: 18px;
+  color: rgba(100,70,10,0.4);
+  pointer-events: none;
+}
+.mg-angle-row {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.mg-angle-row button {
+  background: #2a2a3acc;
+  border: 1px solid #e8c96a;
+  border-radius: 40px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffaa66;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.mg-angle-value {
+  background: #000000aa;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-family: monospace;
+  font-size: 14px;
+  color: #ffaa66;
+}
+.mg-right-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-end;
+}
+.mg-fire-btn {
+  width: 85px;
+  height: 85px;
+  background: #c0392b;
+  border-radius: 50%;
+  border: 3px solid #ffaa88;
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: 0 0 10px rgba(255,50,0,0.5);
+  transition: 0.05s linear;
+}
+.mg-fire-btn:active { transform: scale(0.94); background: #e05a4a; }
+.mg-dodge-btn {
+  background: #2c6e9e;
+  border: 2px solid #4af;
+  border-radius: 60px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  touch-action: manipulation;
+  text-align: center;
+  transition: 0.05s linear;
+}
+.mg-dodge-btn:active { transform: scale(0.96); background: #4a9eff; }
+/* OVERLAY - positioned on body with highest z-index to avoid clipping */
+.mg-full-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  font-family: monospace;
+  text-align: center;
+  color: #e8c96a;
+  gap: 20px;
+}
+.mg-full-overlay button {
+  background: #e8c96a;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 6px;
+  cursor: pointer;
+}
+
+/* Force landscape orientation for mini-game */
 @media (orientation: portrait) {
   .portrait-warning {
     display: flex;
@@ -290,6 +475,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
     display: none;
   }
 }
+
 .portrait-warning {
   display: none;
   position: fixed;
@@ -307,9 +493,18 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   font-family: 'Cinzel', serif;
   color: var(--gold2);
 }
-.portrait-warning span { font-size: 64px; margin-bottom: 20px; }
-.portrait-warning p { font-size: 18px; margin-bottom: 10px; }
-.portrait-warning small { font-size: 14px; color: var(--parch3); }
+.portrait-warning span {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+.portrait-warning p {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+.portrait-warning small {
+  font-size: 14px;
+  color: var(--parch3);
+}
 </style>
 </head>
 <body>
@@ -418,12 +613,12 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   <div class="brow"><button class="bgold" onclick="showScreen('s-title')">← Back</button></div>
 </div>
 
-<!-- MINI-GAME (COD-Style Touch: Left half = move, Right half = aim+release) -->
+<!-- MINI-GAME (Android Optimized with Touch-Drag) -->
 <div id="s-minigame" class="screen">
   <div class="portrait-warning" id="portraitWarning">
     <span>📱↻</span>
     <p>Please rotate your device</p>
-    <small>Landscape mode required</small>
+    <small>This game is best played in landscape mode</small>
   </div>
   <div class="minigame-container">
     <canvas id="mgCanvas" class="minigame-canvas"></canvas>
@@ -434,8 +629,27 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
         <button class="mg-quit-btn" id="mgQuitBtn">✕ Quit</button>
       </div>
       <div class="mg-state-badge" id="mgStateBadge">GUARDING</div>
+      <div class="mg-powerups" id="mgPowerups"></div>
+      <div class="mg-dodge-indicator" id="mgDodgeIndicator">Dodge Roll: Ready</div>
     </div>
-    <div class="mg-control-hint">👈 Left side: drag to move David &nbsp;&nbsp;|&nbsp;&nbsp; 👉 Right side: drag to aim → release to throw</div>
+    <div class="mg-buttons">
+      <div class="mg-joystick-zone">
+        <div class="mg-joystick-touch-area" id="mgJoystickArea">
+          <div class="mg-joystick-base" id="mgJoystickBase">
+            <div class="mg-joystick-knob" id="mgJoystickKnob"></div>
+          </div>
+        </div>
+        <div class="mg-angle-row">
+          <button id="mgAnglePlus">+Angle</button>
+          <button id="mgAngleMinus">-Angle</button>
+          <div class="mg-angle-value" id="mgAngleValue">0°</div>
+        </div>
+      </div>
+      <div class="mg-right-actions">
+        <div class="mg-fire-btn" id="mgFireBtn">🪨<span style="font-size:10px;">HOLD</span></div>
+        <div class="mg-dodge-btn" id="mgDodgeBtn">💨 DODGE</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -443,69 +657,1232 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-//  FIREBASE CONFIGURATION (unchanged)
+//  FIREBASE CONFIGURATION
 // ═══════════════════════════════════════════════════════════════
 const FC={apiKey:"AIzaSyAN3uy58I9BEmjfcjt9LMSbUR6N81Y8sjs",authDomain:"bible-games-92bd2.firebaseapp.com",projectId:"bible-games-92bd2",storageBucket:"bible-games-92bd2.firebasestorage.app",messagingSenderId:"116456102774",appId:"1:116456102774:web:075284078c3c511eb93857"};
 let db=null;
 try{firebase.initializeApp(FC);try{firebase.analytics();}catch(e){}db=firebase.firestore();console.log('✅ Firebase OK');}catch(e){console.warn('Firebase:',e.message);}
 
-function requestFullscreen(element){const el=element||document.documentElement;const rm=el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen;if(rm)rm.call(el);}
-function exitFullscreen(){const em=document.exitFullscreen||document.webkitExitFullscreen||document.msExitFullscreen;if(em)em.call(document);}
-function isFullscreen(){return !!(document.fullscreenElement||document.webkitFullscreenElement);}
+// ── Get a player's existing best score for one episode ──
+async function fsGetPersonalBest(name,epId){
+  if(!db)return null;
+  try{
+    const snap=await db.collection('bc_scores')
+      .where('episodeId','==',epId)
+      .where('name','==',name.slice(0,25))
+      .orderBy('score','desc').limit(1).get();
+    if(snap.empty)return null;
+    const doc=snap.docs[0];
+    return{id:doc.id,...doc.data()};
+  }catch(e){console.error(e);return null;}
+}
 
-async function fsGetPersonalBest(name,epId){if(!db)return null;try{const snap=await db.collection('bc_scores').where('episodeId','==',epId).where('name','==',name.slice(0,25)).orderBy('score','desc').limit(1).get();if(snap.empty)return null;return{id:snap.docs[0].id,...snap.docs[0].data()};}catch(e){return null;}}
-async function fsSavePersonalBest(name,score,epId,rank,correct,total,speedPts,streak){if(!db)return{status:'error'};try{const existing=await fsGetPersonalBest(name,epId);if(existing&&existing.score>=score)return{status:'not_best',best:existing.score};if(existing)await db.collection('bc_scores').doc(existing.id).delete();await db.collection('bc_scores').add({name:name.slice(0,25),score,episodeId:epId,episodeTitle:epId==='minigame'?'⚔️ Battle: David vs Goliath':epId,rank,correct,total,speedPts,streak,pct:total>0?Math.round(correct/total*100):0,ts:firebase.firestore.FieldValue.serverTimestamp()});return{status:existing?'new_best':'first',prev:existing?.score||0};}catch(e){return{status:'error'};}}
-async function fsGet(epId){if(!db)return[];try{let q=db.collection('bc_scores');if(epId!=='all')q=q.where('episodeId','==',epId);const s=await q.get();let scores=s.docs.map(d=>({...d.data(),id:d.id}));scores.sort((a,b)=>b.score-a.score);return scores.slice(0,25);}catch(e){return[];}}
+// ── Option A: delete old record, write new one (only if higher) ──
+// Returns: 'new_best' | 'not_best' | 'first' | 'error'
+async function fsSavePersonalBest(name,score,epId,rank,correct,total,speedPts,streak){
+  if(!db)return'error';
+  try{
+    const existing=await fsGetPersonalBest(name,epId);
+    if(existing&&existing.score>=score){
+      // New score doesn't beat old best — don't save
+      return{status:'not_best',best:existing.score};
+    }
+    // Delete old record if it exists (Option A — clean leaderboard)
+    if(existing){
+      await db.collection('bc_scores').doc(existing.id).delete();
+    }
+    // Write new best
+    await db.collection('bc_scores').add({
+      name:name.slice(0,25),score,episodeId:epId,
+      episodeTitle:EPS.find(e=>e.id===epId)?.title||epId,
+      rank,correct,total,speedPts,streak,
+      pct:total>0?Math.round(correct/total*100):0,
+      ts:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    return{status:existing?'new_best':'first',prev:existing?.score||0};
+  }catch(e){console.error(e);return{status:'error'};}
+}
 
-// SoundFX (unchanged, shortened for brevity)
-const SoundFX={ctx:null,enabled:true,init(){if(!this.ctx&&(window.AudioContext||window.webkitAudioContext))this.ctx=new(window.AudioContext||window.webkitAudioContext)();},beep(freq,duration=0.08,vol=0.12){if(!this.enabled||!this.ctx)return;try{const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.connect(g);g.connect(this.ctx.destination);o.frequency.value=freq;g.gain.setValueAtTime(vol,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.0001,this.ctx.currentTime+duration);o.start();o.stop(this.ctx.currentTime+duration);}catch(e){}},play(type){if(!this.enabled||!this.ctx)return;try{const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.connect(g);g.connect(this.ctx.destination);const t=this.ctx.currentTime;if(type==='correct'){o.frequency.setValueAtTime(523,t);o.frequency.setValueAtTime(659,t+.1);o.frequency.setValueAtTime(784,t+.2);g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);o.start(t);o.stop(t+.5);}else if(type==='throw'){o.frequency.value=700;g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.start(t);o.stop(t+.25);}else if(type==='hit'){o.frequency.setValueAtTime(500,t);o.frequency.exponentialRampToValueAtTime(200,t+.4);g.gain.setValueAtTime(.3,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);o.start(t);o.stop(t+.5);}else if(type==='hurt'){o.type='sawtooth';o.frequency.setValueAtTime(180,t);g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);o.start(t);o.stop(t+.5);}else if(type==='armoured'){o.type='square';o.frequency.value=150;g.gain.setValueAtTime(.1,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);o.start(t);o.stop(t+.3);}else if(type==='victory'){[523,659,784,659,784,1047].forEach((f,i)=>{const oo=this.ctx.createOscillator(),gg=this.ctx.createGain();oo.connect(gg);gg.connect(this.ctx.destination);oo.frequency.value=f;gg.gain.setValueAtTime(.2,t+i*.12);gg.gain.exponentialRampToValueAtTime(.001,t+i*.12+.25);oo.start(t+i*.12);oo.stop(t+i*.12+.3);});}}catch(e){}},startAmbient(){},stopAmbient(){},toggle(){this.enabled=!this.enabled;return this.enabled;}};
+async function fsGet(epId){
+  if(!db)return[];
+  try{
+    let q=db.collection('bc_scores').orderBy('score','desc').limit(25);
+    if(epId!=='all')q=q.where('episodeId','==',epId);
+    const s=await q.get();return s.docs.map(d=>({...d.data(),id:d.id}));
+  }catch(e){console.error(e);return[];}
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SOUND SYSTEM
+// ═══════════════════════════════════════════════════════════════
+const SoundFX={
+  ctx:null,enabled:true,ambientNode:null,ambientGain:null,
+  init(){if(!this.ctx&&(window.AudioContext||window.webkitAudioContext))this.ctx=new(window.AudioContext||window.webkitAudioContext)();},
+  beep(freq, duration=0.08, vol=0.12){
+    if(!this.enabled||!this.ctx)return;
+    try{
+      const o=this.ctx.createOscillator(),g=this.ctx.createGain();
+      o.connect(g);g.connect(this.ctx.destination);
+      o.frequency.value=freq;
+      g.gain.setValueAtTime(vol,this.ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001,this.ctx.currentTime+duration);
+      o.start();o.stop(this.ctx.currentTime+duration);
+    }catch(e){}
+  },
+  play(type){
+    if(!this.enabled||!this.ctx)return;
+    try{
+      const o=this.ctx.createOscillator(),g=this.ctx.createGain();
+      o.connect(g);g.connect(this.ctx.destination);
+      const t=this.ctx.currentTime;
+      switch(type){
+        case 'correct': o.frequency.setValueAtTime(523,t);o.frequency.setValueAtTime(659,t+.1);o.frequency.setValueAtTime(784,t+.2); g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.001,t+.5); o.start(t);o.stop(t+.5);break;
+        case 'wrong': o.type='sawtooth';o.frequency.setValueAtTime(220,t);o.frequency.exponentialRampToValueAtTime(110,t+.3); g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.35); o.start(t);o.stop(t+.35);break;
+        case 'streak': [523,659,784,1047].forEach((f,i)=>{const oo=this.ctx.createOscillator(),gg=this.ctx.createGain();oo.connect(gg);gg.connect(this.ctx.destination);oo.frequency.value=f;gg.gain.setValueAtTime(.15,t+i*.08);gg.gain.exponentialRampToValueAtTime(.001,t+i*.08+.2);oo.start(t+i*.08);oo.stop(t+i*.08+.2);});return;
+        case 'throw': o.frequency.value=700;g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.start(t);o.stop(t+.25);break;
+        case 'hit': o.frequency.setValueAtTime(500,t);o.frequency.exponentialRampToValueAtTime(200,t+.4);g.gain.setValueAtTime(.3,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);o.start(t);o.stop(t+.5);break;
+        case 'hurt': o.type='sawtooth';o.frequency.setValueAtTime(180,t);g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);o.start(t);o.stop(t+.5);break;
+        case 'powerup': o.frequency.setValueAtTime(880,t);o.frequency.setValueAtTime(1047,t+.1);o.frequency.setValueAtTime(1319,t+.2);g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.4);o.start(t);o.stop(t+.4);break;
+        case 'dodge': o.frequency.setValueAtTime(440,t);o.frequency.exponentialRampToValueAtTime(880,t+.15);g.gain.setValueAtTime(.1,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);o.start(t);o.stop(t+.2);break;
+        case 'victory': [523,659,784,659,784,1047].forEach((f,i)=>{const oo=this.ctx.createOscillator(),gg=this.ctx.createGain();oo.connect(gg);gg.connect(this.ctx.destination);oo.frequency.value=f;gg.gain.setValueAtTime(.2,t+i*.12);gg.gain.exponentialRampToValueAtTime(.001,t+i*.12+.25);oo.start(t+i*.12);oo.stop(t+i*.12+.3);});return;
+        case 'armoured': o.type='square';o.frequency.value=150;g.gain.setValueAtTime(.1,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);o.start(t);o.stop(t+.3);break;
+      }
+    }catch(e){}
+  },
+  startAmbient(type){
+    this.stopAmbient();
+    if(!this.enabled||!this.ctx)return;
+    try{
+      this.ambientGain=this.ctx.createGain();this.ambientGain.gain.value=0.04;this.ambientGain.connect(this.ctx.destination);
+      this.ambientNode=this.ctx.createOscillator();this.ambientNode.type='sine';
+      const freqs={battle:60,daniel:80,moses:55,'default':65};
+      this.ambientNode.frequency.value=freqs[type]||freqs.default;
+      this.ambientNode.connect(this.ambientGain);this.ambientNode.start();
+    }catch(e){}
+  },
+  stopAmbient(){try{if(this.ambientNode){this.ambientNode.stop();this.ambientNode=null;}if(this.ambientGain){this.ambientGain.disconnect();this.ambientGain=null;}}catch(e){}},
+  toggle(){this.enabled=!this.enabled;if(!this.enabled)this.stopAmbient();return this.enabled;}
+};
 function updateSoundBtn(){const btns=document.querySelectorAll('[onclick*="SoundFX.toggle"]');btns.forEach(b=>b.textContent=SoundFX.enabled?'🔊 Sound':'🔇 Sound');}
 
-// Episode Data (same as original, truncated for space - but keep full in final)
-const EPS=[{id:'david-goliath',icon:'🪨',num:'Episode I',title:'The Shepherd Who Slew a Giant',book:'1 Samuel 17',desc:'A boy, a sling, and the God of Israel.',difficulty:1,atmosphere:'rgba(20,8,0,0.5)',ambient:'battle',scenes:[{name:'The Valley of Fear',icon:'⚔️',lines:[{t:'story',text:'The valley is silent.'},{t:'story',text:'On one hill — the army of Israel.'},{t:'dramatic',text:'Because every single morning — a giant walks out.'}]},{name:'The Boy Arrives',icon:'🐑',scripture:{text:'"The Lord does not look at the outward appearance"',ref:'1 Samuel 16:7'},lines:[{t:'story',text:'Then one day — a teenage shepherd boy named David arrives.'}]},{name:'Five Smooth Stones',icon:'🌊',scripture:{text:'"I come against you in the name of the Lord Almighty."',ref:'1 Samuel 17:45'},lines:[{t:'story',text:'David picks up five smooth stones from a stream.'},{t:'dramatic',text:'He releases the stone. It strikes Goliath square in the forehead.'}]}],questions:[{type:'mcq',diff:1,q:'How many days did Goliath challenge Israel?',opts:['Seven','Twenty','Forty','Fourteen'],correct:2,explanation:'Forty days.',scripture:'1 Samuel 17:16'},{type:'mcq',diff:1,q:'Why did David come to the battlefield?',opts:['King Saul summoned him','His father sent food for his brothers','He ran from his sheep','God appeared'],correct:1,explanation:'He brought food for his brothers.',scripture:'1 Samuel 17:17'},{type:'mcq',diff:2,q:'How tall was Goliath?',opts:['Six cubits and a span','Four cubits','Seven cubits','Five cubits'],correct:0,explanation:'~9 feet tall',scripture:'1 Samuel 17:4'},{type:'mcq',diff:2,q:'What animals had David already killed?',opts:['Wolves and bears','Lions and bears','Lions and leopards','Bears and hyenas'],correct:1,explanation:'Lion and bear',scripture:'1 Samuel 17:36'},{type:'mcq',diff:2,q:'How many stones did David take?',opts:['One','Three','Five','Ten'],correct:2,explanation:'Five smooth stones',scripture:'1 Samuel 17:40'},{type:'mcq',diff:3,q:'Where exactly did the stone hit Goliath?',opts:['Chest','Throat','Forehead','Eye'],correct:2,explanation:'Forehead',scripture:'1 Samuel 17:49'},{type:'fill',diff:3,q:'Complete David\'s declaration: "I come against you in the name of ___"',hint:'The Lord Almighty',answer:'the lord almighty',acceptedAnswers:['the lord almighty','the lord of hosts','god','the lord'],explanation:'In the name of the Lord Almighty',scripture:'1 Samuel 17:45'},{type:'mcq',diff:3,q:'What did the Philistine army do when Goliath fell?',opts:['Surrendered','Fought harder','Turned and ran','Sent a second champion'],correct:2,explanation:'They fled.',scripture:'1 Samuel 17:51'}]},{id:'daniel-lions',icon:'🦁',num:'Episode II',title:'The Man Who Would Not Stop Praying',book:'Daniel 6',desc:'A law was passed to destroy him.',difficulty:2,atmosphere:'rgba(6,0,12,0.5)',ambient:'daniel',scenes:[],questions:[]},{id:'moses-exodus',icon:'🔥',num:'Episode III',title:'The Voice in the Burning Bush',book:'Exodus 3–4',desc:'A fugitive shepherd hears his name called.',difficulty:2,atmosphere:'rgba(16,8,0,0.5)',ambient:'moses',scenes:[],questions:[]}];
+// ═══════════════════════════════════════════════════════════════
+//  EPISODE DATA (3 episodes)
+// ═══════════════════════════════════════════════════════════════
+const EPS=[
+{id:'david-goliath',icon:'🪨',num:'Episode I',title:'The Shepherd Who Slew a Giant',book:'1 Samuel 17',desc:'A boy, a sling, and the God of Israel. One of the greatest upsets in human history.',difficulty:1,atmosphere:'rgba(20,8,0,0.5)',ambient:'battle',
+scenes:[
+{name:'The Valley of Fear',icon:'⚔️',lines:[{t:'story',text:'The valley is silent.'},{t:'story',text:'On one hill — the army of Israel. Forty thousand soldiers.'},{t:'story',text:'On the other hill — the Philistines. Fierce. Battle-hardened. Ready.'},{t:'story',text:'For forty days, both armies face each other. Nobody moves.'},{t:'dramatic',text:'Because every single morning — a giant walks out.'},{t:'story',text:'His name is Goliath. Nine feet tall. Bronze armour from head to toe.'},{t:'dramatic',text:'"Send me your best fighter!" he roars. "Winner takes everything!"'},{t:'whisper',text:'And every soldier in Israel\'s army... turns around and runs.'}]},
+{name:'The Boy Arrives',icon:'🐑',scripture:{text:'"The Lord does not look at the outward appearance, but the Lord looks at the heart."',ref:'1 Samuel 16:7'},lines:[{t:'story',text:'Then one day — a teenage shepherd boy named David arrives.'},{t:'dramatic',text:'He hears Goliath\'s voice — and something rises inside him.'},{t:'story',text:'"I have killed lions and bears protecting my father\'s sheep."'},{t:'dramatic',text:'"This Philistine will be the same — he has defied the living God!"'}]},
+{name:'Five Smooth Stones',icon:'🌊',scripture:{text:'"I come against you in the name of the Lord Almighty."',ref:'1 Samuel 17:45'},lines:[{t:'story',text:'David picks up five smooth stones from a stream.'},{t:'whisper',text:'And walks toward the giant.'},{t:'story',text:'"I come in the name of the Lord Almighty! Today the whole world will know there is a God in Israel!"'},{t:'story',text:'He releases the stone. It strikes Goliath square in the forehead.'},{t:'dramatic',text:'The giant falls. Face down. Dead.'},{t:'whisper',text:'And all of Israel roars.'}]}],
+questions:[
+{type:'mcq',diff:1,q:'How many days did Goliath challenge Israel?',hint:'The Bible gives the exact number.',opts:['Seven days','Twenty days','Forty days','Fourteen days'],correct:2,explanation:'Exactly forty days — morning and evening — Goliath taunted Israel. David arrived and changed everything.',scripture:'"For forty days the Philistine came forward every morning and evening." — 1 Samuel 17:16'},
+{type:'mcq',diff:1,q:'Why did David come to the battlefield?',hint:'He was not sent as a warrior.',opts:['King Saul summoned him','His father sent food for his brothers','He ran from his sheep','God appeared to him in a dream'],correct:1,explanation:'David\'s father Jesse sent him with bread and cheese for his brothers — not to fight.',scripture:'"Jesse said to David, \'Take this food to your brothers.\'" — 1 Samuel 17:17'},
+{type:'mcq',diff:2,q:'How tall was Goliath?',hint:'Taller than any modern basketball player.',opts:['Six cubits and a span (~9 feet)','Four cubits (~6 feet)','Seven cubits (~10.5 feet)','Five cubits (~7.5 feet)'],correct:0,explanation:'Goliath was "six cubits and a span" — approximately nine feet tall.',scripture:'"His height was six cubits and a span." — 1 Samuel 17:4'},
+{type:'mcq',diff:2,q:'What animals had David already killed?',hint:'He told King Saul about two specific animals.',opts:['Wolves and bears','Lions and bears','Lions and leopards','Bears and hyenas'],correct:1,explanation:'David killed both a lion and a bear while protecting his sheep.',scripture:'"Your servant has killed both the lion and the bear." — 1 Samuel 17:36'},
+{type:'mcq',diff:2,q:'How many stones did David take from the stream?',hint:'The Bible gives the exact number.',opts:['One','Three','Five','Ten'],correct:2,explanation:'David chose exactly five smooth stones. He only needed one.',scripture:'"He chose five smooth stones from the stream." — 1 Samuel 17:40'},
+{type:'mcq',diff:3,q:'Where exactly did the stone hit Goliath?',hint:'The Bible is very specific about this one spot.',opts:['In his chest','In his throat','In the forehead','In his eye'],correct:2,explanation:'The stone struck Goliath\'s forehead — his only exposed area.',scripture:'"The stone sank into his forehead, and he fell facedown." — 1 Samuel 17:49'},
+{type:'fill',diff:3,q:'Complete David\'s declaration: "I come against you in the name of ___"',hint:'Not a weapon — a name. (Using the hint costs 10 speed points)',answer:'the lord almighty',acceptedAnswers:['the lord almighty','the lord of hosts','god','the lord'],explanation:'David came in the NAME of the Lord Almighty — not with human weapons.',scripture:'"I come against you in the name of the Lord Almighty." — 1 Samuel 17:45'},
+{type:'mcq',diff:3,q:'What did the Philistine army do when Goliath fell?',hint:'Think about what losing your champion means.',opts:['Surrendered immediately','Fought harder','Turned and ran','Sent a second champion'],correct:2,explanation:'The entire Philistine army fled in panic when their champion fell.',scripture:'"When the Philistines saw their hero was dead, they turned and ran." — 1 Samuel 17:51'}]},
+{id:'daniel-lions',icon:'🦁',num:'Episode II',title:'The Man Who Would Not Stop Praying',book:'Daniel 6',desc:'A law was passed to destroy him. The lions were hungry. Daniel knelt anyway.',difficulty:2,atmosphere:'rgba(6,0,12,0.5)',ambient:'daniel',
+scenes:[
+{name:'The Plot',icon:'🐍',lines:[{t:'story',text:'Daniel is the most respected man in all of Babylon.'},{t:'dramatic',text:'That makes certain people very, very angry.'},{t:'story',text:'They search for something wrong with him. But they find nothing.'},{t:'dramatic',text:'So they attack the only thing they can — his faith.'},{t:'story',text:'"Issue a new law — thirty days, no prayer to any god but you, O King."'},{t:'whisper',text:'The trap is set.'}]},
+{name:'The Open Window',icon:'🙏',scripture:{text:'"Three times a day he got down on his knees and prayed, giving thanks to his God, just as he had done before."',ref:'Daniel 6:10'},lines:[{t:'story',text:'Daniel hears about the new law. He knows what it means.'},{t:'dramatic',text:'And then he does something extraordinary.'},{t:'story',text:'He goes home, opens the window facing Jerusalem.'},{t:'dramatic',text:'And he kneels. Three times a day. Exactly as always.'},{t:'whisper',text:'He does not even close the window.'}]},
+{name:'The Den',icon:'🦁',scripture:{text:'"My God sent his angel, and he shut the mouths of the lions."',ref:'Daniel 6:22'},lines:[{t:'dramatic',text:'Daniel is thrown into the lions\' den.'},{t:'story',text:'All night the king cannot eat, cannot sleep.'},{t:'dramatic',text:'At dawn he runs to the den. "Daniel! Has your God saved you?"'},{t:'dramatic',text:'"O King, live forever! My God shut the mouths of the lions."'},{t:'whisper',text:'Not a scratch. Because he had trusted in his God.'}]}],
+questions:[
+{type:'mcq',diff:1,q:'Why were the officials jealous of Daniel?',opts:['He had more wealth','The king planned to make him ruler over the whole empire','Daniel insulted them','He refused to cooperate'],correct:1,explanation:'Darius planned to set Daniel over the entire kingdom.',scripture:'"The king planned to set him over the whole kingdom." — Daniel 6:3'},
+{type:'mcq',diff:1,q:'How many days did the law ban prayer to other gods?',opts:['Seven','Fourteen','Twenty-one','Thirty'],correct:3,explanation:'The decree lasted thirty days.',scripture:'"Anyone who prays to any god during the next thirty days." — Daniel 6:7'},
+{type:'mcq',diff:2,q:'Which direction did Daniel\'s window face?',hint:'He always pointed himself toward the holy city.',opts:['Toward Babylon','Toward Persia','Toward Jerusalem','Toward Egypt'],correct:2,explanation:'Daniel\'s window faced Jerusalem — always orienting himself toward God.',scripture:'"His windows were open toward Jerusalem." — Daniel 6:10'},
+{type:'mcq',diff:2,q:'How many times each day did Daniel pray?',opts:['Once','Twice','Three times','Five times'],correct:2,explanation:'Daniel prayed three times a day — a habit no law could break.',scripture:'"Three times a day he got down on his knees and prayed." — Daniel 6:10'},
+{type:'mcq',diff:2,q:'What did Darius do the night Daniel was in the den?',hint:'He was deeply troubled by what he had allowed.',opts:['Celebrated','Slept soundly','Fasted and could not sleep','Wrote a new law'],correct:2,explanation:'Darius fasted all night, unable to sleep — tormented by what he had allowed.',scripture:'"He fasted and could not sleep." — Daniel 6:18'},
+{type:'mcq',diff:3,q:'How did Daniel explain why the lions did not hurt him?',opts:['Lions were not hungry','God sent an angel to shut the lions\' mouths','He prayed all night','Lions recognised his righteousness'],correct:1,explanation:'God sent His angel to shut the lions\' mouths.',scripture:'"My God sent his angel, and he shut the mouths of the lions." — Daniel 6:22'},
+{type:'fill',diff:3,q:'Daniel 6:23 — "no wound was found on him, because he had ___ in his God."',hint:'One powerful word explains everything. (Using the hint costs 10 speed points)',answer:'trusted',acceptedAnswers:['trusted','trust','believed','faith'],explanation:'Daniel was unharmed because he TRUSTED God.',scripture:'"No wound was found on him, because he had trusted in his God." — Daniel 6:23'},
+{type:'mcq',diff:3,q:'What did Darius do AFTER Daniel was rescued?',opts:['Made Daniel king','Issued a decree all must fear Daniel\'s God','Destroyed the den','Apologised privately'],correct:1,explanation:'Darius issued a royal decree across his empire to fear the God of Daniel.',scripture:'"All people must fear and reverence the God of Daniel." — Daniel 6:26'}]},
+{id:'moses-exodus',icon:'🔥',num:'Episode III',title:'The Voice in the Burning Bush',book:'Exodus 3–4',desc:'A fugitive shepherd hears his name called from a bush that refuses to burn up.',difficulty:2,atmosphere:'rgba(16,8,0,0.5)',ambient:'moses',
+scenes:[
+{name:'The Forgotten Man',icon:'🐚',lines:[{t:'story',text:'Millions of Israelites work as slaves in Egypt.'},{t:'story',text:'They cry out to God. And God hears every cry.'},{t:'dramatic',text:'Meanwhile — a man named Moses is quietly watching sheep.'},{t:'whisper',text:'He used to be royalty. That was forty years ago.'}]},
+{name:'The Fire That Would Not Die',icon:'🔥',scripture:{text:'"Moses saw that though the bush was on fire it did not burn up."',ref:'Exodus 3:2'},lines:[{t:'story',text:'A bush is on fire — but it is not burned up.'},{t:'dramatic',text:'And God calls his name. "Moses! Moses!"'},{t:'story',text:'"Take off your sandals — this ground is holy."'},{t:'dramatic',text:'Moses hides his face. He is afraid to look at God.'}]},
+{name:'The Impossible Call',icon:'⚡',scripture:{text:'"I AM WHO I AM. Tell them — I AM has sent you."',ref:'Exodus 3:14'},lines:[{t:'dramatic',text:'"I am sending YOU to Pharaoh — to bring my people out of Egypt."'},{t:'story',text:'"Who am I?" Moses asks. "I cannot speak well."'},{t:'story',text:'"Your brother Aaron will speak for you. I will teach you both."'},{t:'dramatic',text:'"Now go."'},{t:'whisper',text:'God had chosen Moses long before Moses knew his own name.'}]}],
+questions:[
+{type:'mcq',diff:1,q:'Where was Moses when he saw the burning bush?',opts:['In Egypt near the Nile','Near a mountain called Horeb','In a city','By the Red Sea'],correct:1,explanation:'Moses was at Horeb — the mountain of God.',scripture:'"He led the flock to Horeb, the mountain of God." — Exodus 3:1'},
+{type:'mcq',diff:1,q:'What was unusual about the burning bush?',opts:['It made a loud sound','It glowed many colours','It burned but was not consumed','It moved across the ground'],correct:2,explanation:'The bush burned without being consumed — that\'s what stopped Moses.',scripture:'"Though the bush was on fire it did not burn up." — Exodus 3:2'},
+{type:'mcq',diff:2,q:'What did God tell Moses to do before coming closer?',hint:'A physical sign of respect for holy ground.',opts:['Bow down','Remove his sandals','Cover his eyes','Bring an offering'],correct:1,explanation:'Remove his sandals — because the ground was holy.',scripture:'"Take off your sandals, for the place where you are standing is holy ground." — Exodus 3:5'},
+{type:'mcq',diff:2,q:'How long had Moses been in the wilderness?',hint:'He fled Egypt as a young man and was old when called.',opts:['Twenty years','Thirty years','Forty years','Ten years'],correct:2,explanation:'Moses fled Egypt at 40 and stood before Pharaoh at 80 — forty years in the wilderness.',scripture:'Acts 7:23 and 7:30 show forty years in Egypt then forty in Midian.'},
+{type:'mcq',diff:2,q:'What name did God reveal to Moses?',opts:['Lord of Hosts','The Almighty','I AM WHO I AM','God of Heaven'],correct:2,explanation:'"I AM WHO I AM" — YHWH — the eternal, self-existent God.',scripture:'"God said to Moses, \'I AM WHO I AM.\'" — Exodus 3:14'},
+{type:'mcq',diff:3,q:'What excuse did Moses give for not wanting to speak?',opts:['Too old','Did not know the way','Not eloquent — slow of speech','No authority'],correct:2,explanation:'Moses was "slow of speech and tongue" — God promised to be with his mouth.',scripture:'"I am slow of speech and tongue." — Exodus 4:10'},
+{type:'fill',diff:3,q:'God said: "I have heard their cry on account of their ___."',hint:'The cruel people forcing the Israelites to work. (Using the hint costs 10 speed points)',answer:'taskmasters',acceptedAnswers:['taskmasters','task masters','slave drivers','oppressors'],explanation:'God heard the cry "on account of their taskmasters."',scripture:'"I have heard their cry on account of their taskmasters." — Exodus 3:7 (ESV)'},
+{type:'mcq',diff:3,q:'Who would speak to Pharaoh on Moses\'s behalf?',opts:['Joshua','Caleb','Aaron','Miriam'],correct:2,explanation:'Aaron, Moses\'s brother, was appointed as his spokesman.',scripture:'"He will speak to the people for you." — Exodus 4:16'}]}
+];
 
+// ═══════════════════════════════════════════════════════════════
+//  MAIN GAME STATE (episodes)
+// ═══════════════════════════════════════════════════════════════
 let username='';
 let G={ep:null,scene:0,phase:'story',lives:3,score:0,qIdx:0,correct:0,timer:null,timeLeft:0,timeTotal:0,correctPts:0,speedPts:0,answered:false,lineIdx:0,lineTimer:null,pendingSave:null,saved:false,streak:0,bestStreak:0,hintUsed:false,lastSavedScore:null};
 let completedEpisodes=new Set(JSON.parse(localStorage.getItem('bc_completed')||'[]'));
 
-// Star canvas (unchanged)
-(function(){const c=document.getElementById('bg-canvas'),ctx=c.getContext('2d');let W,H,pts=[];function resize(){W=c.width=innerWidth;H=c.height=innerHeight;}resize();window.addEventListener('resize',resize);for(let i=0;i<90;i++)pts.push({x:Math.random(),y:Math.random(),r:Math.random()*1.5+.3,spd:Math.random()*.0003+.00008,op:Math.random()*.4+.1,ph:Math.random()*6.28});function draw(){ctx.clearRect(0,0,W,H);const g=ctx.createRadialGradient(W/2,H*.7,0,W/2,H*.7,H*.8);g.addColorStop(0,'rgba(25,10,5,0.25)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);pts.forEach(p=>{p.ph+=p.spd*60;ctx.beginPath();ctx.arc(p.x*W,p.y*H,p.r,0,6.28);ctx.fillStyle=`rgba(255,245,220,${p.op*(0.6+0.4*Math.sin(p.ph))})`;ctx.fill();});requestAnimationFrame(draw);}draw();})();
+// ═══════════════════════════════════════════════════════════════
+//  STAR CANVAS
+// ═══════════════════════════════════════════════════════════════
+(function(){
+  const c=document.getElementById('bg-canvas'),ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<90;i++)pts.push({x:Math.random(),y:Math.random(),r:Math.random()*1.5+.3,spd:Math.random()*.0003+.00008,op:Math.random()*.4+.1,ph:Math.random()*6.28});
+  function draw(){ctx.clearRect(0,0,W,H);const g=ctx.createRadialGradient(W/2,H*.7,0,W/2,H*.7,H*.8);g.addColorStop(0,'rgba(25,10,5,0.25)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);pts.forEach(p=>{p.ph+=p.spd*60;ctx.beginPath();ctx.arc(p.x*W,p.y*H,p.r,0,6.28);ctx.fillStyle=`rgba(255,245,220,${p.op*(0.6+0.4*Math.sin(p.ph))})`;ctx.fill();});requestAnimationFrame(draw);}
+  draw();
+})();
 
-setTimeout(()=>{showScreen('s-title');renderEpisodes();checkCompleteBadge();const saved=localStorage.getItem('bc_username');const inp=document.getElementById('username-inp');if(saved&&saved.trim()){inp.value=saved;username=saved;document.getElementById('ugreet').textContent=`Welcome back, ${saved}!`;}else inp.focus();},2200);
-function onNameType(){const v=document.getElementById('username-inp').value.trim();username=v;const g=document.getElementById('ugreet');g.className='ugreet';if(v.length>1)g.textContent=`Welcome, ${v}!`;else g.textContent='';}
+// ═══════════════════════════════════════════════════════════════
+//  LOADING SCREEN
+// ═══════════════════════════════════════════════════════════════
+setTimeout(()=>{
+  showScreen('s-title');renderEpisodes();checkCompleteBadge();
+  // Pre-fill saved username (returning player)
+  const saved=localStorage.getItem('bc_username');
+  const inp=document.getElementById('username-inp');
+  if(saved&&saved.trim()){
+    inp.value=saved;username=saved;
+    const g=document.getElementById('ugreet');
+    g.className='ugreet';
+    g.textContent=`Welcome back, ${saved}! 🙏 Your progress is remembered.`;
+  }else{
+    inp.focus();
+  }
+},2200);
+
+// ═══════════════════════════════════════════════════════════════
+//  USERNAME & EPISODE RENDERING
+// ═══════════════════════════════════════════════════════════════
+function onNameType(){
+  const v=document.getElementById('username-inp').value.trim();
+  username=v;
+  const greets=['Faithful servant','Seeker of truth','Child of the Word','Brave soul','Beloved pilgrim'];
+  const g=document.getElementById('ugreet');
+  g.className='ugreet';
+  if(v.length>1){
+    // Check if returning player
+    const saved=localStorage.getItem('bc_username');
+    if(saved&&saved.toLowerCase()===v.toLowerCase()){
+      g.textContent=`Welcome back, ${v}! 🙏 Your progress is remembered.`;
+    }else{
+      g.textContent=`Welcome, ${v}! ${greets[v.length%greets.length]}.`;
+    }
+  }else{
+    g.textContent='';
+  }
+}
 function getUsername(){return username.trim()||'Anonymous';}
-function renderEpisodes(){const grid=document.getElementById('ep-grid');let html=EPS.map(ep=>{const dots=[1,2,3].map(d=>`<span class="ddot ${d<=ep.difficulty?'lit':''}"></span>`).join('');const done=completedEpisodes.has(ep.id);return `<div class="ep-card ${done?'done-card':''}" onclick="startEp('${ep.id}')">${done?'<div class="ep-done-tag">✓ Done</div>':''}<span class="ep-ico">${ep.icon}</span><div class="ep-num">${ep.num}</div><div class="ep-ttl">${ep.title}</div><div class="ep-bk">${ep.book}</div><div class="ep-dsc">${ep.desc}</div><div class="ep-dif">${dots}</div></div>`;}).join('');html+=`<div class="ep-card special-card" onclick="startMiniGame()"><span class="ep-ico">⚔️</span><div class="special-badge">Mini-Game</div><div class="ep-ttl">David vs Goliath</div><div class="ep-bk">Full Control</div><div class="ep-dsc">Touch left to move, touch right to aim & release! COD-style sling battle.</div></div>`;grid.innerHTML=html;}
+function renderEpisodes(){
+  const grid=document.getElementById('ep-grid');
+  let html=EPS.map(ep=>{
+    const dots=[1,2,3].map(d=>`<span class="ddot ${d<=ep.difficulty?'lit':''}"></span>`).join('');
+    const done=completedEpisodes.has(ep.id);
+    return `<div class="ep-card ${done?'done-card':''}" onclick="startEp('${ep.id}')">${done?'<div class="ep-done-tag">✓ Done</div>':''}<span class="ep-ico">${ep.icon}</span><div class="ep-num">${ep.num}</div><div class="ep-ttl">${ep.title}</div><div class="ep-bk">${ep.book}</div><div class="ep-dsc">${ep.desc}</div><div class="ep-dif">${dots}<span style="color:var(--parch3);font-size:10px;margin-left:5px;">${['','Easy','Medium','Hard'][ep.difficulty]}</span></div></div>`;
+  }).join('');
+  html+=`<div class="ep-card special-card" onclick="startMiniGame()"><span class="ep-ico">⚔️</span><div class="special-badge">Mini-Game</div><div class="ep-ttl">David vs Goliath</div><div class="ep-bk">1 Samuel 17 · Full Control</div><div class="ep-dsc">Move David ANYWHERE, adjust launch ANGLE, charge power! True manual aiming. Stone flies with gravity.</div><div class="ep-dif"><span class="ddot lit"></span><span class="ddot lit"></span><span class="ddot lit"></span><span style="color:var(--ember);font-size:10px;margin-left:5px;">Skill</span></div></div>`;
+  grid.innerHTML=html;
+}
 function checkCompleteBadge(){if(EPS.every(ep=>completedEpisodes.has(ep.id)))document.getElementById('complete-badge').classList.add('show');}
-function startEp(id){/* full original logic but shortened for brevity - same as before */ alert("Episode system unchanged");}
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id)?.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
-function autoSaveScore(btn){alert("Save logic unchanged");}
-function loadLB(epId){/* unchanged */}
 
-// ========== MINI-GAME (COD-STYLE TOUCH CONTROLS - COMPLETE REWRITE) ==========
-let mgCanvas, mgCtx, mgWidth, mgHeight, mgAnimationId=null, mgLastTimestamp=0;
-let mgDavid={x:100,y:200,w:40,h:60,speed:6};
-let mgGoliath={x:600,y:200,w:70,h:110,speed:0.8,walkDir:1,rage:false,state:'GUARDING',stateTimer:5000};
-let mgStone={active:false,x:0,y:0,vx:0,vy:0,charge:0,trail:[]};
-let mgJavelins=[], mgHits=0, mgLives=3, mgScore=0, mgCombo=0, mgMaxCombo=0, mgPhase='play', mgShake=0, mgFrame=0;
-let mgMoveX=0, mgMoveY=0; // movement vector from left touch
-let mgAimActive=false, mgAimX=0, mgAimY=0, mgAimAngle=0, mgAimPower=0;
-let mgAimStartX=0, mgAimStartY=0;
-let mgBatchSize=0, mgBatchCooldown=0;
+// ═══════════════════════════════════════════════════════════════
+//  MAIN EPISODE LOGIC (unchanged)
+// ═══════════════════════════════════════════════════════════════
+function startEp(id){
+  if(!username.trim()){
+    const inp=document.getElementById('username-inp');const greet=document.getElementById('ugreet');
+    inp.classList.add('error');greet.className='ugreet err';greet.textContent='Please enter your name before starting!';inp.focus();
+    setTimeout(()=>{inp.classList.remove('error');greet.className='ugreet';if(!username.trim())greet.textContent='';},2000);
+    return;
+  }
+  const ep=EPS.find(e=>e.id===id);if(!ep)return;
+  SoundFX.init();SoundFX.startAmbient(ep.ambient||'default');
+  clearInterval(G.timer);clearTimeout(G.lineTimer);
+  G={ep,scene:0,phase:'story',lives:3,score:0,qIdx:0,correct:0,timer:null,timeLeft:0,timeTotal:0,correctPts:0,speedPts:0,answered:false,lineIdx:0,lineTimer:null,pendingSave:null,saved:false,streak:0,bestStreak:0,hintUsed:false,lastSavedScore:null};
+  document.getElementById('hep').textContent=ep.num;document.getElementById('httl').textContent=ep.title;
+  document.getElementById('huser').textContent='👤 '+getUsername();document.getElementById('sdisp').textContent='0';
+  document.getElementById('atm').style.background=ep.atmosphere;document.getElementById('streak-banner').className='streak-banner';
+  renderLives();setPhase('story');showScreen('s-game');setTimeout(()=>renderScene(),80);
+}
+function renderLives(){document.getElementById('liveswrap').innerHTML=[1,2,3].map(i=>`<span class="life ${i>G.lives?'lost':''}">🕯️</span>`).join('');}
+function setPhase(ph){G.phase=ph;const idx=['story','challenge','verdict'].indexOf(ph);['ph0','ph1','ph2'].forEach((id,i)=>{const el=document.getElementById(id);if(!el)return;el.className='pstep';if(i<idx)el.classList.add('done');else if(i===idx)el.classList.add('active');});}
+function confirmQuit(){const ov=document.createElement('div');ov.className='modal-ov';ov.innerHTML=`<div class="modal-bx"><div class="mttl">⚠️ Quit Episode?</div><div class="msub2">Your current progress will be lost.</div><div class="mrow"><button class="bgold" onclick="doQuit()">Yes, Quit</button><button class="bghost" onclick="this.closest('.modal-ov').remove()">Keep Playing</button></div></div>`;document.body.appendChild(ov);}
+function doQuit(){clearInterval(G.timer);clearTimeout(G.lineTimer);SoundFX.stopAmbient();document.querySelector('.modal-ov')?.remove();document.getElementById('atm').style.background='transparent';showScreen('s-title');}
+function renderScene(){const area=document.getElementById('game-area');if(!area){setTimeout(()=>renderScene(),80);return;}const sc=G.ep.scenes[G.scene];clearTimeout(G.lineTimer);G.lineIdx=0;const total=G.ep.scenes.length;const dots=G.ep.scenes.map((_,i)=>`<span class="sdot ${i<G.scene?'done':i===G.scene?'active':''}"></span>`).join('');area.innerHTML=`<div class="spanel"><div class="shdr"><span class="sico">${sc.icon}</span><div><div class="slbl">Scene ${G.scene+1} of ${total}</div><div class="snm">${sc.name}</div></div></div><div class="sbody"><div id="stlines"></div>${sc.scripture?`<div class="screv" id="screv"><div class="sclbl">📖 Scripture</div><div class="sctxt">"${sc.scripture.text}"</div><div class="scref">— ${sc.scripture.ref}</div></div>`:''}</div><div class="snav"><div class="sdots">${dots}</div><div style="display:flex;align-items:center;gap:12px;"><span class="sklnk" onclick="skipAll()">Skip</span><button class="bcont" id="btnnext" onclick="nextScene()" style="display:none;">${G.scene<total-1?'Next Scene →':'Begin Challenge →'}</button></div></div></div>`;revealLines(sc);}
+function revealLines(sc){const c=document.getElementById('stlines');if(!c)return;if(G.lineIdx>=sc.lines.length){const r=document.getElementById('screv');if(r)setTimeout(()=>r.classList.add('vis'),400);setTimeout(()=>{const b=document.getElementById('btnnext');if(b)b.style.display='inline-flex';},r?1400:500);return;}const l=sc.lines[G.lineIdx];const d=document.createElement('div');d.className=`stline ${l.t}`;d.textContent=l.text;c.appendChild(d);requestAnimationFrame(()=>setTimeout(()=>d.classList.add('vis'),30));G.lineIdx++;const delay=l.t==='dramatic'?1200:l.t==='whisper'?950:720;G.lineTimer=setTimeout(()=>revealLines(sc),delay);}
+function skipAll(){clearTimeout(G.lineTimer);const c=document.getElementById('stlines');if(!c)return;const sc=G.ep.scenes[G.scene];while(G.lineIdx<sc.lines.length){const l=sc.lines[G.lineIdx];if(!c.children[G.lineIdx]){const d=document.createElement('div');d.className=`stline ${l.t} vis`;d.textContent=l.text;c.appendChild(d);}G.lineIdx++;}const r=document.getElementById('screv');if(r)r.classList.add('vis');const b=document.getElementById('btnnext');if(b)b.style.display='inline-flex';}
+function nextScene(){clearTimeout(G.lineTimer);G.scene++;if(G.scene>=G.ep.scenes.length){setPhase('challenge');G.qIdx=0;renderChallenge();}else renderScene();}
+const TDIFF={1:30,2:22,3:18};
+function renderChallenge(){G.answered=false;G.hintUsed=false;const qs=G.ep.questions;if(G.qIdx>=qs.length){showVerdict();return;}const q=qs[G.qIdx];const area=document.getElementById('game-area');const t=TDIFF[q.diff]||25;G.timeTotal=t;G.timeLeft=t;const dl=['','⚔️ Easy','🔥 Medium','💀 Hard'][q.diff];const streakTxt=G.streak>=2?`🔥 ${G.streak} streak`:'';area.innerHTML=`<div class="qctr"><span>Question ${G.qIdx+1} of ${qs.length} · ${getUsername()}</span><span class="qstreak">${streakTxt}</span></div><div class="cpanel"><div class="chdr"><div class="ctype">${dl} · ${q.type==='fill'?'Complete the Verse':'Choose the Correct Answer'}</div><div class="cq">${q.q}</div>${q.hint?`<button class="chint-btn" onclick="revealHint(this)">💡 Show Hint</button><div class="chint-txt" id="chint-txt">${q.hint}</div>`:''}</div><div class="twrap"><div class="ttrack"><div class="tfill" id="tfill" style="width:100%"></div></div><div class="tnum" id="tnum">${t}s</div></div>${q.type==='mcq'?mkMCQ(q):mkFill()}<div class="afb" id="afb"></div></div>`;startTimer(q,t);if(q.type==='fill')setTimeout(()=>{const i=document.getElementById('finp');if(i)i.addEventListener('keydown',e=>{if(e.key==='Enter')doFill();});},100);}
+function revealHint(btn){if(G.hintUsed)return;G.hintUsed=true;G.speedPts=Math.max(0,G.speedPts-10);G.score=G.correctPts+G.speedPts;document.getElementById('sdisp').textContent=G.score;const txt=document.getElementById('chint-txt');if(txt)txt.classList.add('show');btn.textContent='💡 Hint (-10 speed pts)';btn.disabled=true;}
+function mkMCQ(q){return `<div class="owrap">${q.opts.map((o,i)=>`<button class="obtn" onclick="doMCQ(${i})"><span class="olet">${'ABCD'[i]}</span><span>${o}</span></button>`).join('')}</div>`;}
+function mkFill(){return `<div class="fwrap"><input class="finp" id="finp" placeholder="Type your answer..." autocomplete="off" spellcheck="false"><button class="bgold" onclick="doFill()">Submit</button></div>`;}
+function startTimer(q,sec){clearInterval(G.timer);G.timeLeft=sec;G.timer=setInterval(()=>{G.timeLeft--;const pct=Math.max(0,G.timeLeft/G.timeTotal*100);const f=document.getElementById('tfill'),n=document.getElementById('tnum');if(f){f.style.width=pct+'%';if(pct<30)f.classList.add('urg');}if(n)n.textContent=G.timeLeft+'s';if(G.timeLeft<=0){clearInterval(G.timer);timeUp(q);}},1000);}
+function timeUp(q){if(G.answered)return;G.answered=true;clearInterval(G.timer);G.streak=0;loseLife();disableAll(q);showFB(false,q,'⏰ Time\'s up!');}
+function doMCQ(idx){if(G.answered)return;G.answered=true;clearInterval(G.timer);const q=G.ep.questions[G.qIdx];const ok=idx===q.correct;const bs=document.querySelectorAll('.obtn');bs.forEach(b=>b.disabled=true);bs[idx].classList.add(ok?'correct':'wrong');if(!ok&&bs[q.correct])bs[q.correct].classList.add('correct');handle(ok,q);}
+function doFill(){if(G.answered)return;const i=document.getElementById('finp');if(!i)return;const v=i.value.trim().toLowerCase();if(!v)return;G.answered=true;clearInterval(G.timer);const q=G.ep.questions[G.qIdx];const ok=q.acceptedAnswers.some(a=>v.includes(a)||a.includes(v));i.disabled=true;i.classList.add(ok?'correct':'wrong');handle(ok,q);}
+function handle(ok,q){if(ok){SoundFX.play('correct');const cp=100,sp=Math.max(0,G.timeLeft*5);G.correctPts+=cp;G.speedPts+=sp;G.correct++;G.streak++;if(G.streak>G.bestStreak)G.bestStreak=G.streak;let streakBonus=0;if(G.streak%3===0){streakBonus=50;G.speedPts+=streakBonus;SoundFX.play('streak');const sb=document.getElementById('streak-banner');sb.className='streak-banner show';sb.textContent=`🔥 ${G.streak}-Answer Streak! +${streakBonus} Bonus Points!`;setTimeout(()=>sb.className='streak-banner',3000);spawn('🌟',5);}G.score=G.correctPts+G.speedPts;document.getElementById('sdisp').textContent=G.score;flash(true);spawn('✨',3);showFB(true,q,`+${cp} correct · +${sp} speed${streakBonus?` · +${streakBonus} streak bonus!`:''}`);}else{SoundFX.play('wrong');G.streak=0;loseLife();flash(false);showFB(false,q,'Not quite right.');}}
+function showFB(ok,q,extra){const fb=document.getElementById('afb');if(!fb)return;fb.className=`afb show ${ok?'cfb':'wfb'}`;const last=G.qIdx+1>=G.ep.questions.length;fb.innerHTML=`<div class="fbtl ${ok?'c':'w'}">${ok?'✅ Correct!':'❌ Wrong'} — ${extra}</div><div class="fbtxt">${q.explanation}</div><div class="fbsc">${q.scripture}</div><br><button class="bcont" onclick="nextQ()" style="margin-top:6px;">${last?'See Verdict →':'Next Question →'}</button>`;fb.scrollIntoView({behavior:'smooth',block:'nearest'});}
+function disableAll(q){document.querySelectorAll('.obtn,.finp').forEach(e=>e.disabled=true);const bs=document.querySelectorAll('.obtn');if(bs.length&&q)bs[q.correct]?.classList.add('correct');}
+function loseLife(){G.lives=Math.max(0,G.lives-1);renderLives();}
+function nextQ(){G.qIdx++;G.answered=false;if(G.lives<=0){showVerdict();return;}renderChallenge();}
+function flash(ok){const e=document.getElementById('ff');e.className=`ff ${ok?'cfl':'wfl'} show`;setTimeout(()=>e.classList.remove('show'),300);}
+function spawn(em,n){for(let i=0;i<n;i++)setTimeout(()=>{const p=document.createElement('div');p.className='particle';p.textContent=em;p.style.left=Math.random()*80+10+'%';p.style.top=Math.random()*50+20+'%';document.body.appendChild(p);setTimeout(()=>p.remove(),2000);},i*200);}
+function spawnConfetti(){const cols=['#ffd700','#c9a84c','#ff6b6b','#4ecdc4','#45b7d1','#96ceb4','#ffeaa7'];for(let i=0;i<80;i++){setTimeout(()=>{const p=document.createElement('div');p.className='confetti-piece';p.style.left=Math.random()*100+'%';p.style.top='-10px';p.style.background=cols[Math.floor(Math.random()*cols.length)];p.style.transform=`rotate(${Math.random()*360}deg)`;p.style.animationDuration=(2+Math.random()*3)+'s';p.style.animationDelay=(Math.random()*1)+'s';document.body.appendChild(p);setTimeout(()=>p.remove(),5000);},i*30);}}
+const RANKS=[{min:0,name:'Novice',crown:'📖',cls:'novice',sub:'Keep reading — every scripture is a step forward.'},{min:40,name:'Scribe',crown:'✍️',cls:'scribe',sub:'You know the stories well. The Word is taking root.'},{min:70,name:'Prophet',crown:'🌟',cls:'prophet',sub:'Remarkable! The Spirit is teaching you.'},{min:90,name:'Apostle',crown:'👑',cls:'apostle',sub:'Extraordinary! You have hidden His Word in your heart.'}];
+const VVERSES=[{text:'"I have hidden your word in my heart that I might not sin against you."',ref:'Psalm 119:11'},{text:'"Your word is a lamp to my feet and a light to my path."',ref:'Psalm 119:105'},{text:'"Faith comes from hearing the message, and the message is heard through the word about Christ."',ref:'Romans 10:17'},{text:'"Do not merely listen to the word. Do what it says."',ref:'James 1:22'}];
+function showVerdict(){clearInterval(G.timer);SoundFX.stopAmbient();setPhase('verdict');const tot=G.ep.questions.length;const pct=tot>0?Math.round(G.correct/tot*100):0;const rank=RANKS.slice().reverse().find(r=>pct>=r.min)||RANKS[0];const v=VVERSES[Math.floor(Math.random()*VVERSES.length)];G.pendingSave={score:G.score,epId:G.ep.id,rank:rank.name,correct:G.correct,total:tot,speedPts:G.speedPts,streak:G.bestStreak};document.getElementById('vcrown').textContent=rank.crown;document.getElementById('vplayer').textContent='👤 '+getUsername();document.getElementById('vrank').textContent=rank.name;document.getElementById('vrank').className=`vrank ${rank.cls}`;document.getElementById('vsub').textContent=rank.sub;document.getElementById('vscore').textContent=G.score;document.getElementById('vcor').textContent=G.correct+'/'+tot;document.getElementById('vtot').textContent=pct+'%';document.getElementById('vspd').textContent=G.speedPts;document.getElementById('vstr').textContent=G.bestStreak;document.getElementById('vverse').innerHTML=`"${v.text}"<cite>— ${v.ref}</cite>`;completedEpisodes.add(G.ep.id);localStorage.setItem('bc_completed',JSON.stringify([...completedEpisodes]));if(pct>=90){spawn('✨',8);spawnConfetti();}else if(pct>=70)spawn('🌟',5);showScreen('s-verdict');
+  // Show battle button only for David & Goliath episode
+  const battleWrap=document.getElementById('battle-btn-wrap');
+  if(battleWrap)battleWrap.style.display=G.ep.id==='david-goliath'?'block':'none';
+}
+async function autoSaveScore(btn){
+  if(G.saved){btn.textContent='✅ Already Saved';return;}
+  if(!G.pendingSave)return;
+  btn.textContent='Checking your best...';btn.disabled=true;
+  const s=G.pendingSave;
+  const result=await fsSavePersonalBest(getUsername(),s.score,s.epId,s.rank,s.correct,s.total,s.speedPts,s.streak);
+  if(result.status==='error'){
+    btn.textContent='❌ Failed — retry';btn.disabled=false;return;
+  }
+  G.saved=true;
+  G.lastSavedScore={name:getUsername(),score:s.score};
+  // Persist username for next visit
+  localStorage.setItem('bc_username',getUsername());
+  if(result.status==='new_best'){
+    btn.textContent='🏆 New Personal Best!';
+    spawn('🌟',6);spawnConfetti();
+    const sub=document.getElementById('vsub');
+    if(sub)sub.textContent=`🎉 New personal best! You beat your previous score of ${result.prev}!`;
+  }else if(result.status==='first'){
+    btn.textContent='✅ Score Saved!';
+    spawn('✨',4);
+  }else{
+    // not_best
+    btn.textContent=`Your best is still ${result.best} 💪`;
+    const sub=document.getElementById('vsub');
+    if(sub)sub.textContent=`Your personal best is ${result.best}. Keep going — you can beat it!`;
+    // Still go to leaderboard so they can see their standing
+    setTimeout(()=>{showScreen('s-leaderboard');loadLB('all');},2000);
+    return;
+  }
+  setTimeout(()=>{showScreen('s-leaderboard');loadLB('all');},1500);
+}
+function replay(){if(G.ep)startEp(G.ep.id);}
+function setTab(el){document.querySelectorAll('.lbtab').forEach(t=>t.classList.remove('act'));el.classList.add('act');}
+function formatTs(ts){if(!ts||!ts.seconds)return'';const d=new Date(ts.seconds*1000),now=new Date();const diffDays=Math.floor((now-d)/(1000*60*60*24));if(diffDays===0)return'Today';if(diffDays===1)return'Yesterday';if(diffDays<7)return`${diffDays}d ago`;return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});}
+async function loadLB(epId){const list=document.getElementById('lblist');if(!list)return;list.innerHTML='<div class="lbload">📜 Loading Hall of Prophets...</div>';if(!db){list.innerHTML='<div class="lbload">Firebase not connected.</div>';return;}const scores=await fsGet(epId);if(!scores.length){list.innerHTML='<div class="lbload">No scores yet — be the first!</div>';return;}const medals=['🥇','🥈','🥉'];const myName=getUsername().toLowerCase();const myScore=G.lastSavedScore?.score||null;list.innerHTML=scores.map((s,i)=>{const isMe=s.name?.toLowerCase()===myName&&(myScore===null||s.score===myScore);const rn=i<3?`<span class="lbrn t${i+1}">${medals[i]}</span>`:`<span class="lbrn">${i+1}</span>`;return `<div class="lbrow ${isMe?'my-score':''}">${rn}<div class="lbinfo"><div class="lbname">${esc(s.name)}${isMe?' ⭐ You':''}</div><div class="lbep">${esc(s.episodeTitle||s.episodeId)}</div></div><div><div class="lbsc">⭐ ${s.score}</div><div class="lbbd">${esc(s.rank)} · ${s.correct}/${s.total}</div><div class="lbts">${formatTs(s.ts)}</div></div></div>`;}).join('');}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
 
-function setBodyScrollLock(lock){if(lock)document.body.classList.add('mg-active');else document.body.classList.remove('mg-active');}
-function startMiniGame(){if(!username.trim()){alert("Please enter your name first!");showScreen('s-title');return;}showScreen('s-minigame');if(window.matchMedia("(orientation: portrait)").matches){document.getElementById('portraitWarning').style.display='flex';document.querySelector('.minigame-container').style.display='none';return;}document.getElementById('portraitWarning').style.display='none';document.querySelector('.minigame-container').style.display='block';initializeMiniGame();}
-function initializeMiniGame(){requestFullscreen();setBodyScrollLock(true);mgCanvas=document.getElementById('mgCanvas');mgWidth=window.innerWidth;mgHeight=window.innerHeight;mgCanvas.width=mgWidth;mgCanvas.height=mgHeight;mgCtx=mgCanvas.getContext('2d');resetMG();bindTouchControls();window.addEventListener('resize',()=>{mgWidth=window.innerWidth;mgHeight=window.innerHeight;mgCanvas.width=mgWidth;mgCanvas.height=mgHeight;mgDavid.x=Math.min(Math.max(mgDavid.x,40),mgWidth-mgDavid.w-40);mgDavid.y=Math.min(Math.max(mgDavid.y,60),mgHeight-mgDavid.h-60);mgGoliath.x=Math.min(mgWidth-100,Math.max(100,mgGoliath.x));mgGoliath.y=mgHeight-180;});window.addEventListener('orientationchange',()=>setTimeout(()=>{mgWidth=window.innerWidth;mgHeight=window.innerHeight;mgCanvas.width=mgWidth;mgCanvas.height=mgHeight;},100));mgAnimationId=requestAnimationFrame(mgGameLoop);}
-function resetMG(){mgDavid={x:100,y:mgHeight/2,w:40,h:60,speed:6};mgGoliath={x:Math.min(mgWidth-120,600),y:mgHeight-180,w:70,h:110,speed:0.8,walkDir:1,rage:false,state:'GUARDING',stateTimer:5000};mgStone={active:false,x:0,y:0,vx:0,vy:0,charge:0,trail:[]};mgJavelins=[];mgHits=0;mgLives=3;mgScore=0;mgCombo=0;mgMaxCombo=0;mgPhase='play';mgShake=0;mgMoveX=0;mgMoveY=0;mgAimActive=false;mgBatchSize=0;mgBatchCooldown=0;updateMGUI();}
-function updateMGUI(){document.getElementById('mgLives').innerHTML='❤️'.repeat(mgLives)+'🖤'.repeat(3-mgLives);document.getElementById('mgScore').innerText=mgScore;document.getElementById('mgStateBadge').innerText=mgGoliath.state;}
-function bindTouchControls(){const container=document.querySelector('.minigame-container');if(!container)return;const onTouchMove=(e)=>{e.preventDefault();const rect=container.getBoundingClientRect();for(let i=0;i<e.touches.length;i++){const touch=e.touches[i];const x=touch.clientX-rect.left;const y=touch.clientY-rect.top;if(x<mgWidth/2){// left half: movement
-            const centerX=mgDavid.x+mgDavid.w/2, centerY=mgDavid.y+mgDavid.h/2;
-            let dx=x-centerX, dy=y-centerY;let len=Math.hypot(dx,dy);if(len>1){mgMoveX=dx/len;mgMoveY=dy/len;let speed=Math.min(1,len/60);mgDavid.x+=mgMoveX*mgDavid.speed*speed;mgDavid.y+=mgMoveY*mgDavid.speed*speed;}else{mgMoveX=0;mgMoveY=0;}}else{// right half: aim
-            mgAimActive=true;mgAimX=x;mgAimY=y;let startX=mgDavid.x+mgDavid.w-5, startY=mgDavid.y+30;let dx=x-startX, dy=y-startY;mgAimAngle=Math.atan2(dy,dx);let dist=Math.hypot(dx,dy);mgAimPower=Math.min(1.2,dist/200);mgStone.charge=Math.min(60,mgAimPower*60);}}};const onTouchEnd=(e)=>{if(mgAimActive&&!mgStone.active&&mgPhase==='play'){fireMGStone();}mgAimActive=false;mgMoveX=0;mgMoveY=0;mgStone.charge=0;};container.addEventListener('touchstart',(e)=>{e.preventDefault();const rect=container.getBoundingClientRect();const touch=e.touches[0];const x=touch.clientX-rect.left;if(x>=mgWidth/2){mgAimStartX=x;mgAimStartY=touch.clientY-rect.top;mgAimActive=true;}else{mgMoveX=0;mgMoveY=0;}});container.addEventListener('touchmove',onTouchMove,{passive:false});container.addEventListener('touchend',onTouchEnd);container.addEventListener('touchcancel',onTouchEnd);document.getElementById('mgQuitBtn').addEventListener('click',()=>{if(mgAnimationId)cancelAnimationFrame(mgAnimationId);setBodyScrollLock(false);if(isFullscreen())exitFullscreen();showScreen('s-title');});}
-function fireMGStone(){if(mgStone.active||mgPhase!=='play')return;let power=5+mgStone.charge*0.15;mgStone.active=true;mgStone.x=mgDavid.x+mgDavid.w-5;mgStone.y=mgDavid.y+30;mgStone.vx=Math.cos(mgAimAngle)*power;mgStone.vy=Math.sin(mgAimAngle)*power;mgStone.charge=0;SoundFX.play('throw');}
-function updateMG(delta){if(mgPhase!=='play')return;if(mgMoveX!==0||mgMoveY!==0){mgDavid.x+=mgMoveX*mgDavid.speed;mgDavid.y+=mgMoveY*mgDavid.speed;}mgDavid.x=Math.min(Math.max(mgDavid.x,40),mgWidth-mgDavid.w-40);mgDavid.y=Math.min(Math.max(mgDavid.y,60),mgHeight-mgDavid.h-60);if(mgGoliath.stateTimer>0)mgGoliath.stateTimer-=delta;else{mgGoliath.state=Math.random()<0.33?'TAUNTING':Math.random()<0.5?'WINDING_UP':'GUARDING';mgGoliath.stateTimer=mgGoliath.state==='TAUNTING'?2500:mgGoliath.state==='WINDING_UP'?1800:4000;updateMGUI();}mgGoliath.x+=mgGoliath.walkDir*mgGoliath.speed;if(mgGoliath.x<mgWidth-250)mgGoliath.walkDir=1;if(mgGoliath.x>mgWidth-100)mgGoliath.walkDir=-1;mgGoliath.y=mgHeight-180;if(mgBatchCooldown>0)mgBatchCooldown-=delta;else if(mgBatchSize<=0){mgBatchSize=mgGoliath.rage?4:Math.floor(Math.random()*3)+2;mgBatchCooldown=200;}else if(mgBatchCooldown<=0){let startX=mgGoliath.x-10,startY=mgGoliath.y+45;let targetX=mgDavid.x+mgDavid.w/2,targetY=mgDavid.y+mgDavid.h/2;let dx=targetX-startX,dy=targetY-startY,dist=Math.hypot(dx,dy);let spd=4+(mgGoliath.rage?1:0);mgJavelins.push({x:startX,y:startY,vx:(dx/dist)*spd,vy:(dy/dist)*spd});mgBatchSize--;mgBatchCooldown=250;if(mgBatchSize===0)mgBatchCooldown=1800;}for(let i=0;i<mgJavelins.length;i++){let j=mgJavelins[i];j.x+=j.vx;j.y+=j.vy;if(j.x>mgDavid.x&&j.x<mgDavid.x+mgDavid.w&&j.y>mgDavid.y&&j.y<mgDavid.y+mgDavid.h){mgLives--;mgCombo=0;updateMGUI();mgShake=10;SoundFX.play('hurt');mgJavelins.splice(i,1);i--;if(mgLives<=0){mgPhase='gameover';showMGOverlay('gameover');}}else if(j.x>mgWidth+100||j.x<-100||j.y>mgHeight+100||j.y<-100){mgJavelins.splice(i,1);i--;}}if(mgStone.active){mgStone.x+=mgStone.vx;mgStone.vy+=0.3;mgStone.y+=mgStone.vy;mgStone.trail.unshift({x:mgStone.x,y:mgStone.y});if(mgStone.trail.length>6)mgStone.trail.pop();let fx=mgGoliath.x+8,fy=mgGoliath.y+2,fw=mgGoliath.w-16,fh=22;if(mgStone.x>fx&&mgStone.x<fx+fw&&mgStone.y>fy&&mgStone.y<fy+fh){let isStraight=Math.abs(Math.atan2(mgStone.vy,mgStone.vx))<0.3;let canHit=(mgGoliath.state==='TAUNTING'||mgGoliath.state==='WINDING_UP'||mgGoliath.state==='STUNNED')||((mgGoliath.state==='GUARDING'||mgGoliath.state==='RAGE')&&!isStraight);if(canHit){let pts=150+Math.floor(mgStone.charge*5);mgScore+=pts;mgCombo++;if(mgCombo>mgMaxCombo)mgMaxCombo=mgCombo;mgHits++;SoundFX.play('hit');mgShake=12;mgStone.active=false;mgStone.trail=[];updateMGUI();if(mgHits>=3){mgPhase='victory';showMGOverlay('victory');}else{mgGoliath.state='STUNNED';mgGoliath.stateTimer=1500;if(mgHits===2)mgGoliath.rage=true;}}else{SoundFX.play('armoured');mgStone.active=false;mgStone.trail=[];mgCombo=Math.max(0,mgCombo-1);updateMGUI();}return;}let bx=mgGoliath.x+4,by=mgGoliath.y+30,bw=mgGoliath.w-8,bh=mgGoliath.h-50;if(mgStone.x>bx&&mgStone.x<bx+bw&&mgStone.y>by&&mgStone.y<by+bh){SoundFX.play('armoured');mgStone.active=false;mgStone.trail=[];mgCombo=Math.max(0,mgCombo-1);updateMGUI();return;}if(mgStone.x>mgWidth+100||mgStone.x<-100||mgStone.y>mgHeight+100||mgStone.y<-100){mgStone.active=false;mgStone.trail=[];mgCombo=Math.max(0,mgCombo-1);updateMGUI();}}}
-function drawMG(){mgCtx.clearRect(0,0,mgWidth,mgHeight);if(mgShake>0){mgCtx.translate((Math.random()-0.5)*mgShake,(Math.random()-0.5)*mgShake);mgShake*=0.9;}const skyGrad=mgCtx.createLinearGradient(0,0,0,mgHeight);skyGrad.addColorStop(0,mgGoliath.rage?'#2a0000':'#1a2a1a');skyGrad.addColorStop(0.6,mgGoliath.rage?'#3d1500':'#2a3a1a');skyGrad.addColorStop(1,'#4a2a0a');mgCtx.fillStyle=skyGrad;mgCtx.fillRect(0,0,mgWidth,mgHeight);mgCtx.fillStyle='#5a3a1a';mgCtx.fillRect(0,mgHeight-80,mgWidth,80);let d=mgDavid;mgCtx.fillStyle='#8b6914';mgCtx.fillRect(d.x+5,d.y+22,d.w-10,d.h-22);mgCtx.fillStyle='#c8a060';mgCtx.beginPath();mgCtx.arc(d.x+d.w/2,d.y+12,14,0,Math.PI*2);mgCtx.fill();mgCtx.fillStyle='#5a3010';mgCtx.beginPath();mgCtx.arc(d.x+d.w/2,d.y+6,14,Math.PI,2*Math.PI);mgCtx.fill();let g=mgGoliath;mgCtx.fillStyle='#4a3010';mgCtx.fillRect(g.x+8,g.y+g.h-20,20,20);mgCtx.fillRect(g.x+g.w-28,g.y+g.h-20,20,20);mgCtx.fillStyle='#b09040';mgCtx.fillRect(g.x-8,g.y+30,14,36);mgCtx.fillRect(g.x+g.w-6,g.y+30,14,36);mgCtx.fillStyle='#c09060';mgCtx.fillRect(g.x+12,g.y+16,g.w-24,22);mgCtx.fillStyle=`rgb(${mgGoliath.rage?255:80},20,0)`;mgCtx.beginPath();mgCtx.ellipse(g.x+g.w/2-10,g.y+24,5,4,0,0,Math.PI*2);mgCtx.fill();mgCtx.beginPath();mgCtx.ellipse(g.x+g.w/2+10,g.y+24,5,4,0,0,Math.PI*2);mgCtx.fill();for(let h=0;h<mgHits;h++){mgCtx.fillStyle='#cc2200';mgCtx.beginPath();mgCtx.arc(g.x+g.w/2+(h-1)*12,g.y+12,5,0,Math.PI*2);mgCtx.fill();}for(let j of mgJavelins){mgCtx.fillStyle='#8b6914';mgCtx.fillRect(j.x-4,j.y-2,28,4);}if(mgStone.active){for(let i=0;i<mgStone.trail.length;i++){mgCtx.globalAlpha=0.6-i*0.1;mgCtx.fillStyle='#ffaa44';mgCtx.beginPath();mgCtx.arc(mgStone.trail[i].x,mgStone.trail[i].y,6-i,0,Math.PI*2);mgCtx.fill();}mgCtx.globalAlpha=1;mgCtx.fillStyle='#c8a060';mgCtx.beginPath();mgCtx.arc(mgStone.x,mgStone.y,8,0,Math.PI*2);mgCtx.fill();}if(mgAimActive&&!mgStone.active&&mgPhase==='play'){let power=5+mgStone.charge*0.15;let vx=Math.cos(mgAimAngle)*power,vy=Math.sin(mgAimAngle)*power;let x=mgDavid.x+mgDavid.w-5,y=mgDavid.y+30;mgCtx.save();for(let i=0;i<60;i++){vy+=0.3;x+=vx;y+=vy;if(i%2===0){mgCtx.globalAlpha=0.7-i*0.012;mgCtx.fillStyle='#ffdd88';mgCtx.beginPath();mgCtx.arc(x,y,3,0,Math.PI*2);mgCtx.fill();}if(x>mgWidth+60||y>mgHeight+60||y<-60)break;}mgCtx.globalAlpha=1;mgCtx.restore();}mgCtx.fillStyle='rgba(255,255,200,0.7)';mgCtx.font='bold 12px monospace';mgCtx.fillText('← MOVE',30,mgHeight-20);mgCtx.fillText('AIM →',mgWidth-80,mgHeight-20);}
-function mgGameLoop(now){if(!mgCanvas||!document.getElementById('s-minigame').classList.contains('active')){if(mgAnimationId)cancelAnimationFrame(mgAnimationId);mgAnimationId=null;return;}mgAnimationId=requestAnimationFrame(mgGameLoop);let delta=Math.min(32,now-mgLastTimestamp);if(delta<10)delta=16;mgLastTimestamp=now;updateMG(delta);drawMG();}
-function showMGOverlay(type){let ov=document.querySelector('.mg-full-overlay');if(ov)ov.remove();ov=document.createElement('div');ov.className='mg-full-overlay';if(type==='victory'){ov.innerHTML=`<h2>🏆 VICTORY!</h2><p>Score: ${mgScore}<br>Max Combo: ${mgMaxCombo}x</p><button id="mgSaveBtn">💾 Save Score</button><button id="mgRestartBtn">Play Again</button><button id="mgMenuBtn">Back</button>`;document.body.appendChild(ov);document.getElementById('mgSaveBtn').onclick=async()=>{let btn=document.getElementById('mgSaveBtn');btn.textContent='Saving...';btn.disabled=true;let res=await fsSavePersonalBest(getUsername(),mgScore,'minigame',mgScore>=1000?'Champion':'Warrior',mgHits,3,mgMaxCombo,mgMaxCombo);localStorage.setItem('bc_username',getUsername());if(res.status==='new_best')btn.textContent='🏆 New Best!';else if(res.status==='first')btn.textContent='✅ Saved!';else btn.textContent=`Best: ${res.best}`;setTimeout(()=>{ov.remove();showScreen('s-leaderboard');loadLB('minigame');},1500);};document.getElementById('mgRestartBtn').onclick=()=>{ov.remove();if(mgAnimationId)cancelAnimationFrame(mgAnimationId);startMiniGame();};document.getElementById('mgMenuBtn').onclick=()=>{ov.remove();if(mgAnimationId)cancelAnimationFrame(mgAnimationId);setBodyScrollLock(false);if(isFullscreen())exitFullscreen();showScreen('s-title');};}else if(type==='gameover'){ov.innerHTML=`<h2>💀 DEFEATED</h2><p>Score: ${mgScore}</p><button id="mgRestartBtn">Try Again</button><button id="mgMenuBtn">Menu</button>`;document.body.appendChild(ov);document.getElementById('mgRestartBtn').onclick=()=>{ov.remove();if(mgAnimationId)cancelAnimationFrame(mgAnimationId);startMiniGame();};document.getElementById('mgMenuBtn').onclick=()=>{ov.remove();if(mgAnimationId)cancelAnimationFrame(mgAnimationId);setBodyScrollLock(false);if(isFullscreen())exitFullscreen();showScreen('s-title');};}}
+// ═══════════════════════════════════════════════════════════════
+//  MINI-GAME (Android Optimized with Touch-Drag)
+// ═══════════════════════════════════════════════════════════════
+
+let mgCanvas, mgCtx, mgWidth, mgHeight;
+let mgAnimationId = null;
+let mgLastTimestamp = 0;
+
+// Game state
+let mgDavid = { x: 100, y: 200, w: 40, h: 60, speed: 6 };
+let mgGoliath = { x: 600, y: 200, w: 70, h: 110, speed: 0.8, walkDir: 1, rage: false, state: 'GUARDING', stateTimer: 5000 };
+let mgStone = { active: false, x: 0, y: 0, vx: 0, vy: 0, charge: 0, trail: [] };
+let mgJavelins = [];
+let mgPowerups = [];
+let mgHits = 0, mgLives = 3, mgScore = 0, mgCombo = 0, mgMaxCombo = 0;
+let mgPhase = 'play';
+let mgAngle = 0;
+let mgChargeActive = false;
+let mgDodgeActive = false, mgDodgeCooldown = 0;
+let mgShake = 0;
+let mgFrame = 0;
+let mgBatchSize = 0, mgBatchCooldown = 0;
+let mgMoveLeft = false, mgMoveRight = false, mgMoveUp = false, mgMoveDown = false;
+let mgJoyVX = 0, mgJoyVY = 0, mgJoyActive = false;
+let mgAngleAdjust = 0;
+
+function setBodyScrollLock(lock) {
+  if (lock) {
+    document.body.classList.add('mg-active');
+  } else {
+    document.body.classList.remove('mg-active');
+  }
+}
+
+// ========== CORRECTED startMiniGame FUNCTION ==========
+function startMiniGame() {
+  // Check if username exists
+  if (!username || username.trim() === '') {
+    const inp = document.getElementById('username-inp');
+    const greet = document.getElementById('ugreet');
+    if (inp) {
+      inp.classList.add('error');
+      greet.className = 'ugreet err';
+      greet.textContent = 'Please enter your name before battling Goliath!';
+      inp.focus();
+      setTimeout(() => {
+        inp.classList.remove('error');
+        greet.className = 'ugreet';
+        if (!username.trim()) greet.textContent = '';
+      }, 3000);
+    }
+    showScreen('s-title');
+    return;
+  }
+  
+  console.log("startMiniGame called");
+  showScreen('s-minigame');
+  
+  // Function to check orientation and show/hide warning
+  function checkAndInit() {
+    if (window.matchMedia("(orientation: portrait)").matches) {
+      // Portrait mode - show warning, hide game container
+      const warning = document.getElementById('portraitWarning');
+      if (warning) warning.style.display = 'flex';
+      const container = document.querySelector('.minigame-container');
+      if (container) container.style.display = 'none';
+      return false;
+    } else {
+      // Landscape mode - hide warning, show game container
+      const warning = document.getElementById('portraitWarning');
+      if (warning) warning.style.display = 'none';
+      const container = document.querySelector('.minigame-container');
+      if (container) container.style.display = 'block';
+      return true;
+    }
+  }
+  
+  // Initial check - if portrait, don't initialize, just show warning and wait
+  if (!checkAndInit()) {
+    // Listen for orientation change to initialize when rotated
+    const orientationHandler = () => {
+      if (checkAndInit()) {
+        // Now landscape - initialize the game
+        initializeMiniGame();
+        window.removeEventListener('orientationchange', orientationHandler);
+        window.removeEventListener('resize', orientationHandler);
+      }
+    };
+    window.addEventListener('orientationchange', orientationHandler);
+    window.addEventListener('resize', orientationHandler);
+    return; // Stop here - don't initialize yet
+  }
+  
+  // If we get here, device is already in landscape - initialize normally
+  initializeMiniGame();
+}
+
+// ========== NEW initializeMiniGame FUNCTION (OUTSIDE startMiniGame) ==========
+function initializeMiniGame() {
+  setBodyScrollLock(true);
+  
+  mgCanvas = document.getElementById('mgCanvas');
+  if (!mgCanvas) {
+    console.error("Canvas not found!");
+    return;
+  }
+  
+  mgWidth = window.innerWidth;
+  mgHeight = window.innerHeight;
+  mgCanvas.width = mgWidth;
+  mgCanvas.height = mgHeight;
+  
+  mgCtx = mgCanvas.getContext('2d');
+  if (!mgCtx) {
+    console.error("Cannot get 2D context!");
+    return;
+  }
+  
+  console.log("Canvas size:", mgWidth, mgHeight);
+  
+  resizeMGCanvas();
+  resetMG();
+  bindMGButtons();
+  
+  setTimeout(() => {
+    showMGOverlay('start');
+  }, 100);
+  
+  window.addEventListener('resize', () => {
+    resizeMGCanvas();
+  });
+  
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      resizeMGCanvas();
+    }, 100);
+  });
+}
+
+function resizeMGCanvas() {
+  // Check orientation and adjust if needed
+  if (window.matchMedia("(orientation: portrait)").matches) {
+    // Still resize but warning will be shown
+  }
+  
+  mgWidth = window.innerWidth;
+  mgHeight = window.innerHeight;
+  
+  if (mgWidth < 100) mgWidth = 800;
+  if (mgHeight < 100) mgHeight = 500;
+  
+  mgCanvas.width = mgWidth;
+  mgCanvas.height = mgHeight;
+  
+  if (mgDavid) {
+    mgDavid.x = Math.min(Math.max(mgDavid.x, 40), mgWidth - mgDavid.w - 40);
+    mgDavid.y = Math.min(Math.max(mgDavid.y, 60), mgHeight - mgDavid.h - 60);
+  }
+  if (mgGoliath) {
+    mgGoliath.x = Math.min(mgWidth - 100, Math.max(100, mgGoliath.x));
+    mgGoliath.y = mgHeight - 180;
+  }
+}
+
+function resetMG() {
+  mgDavid = { x: 100, y: mgHeight / 2, w: 40, h: 60, speed: 6 };
+  mgGoliath = { x: Math.min(mgWidth - 120, 600), y: mgHeight - 180, w: 70, h: 110, speed: 0.8, walkDir: 1, rage: false, state: 'GUARDING', stateTimer: 5000 };
+  mgStone = { active: false, x: 0, y: 0, vx: 0, vy: 0, charge: 0, trail: [] };
+  mgJavelins = [];
+  mgPowerups = [];
+  mgHits = 0; mgLives = 3; mgScore = 0; mgCombo = 0; mgMaxCombo = 0;
+  mgPhase = 'play';
+  mgAngle = 0;
+  mgChargeActive = false;
+  mgDodgeActive = false; mgDodgeCooldown = 0;
+  mgShake = 0;
+  mgFrame = 0;
+  mgBatchSize = 0; mgBatchCooldown = 0;
+  mgMoveLeft = false; mgMoveRight = false; mgMoveUp = false; mgMoveDown = false;
+  mgJoyVX = 0; mgJoyVY = 0; mgJoyActive = false;
+  mgAngleAdjust = 0;
+  updateMGUI();
+}
+
+function updateMGUI() {
+  document.getElementById('mgLives').innerHTML = '❤️'.repeat(mgLives) + '🖤'.repeat(3 - mgLives);
+  document.getElementById('mgScore').innerText = mgScore;
+  document.getElementById('mgStateBadge').innerText = mgGoliath.state;
+  document.getElementById('mgAngleValue').innerText = Math.round(mgAngle * 180 / Math.PI) + '°';
+  if (mgDodgeActive) document.getElementById('mgDodgeIndicator').innerText = '💨 DODGE ACTIVE!';
+  else if (mgDodgeCooldown > 0) document.getElementById('mgDodgeIndicator').innerText = `⏳ Dodge: ${Math.ceil(mgDodgeCooldown / 60)}s`;
+  else document.getElementById('mgDodgeIndicator').innerText = '✅ Dodge Roll Ready';
+}
+
+function showMGOverlay(type) {
+  let ov = document.querySelector('.mg-full-overlay');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.className = 'mg-full-overlay';
+  if (type === 'start') {
+    ov.innerHTML = `<h2>⚔️ David vs Goliath</h2>
+      <p>Drag the <b>left joystick</b> to move David<br>Hold <b>FIRE</b> to charge & aim<br>Use <b>+Angle / -Angle</b> to adjust trajectory<br>Press <b>DODGE</b> for invincible roll<br>Hit Goliath's forehead <b>3 times!</b></p>
+      <button id="mgStartBtn">⚔️ BEGIN BATTLE</button>`;
+    document.body.appendChild(ov);
+    document.getElementById('mgStartBtn').onclick = () => {
+      ov.remove();
+      resetMG();
+      mgPhase = 'play';
+      updateMGUI();
+      if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
+      mgLastTimestamp = 0;
+      mgAnimationId = requestAnimationFrame(mgGameLoop);
+    };
+  } else if (type === 'victory') {
+    ov.innerHTML = `<h2>🏆 VICTORY!</h2><p>Score: ${mgScore}<br>Max Combo: ${mgMaxCombo}x</p><button id="mgSaveBtn">💾 Save Score</button><button id="mgRestartBtn">Play Again</button><button id="mgMenuBtn">Back to Menu</button>`;
+    document.body.appendChild(ov);
+    document.getElementById('mgSaveBtn').onclick = async () => {
+      const btn=document.getElementById('mgSaveBtn');
+      btn.textContent='Saving...';btn.disabled=true;
+      const result=await fsSavePersonalBest(
+        getUsername(),mgScore,'minigame',
+        mgScore>=1000?'Champion':'Warrior',
+        mgHits,3,mgMaxCombo,mgMaxCombo
+      );
+      localStorage.setItem('bc_username',getUsername());
+      G.lastSavedScore={name:getUsername(),score:mgScore};
+      if(result.status==='new_best'){
+        btn.textContent='🏆 New Personal Best!';
+        const p=ov.querySelector('p');if(p)p.innerHTML+=`<br>🎉 You beat your previous best of ${result.prev}!`;
+      }else if(result.status==='first'){
+        btn.textContent='✅ Score Saved!';
+      }else if(result.status==='not_best'){
+        btn.textContent=`Best is still ${result.best} 💪`;
+        const p=ov.querySelector('p');if(p)p.innerHTML+=`<br>Your personal best is ${result.best}. Keep going!`;
+      }else{
+        btn.textContent='❌ Failed';btn.disabled=false;return;
+      }
+      setTimeout(()=>{ov.remove();showScreen('s-leaderboard');loadLB('minigame');},1500);
+    };
+    document.getElementById('mgRestartBtn').onclick = () => { ov.remove(); resetMG(); showMGOverlay('start'); };
+    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); setBodyScrollLock(false); showScreen('s-title'); };
+  } else if (type === 'gameover') {
+    ov.innerHTML = `<h2>💀 DEFEATED</h2><p>Score: ${mgScore}</p><button id="mgRestartBtn">Try Again</button><button id="mgMenuBtn">Back to Menu</button>`;
+    document.body.appendChild(ov);
+    document.getElementById('mgRestartBtn').onclick = () => { ov.remove(); resetMG(); showMGOverlay('start'); };
+    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); setBodyScrollLock(false); showScreen('s-title'); };
+  }
+}
+
+function bindMGButtons() {
+  console.log("bindMGButtons: analog joystick mode");
+
+  // ─── Joystick globals ─────────────────────────────────────────
+  const JOYSTICK_RADIUS = 55; // max knob travel from base centre (px)
+  let joyTouchId = null;
+  let joyBaseX = 0, joyBaseY = 0;
+
+  const joystickArea = document.getElementById('mgJoystickArea');
+  const joystickBase = document.getElementById('mgJoystickBase');
+  const joystickKnob = document.getElementById('mgJoystickKnob');
+
+  function joyStart(clientX, clientY) {
+    const rect = joystickArea.getBoundingClientRect();
+    // Clamp base position so the base circle stays inside the touch area
+    const margin = JOYSTICK_RADIUS + 5;
+    joyBaseX = Math.max(margin, Math.min(rect.width  - margin, clientX - rect.left));
+    joyBaseY = Math.max(margin, Math.min(rect.height - margin, clientY - rect.top));
+
+    // Position base
+    joystickBase.style.left = joyBaseX + 'px';
+    joystickBase.style.top  = joyBaseY + 'px';
+    joystickBase.classList.add('visible');
+
+    // Reset knob to centre
+    joystickKnob.style.left = '50%';
+    joystickKnob.style.top  = '50%';
+    joystickKnob.style.transform = 'translate(-50%,-50%)';
+
+    mgJoyVX = 0; mgJoyVY = 0; mgJoyActive = true;
+  }
+
+  function joyMove(clientX, clientY) {
+    if (!mgJoyActive) return;
+    const rect = joystickArea.getBoundingClientRect();
+    const dx = (clientX - rect.left) - joyBaseX;
+    const dy = (clientY - rect.top)  - joyBaseY;
+    const dist = Math.hypot(dx, dy);
+    const clamped = Math.min(dist, JOYSTICK_RADIUS);
+    const angle = Math.atan2(dy, dx);
+    const kx = Math.cos(angle) * clamped;
+    const ky = Math.sin(angle) * clamped;
+
+    // Move knob visually (offset from base centre)
+    joystickKnob.style.left = (50 + (kx / 70) * 50) + '%';
+    joystickKnob.style.top  = (50 + (ky / 70) * 50) + '%';
+
+    // Normalised velocity (0…1)
+    const norm = dist > 8 ? clamped / JOYSTICK_RADIUS : 0;  // dead zone 8px
+    mgJoyVX = Math.cos(angle) * norm;
+    mgJoyVY = Math.sin(angle) * norm;
+  }
+
+  function joyEnd() {
+    joyTouchId = null;
+    mgJoyVX = 0; mgJoyVY = 0; mgJoyActive = false;
+    joystickBase.classList.remove('visible');
+    joystickKnob.style.left = '50%';
+    joystickKnob.style.top  = '50%';
+    joystickKnob.style.transform = 'translate(-50%,-50%)';
+  }
+
+  // Touch events on joystick area
+  joystickArea.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (joyTouchId !== null) return;       // already active
+    const t = e.changedTouches[0];
+    joyTouchId = t.identifier;
+    joyStart(t.clientX, t.clientY);
+  }, { passive: false });
+
+  joystickArea.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      if (t.identifier === joyTouchId) { joyMove(t.clientX, t.clientY); break; }
+    }
+  }, { passive: false });
+
+  joystickArea.addEventListener('touchend',    (e) => { e.preventDefault(); joyEnd(); }, { passive: false });
+  joystickArea.addEventListener('touchcancel', (e) => { e.preventDefault(); joyEnd(); }, { passive: false });
+
+  // Mouse support (desktop testing)
+  let mouseJoy = false;
+  joystickArea.addEventListener('mousedown', (e) => { mouseJoy = true; joyStart(e.clientX, e.clientY); });
+  document.addEventListener('mousemove', (e) => { if (mouseJoy) joyMove(e.clientX, e.clientY); });
+  document.addEventListener('mouseup', () => { if (mouseJoy) { mouseJoy = false; joyEnd(); } });
+
+  // ─── Angle buttons ────────────────────────────────────────────
+  const anglePlus  = document.getElementById('mgAnglePlus');
+  const angleMinus = document.getElementById('mgAngleMinus');
+
+  let anglePlusActive = false, angleMinusActive = false;
+  let angleTouchId1 = null, angleTouchId2 = null;
+
+  function setupAngleBtn(btn, setActive, clearId) {
+    btn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const t = e.changedTouches[0];
+      setActive(t.identifier, true);
+    }, { passive: false });
+    btn.addEventListener('touchend',    (e) => { e.preventDefault(); setActive(null, false); }, { passive: false });
+    btn.addEventListener('touchcancel', (e) => { e.preventDefault(); setActive(null, false); }, { passive: false });
+    btn.addEventListener('mousedown', () => setActive('mouse', true));
+    btn.addEventListener('mouseup',   () => setActive(null, false));
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const dir = btn.id === 'mgAnglePlus' ? 1 : -1;
+      mgAngleAdjust = dir;
+      setTimeout(() => { mgAngleAdjust = 0; }, 150);
+      SoundFX.beep(dir > 0 ? 650 : 550, 0.04);
+    });
+  }
+
+  setupAngleBtn(anglePlus,  (id, on) => { angleTouchId1 = id; mgAngleAdjust = on ? 1  : (angleTouchId2 ? -1 : 0); });
+  setupAngleBtn(angleMinus, (id, on) => { angleTouchId2 = id; mgAngleAdjust = on ? -1 : (angleTouchId1 ?  1 : 0); });
+
+  // ─── Fire button ──────────────────────────────────────────────
+  const fireBtn  = document.getElementById('mgFireBtn');
+  let fireTouchId = null;
+
+  function handleFireStart(e) {
+    e.preventDefault();
+    const t = e.changedTouches ? e.changedTouches[0] : null;
+    if (t) fireTouchId = t.identifier;
+    mgChargeActive = true;
+    fireBtn.style.transform = 'scale(0.94)';
+    fireBtn.style.background = '#e05a4a';
+  }
+  function handleFireEnd(e) {
+    e.preventDefault();
+    fireTouchId = null;
+    if (mgChargeActive && !mgStone.active) fireMGStone();
+    mgChargeActive = false;
+    fireBtn.style.transform = '';
+    fireBtn.style.background = '';
+  }
+  fireBtn.addEventListener('touchstart',  handleFireStart);
+  fireBtn.addEventListener('touchend',    handleFireEnd);
+  fireBtn.addEventListener('touchcancel', handleFireEnd);
+  fireBtn.addEventListener('mousedown',   handleFireStart);
+  fireBtn.addEventListener('mouseup',     handleFireEnd);
+
+  // ─── Dodge button ─────────────────────────────────────────────
+  const dodgeBtn = document.getElementById('mgDodgeBtn');
+  dodgeBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (mgDodgeCooldown <= 0 && !mgDodgeActive && mgPhase === 'play') {
+      mgDodgeActive = true;
+      SoundFX.beep(550, 0.15);
+    }
+  }, { passive: false });
+  dodgeBtn.addEventListener('click', () => {
+    if (mgDodgeCooldown <= 0 && !mgDodgeActive && mgPhase === 'play') {
+      mgDodgeActive = true;
+      SoundFX.beep(550, 0.15);
+    }
+  });
+
+  // ─── Quit button ──────────────────────────────────────────────
+  const quitBtn = document.getElementById('mgQuitBtn');
+  if (quitBtn) {
+    quitBtn.addEventListener('click', () => {
+      if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
+      setBodyScrollLock(false);
+      showScreen('s-title');
+    });
+  }
+
+  // ─── Keyboard support (desktop) ───────────────────────────────
+  let keyUp = false, keyDown = false, keyLeft = false, keyRight = false;
+  let spacePressed = false;
+
+  window.addEventListener('keydown', (e) => {
+    const key = e.key;
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Space'].includes(key)) e.preventDefault();
+    if (key === 'ArrowUp')    { keyUp    = true; }
+    if (key === 'ArrowDown')  { keyDown  = true; }
+    if (key === 'ArrowLeft')  { keyLeft  = true; }
+    if (key === 'ArrowRight') { keyRight = true; }
+    mgMoveUp = keyUp; mgMoveDown = keyDown; mgMoveLeft = keyLeft; mgMoveRight = keyRight;
+    if ((key === ' ' || key === 'Space') && !spacePressed) { spacePressed = true; mgChargeActive = true; }
+    if (key === 'ArrowUp'   || key === 'w') mgAngleAdjust =  1;
+    if (key === 'ArrowDown' || key === 's') mgAngleAdjust = -1;
+    if (key === 'Shift') { if (mgDodgeCooldown <= 0 && !mgDodgeActive && mgPhase === 'play') mgDodgeActive = true; }
+  });
+
+  window.addEventListener('keyup', (e) => {
+    const key = e.key;
+    if (key === 'ArrowUp')    { keyUp    = false; }
+    if (key === 'ArrowDown')  { keyDown  = false; }
+    if (key === 'ArrowLeft')  { keyLeft  = false; }
+    if (key === 'ArrowRight') { keyRight = false; }
+    mgMoveUp = keyUp; mgMoveDown = keyDown; mgMoveLeft = keyLeft; mgMoveRight = keyRight;
+    if (key === ' ' || key === 'Space') {
+      if (spacePressed) { spacePressed = false; if (mgChargeActive && !mgStone.active) fireMGStone(); mgChargeActive = false; }
+    }
+    if (!keyUp && !keyDown) mgAngleAdjust = 0;
+  });
+}
+
+function fireMGStone() {
+  if (mgStone.active || mgPhase !== 'play') return;
+  let power = 7 + Math.min(mgStone.charge, 60) * 0.15;
+  mgStone.active = true;
+  mgStone.x = mgDavid.x + mgDavid.w - 5;
+  mgStone.y = mgDavid.y + 30;
+  mgStone.vx = Math.cos(mgAngle) * power;
+  mgStone.vy = Math.sin(mgAngle) * power;
+  mgStone.charge = 0;
+  SoundFX.play('throw');
+}
+
+function updateMG(delta) {
+  if (mgPhase !== 'play') return;
+
+  // Movement: joystick takes priority over D-pad booleans (keyboard still works via booleans)
+  let moveX = mgJoyVX !== 0 ? mgJoyVX : (mgMoveRight ? 1 : mgMoveLeft ? -1 : 0);
+  let moveY = mgJoyVY !== 0 ? mgJoyVY : (mgMoveDown ? 1 : mgMoveUp ? -1 : 0);
+  // Normalize diagonal keyboard movement
+  if (moveX !== 0 && moveY !== 0 && mgJoyVX === 0) { moveX *= 0.707; moveY *= 0.707; }
+  mgDavid.x = Math.max(40, Math.min(mgWidth - mgDavid.w - 40, mgDavid.x + moveX * mgDavid.speed));
+  mgDavid.y = Math.max(60, Math.min(mgHeight - mgDavid.h - 60, mgDavid.y + moveY * mgDavid.speed));
+
+  // ========== FIXED ANGLE ADJUSTMENT (WORKS ANYTIME, NOT JUST WHILE CHARGING) ==========
+  let totalAngleAdjust = mgAngleAdjust;
+  if (totalAngleAdjust !== 0) {
+    mgAngle += totalAngleAdjust * 0.04;
+    mgAngle = Math.max(-0.9, Math.min(0.9, mgAngle));
+    updateMGUI();
+  }
+
+  if (mgChargeActive && !mgStone.active) {
+    mgStone.charge = Math.min(60, (mgStone.charge || 0) + 1.5);
+  }
+
+  if (mgGoliath.stateTimer > 0) mgGoliath.stateTimer -= delta;
+  else {
+    let rand = Math.random();
+    if (mgGoliath.rage) mgGoliath.state = rand < 0.4 ? 'TAUNTING' : rand < 0.7 ? 'WINDING_UP' : 'GUARDING';
+    else mgGoliath.state = rand < 0.25 ? 'TAUNTING' : rand < 0.45 ? 'WINDING_UP' : 'GUARDING';
+    mgGoliath.stateTimer = (mgGoliath.state === 'TAUNTING' ? 2500 : mgGoliath.state === 'WINDING_UP' ? 1800 : 4000);
+    updateMGUI();
+  }
+
+  mgGoliath.x += mgGoliath.walkDir * mgGoliath.speed;
+  if (mgGoliath.x < mgWidth - 250) mgGoliath.walkDir = 1;
+  if (mgGoliath.x > mgWidth - 100) mgGoliath.walkDir = -1;
+  mgGoliath.y = mgHeight - 180;
+
+  if (mgBatchCooldown > 0) mgBatchCooldown -= delta;
+  else if (mgBatchSize <= 0) {
+    mgBatchSize = mgGoliath.rage ? 4 : Math.floor(Math.random() * 3) + 2;
+    mgBatchCooldown = 200;
+  } else if (mgBatchCooldown <= 0) {
+    let startX = mgGoliath.x - 10, startY = mgGoliath.y + 45;
+    let targetX = mgDavid.x + mgDavid.w / 2, targetY = mgDavid.y + mgDavid.h / 2;
+    let dx = targetX - startX, dy = targetY - startY, dist = Math.hypot(dx, dy);
+    let spd = 4 + (mgGoliath.rage ? 1 : 0);
+    mgJavelins.push({ x: startX, y: startY, vx: (dx / dist) * spd, vy: (dy / dist) * spd, angle: Math.atan2(dy, dx) });
+    mgBatchSize--;
+    mgBatchCooldown = 250;
+    if (mgBatchSize === 0) mgBatchCooldown = 1800;
+  }
+
+  for (let i = 0; i < mgJavelins.length; i++) {
+    let j = mgJavelins[i];
+    j.x += j.vx;
+    j.y += j.vy;
+    if (j.x > mgDavid.x && j.x < mgDavid.x + mgDavid.w && j.y > mgDavid.y && j.y < mgDavid.y + mgDavid.h) {
+      if (!mgDodgeActive) {
+        mgLives--;
+        mgCombo = 0;
+        updateMGUI();
+        mgShake = 10;
+        SoundFX.play('hurt');
+        mgJavelins.splice(i, 1);
+        i--;
+        if (mgLives <= 0) {
+          mgPhase = 'gameover';
+          showMGOverlay('gameover');
+        }
+      } else {
+        mgJavelins.splice(i, 1);
+        i--;
+      }
+    } else if (j.x > mgWidth + 100 || j.x < -100 || j.y > mgHeight + 100 || j.y < -100) {
+      mgJavelins.splice(i, 1);
+      i--;
+    }
+  }
+
+  if (mgStone.active) {
+    mgStone.x += mgStone.vx;
+    mgStone.vy += 0.3;
+    mgStone.y += mgStone.vy;
+    mgStone.trail.unshift({ x: mgStone.x, y: mgStone.y });
+    if (mgStone.trail.length > 6) mgStone.trail.pop();
+
+    let fx = mgGoliath.x + 8, fy = mgGoliath.y + 2, fw = mgGoliath.w - 16, fh = 22;
+    if (mgStone.x > fx && mgStone.x < fx + fw && mgStone.y > fy && mgStone.y < fy + fh) {
+      let canHit = false;
+      let isStraight = Math.abs(Math.atan2(mgStone.vy, mgStone.vx)) < 0.3;
+      if (mgGoliath.state === 'TAUNTING' || mgGoliath.state === 'WINDING_UP' || mgGoliath.state === 'STUNNED') canHit = true;
+      if (mgGoliath.state === 'GUARDING' && !isStraight) canHit = true;
+      if (mgGoliath.state === 'RAGE' && !isStraight) canHit = true;
+      if (canHit) {
+        let pts = 150 + Math.floor(mgStone.charge * 5);
+        mgScore += pts;
+        mgCombo++;
+        if (mgCombo > mgMaxCombo) mgMaxCombo = mgCombo;
+        mgHits++;
+        SoundFX.play('hit');
+        mgShake = 12;
+        mgStone.active = false;
+        mgStone.trail = [];
+        updateMGUI();
+        if (mgHits >= 3) {
+          mgPhase = 'victory';
+          showMGOverlay('victory');
+        } else {
+          mgGoliath.state = 'STUNNED';
+          mgGoliath.stateTimer = 1500;
+          if (mgHits === 2) mgGoliath.rage = true;
+        }
+      } else {
+        SoundFX.play('armoured');
+        mgStone.active = false;
+        mgStone.trail = [];
+        mgCombo = Math.max(0, mgCombo - 1);
+        updateMGUI();
+      }
+      return;
+    }
+
+    let bx = mgGoliath.x + 4, by = mgGoliath.y + 30, bw = mgGoliath.w - 8, bh = mgGoliath.h - 50;
+    if (mgStone.x > bx && mgStone.x < bx + bw && mgStone.y > by && mgStone.y < by + bh) {
+      SoundFX.play('armoured');
+      mgStone.active = false;
+      mgStone.trail = [];
+      mgCombo = Math.max(0, mgCombo - 1);
+      updateMGUI();
+      return;
+    }
+
+    if (mgStone.x > mgWidth + 100 || mgStone.x < -100 || mgStone.y > mgHeight + 100 || mgStone.y < -100) {
+      mgStone.active = false;
+      mgStone.trail = [];
+      mgCombo = Math.max(0, mgCombo - 1);
+      updateMGUI();
+    }
+  }
+
+  if (mgDodgeActive) {
+    mgDodgeActive = false;
+    mgDodgeCooldown = 2000;
+  }
+  if (mgDodgeCooldown > 0) mgDodgeCooldown -= delta;
+  if (mgDodgeCooldown < 0) mgDodgeCooldown = 0;
+}
+
+function drawMG() {
+  mgCtx.clearRect(0, 0, mgWidth, mgHeight);
+  if (mgShake > 0) {
+    mgCtx.translate((Math.random() - 0.5) * mgShake, (Math.random() - 0.5) * mgShake);
+    mgShake *= 0.9;
+  }
+
+  const skyGrad = mgCtx.createLinearGradient(0, 0, 0, mgHeight);
+  skyGrad.addColorStop(0, mgGoliath.rage ? '#2a0000' : '#1a2a1a');
+  skyGrad.addColorStop(0.6, mgGoliath.rage ? '#3d1500' : '#2a3a1a');
+  skyGrad.addColorStop(1, '#4a2a0a');
+  mgCtx.fillStyle = skyGrad;
+  mgCtx.fillRect(0, 0, mgWidth, mgHeight);
+  
+  const sunGrad = mgCtx.createRadialGradient(mgWidth - 60, 60, 0, mgWidth - 60, 60, 80);
+  sunGrad.addColorStop(0, '#ffdd88');
+  sunGrad.addColorStop(0.5, '#ffaa44');
+  sunGrad.addColorStop(1, 'rgba(255,100,0,0)');
+  mgCtx.fillStyle = sunGrad;
+  mgCtx.fillRect(0, 0, mgWidth, mgHeight);
+  
+  const groundGrad = mgCtx.createLinearGradient(0, mgHeight - 80, 0, mgHeight);
+  groundGrad.addColorStop(0, '#5a3a1a');
+  groundGrad.addColorStop(1, '#3a1a00');
+  mgCtx.fillStyle = groundGrad;
+  mgCtx.fillRect(0, mgHeight - 80, mgWidth, 80);
+  
+  mgCtx.fillStyle = 'rgba(70,50,20,0.5)';
+  mgCtx.beginPath();
+  mgCtx.ellipse(120, mgHeight - 85, 150, 40, 0, 0, Math.PI * 2);
+  mgCtx.fill();
+  mgCtx.beginPath();
+  mgCtx.ellipse(550, mgHeight - 90, 200, 45, 0, 0, Math.PI * 2);
+  mgCtx.fill();
+
+  const d = mgDavid;
+  
+  mgCtx.fillStyle = 'rgba(0,0,0,0.3)';
+  mgCtx.beginPath();
+  mgCtx.ellipse(d.x + d.w / 2, d.y + d.h + 4, 20, 6, 0, 0, Math.PI * 2);
+  mgCtx.fill();
+  
+  mgCtx.fillStyle = '#8b6914';
+  mgCtx.beginPath();
+  mgCtx.roundRect(d.x + 5, d.y + 22, d.w - 10, d.h - 22, 4);
+  mgCtx.fill();
+  
+  mgCtx.fillStyle = '#a07820';
+  mgCtx.fillRect(d.x + 5, d.y + 22, d.w - 10, 8);
+  
+  mgCtx.fillStyle = '#c8a060';
+  mgCtx.fillRect(d.x - 5, d.y + 24, 10, 20);
+  mgCtx.fillRect(d.x + d.w - 5, d.y + 24, 10, 20);
+  
+  mgCtx.fillStyle = '#c8a060';
+  mgCtx.beginPath();
+  mgCtx.arc(d.x + d.w / 2, d.y + 12, 14, 0, Math.PI * 2);
+  mgCtx.fill();
+  
+  mgCtx.fillStyle = '#5a3010';
+  mgCtx.beginPath();
+  mgCtx.arc(d.x + d.w / 2, d.y + 6, 14, Math.PI, 2 * Math.PI);
+  mgCtx.fill();
+  
+  mgCtx.fillStyle = '#2a1800';
+  mgCtx.fillRect(d.x + d.w / 2 - 6, d.y + 11, 4, 3);
+  mgCtx.fillRect(d.x + d.w / 2 + 2, d.y + 11, 4, 3);
+  
+  mgCtx.strokeStyle = mgChargeActive ? '#ffaa00' : '#8b6914';
+  mgCtx.lineWidth = 2;
+  mgCtx.beginPath();
+  mgCtx.moveTo(d.x + d.w - 5, d.y + 30);
+  mgCtx.lineTo(d.x + d.w + 15, d.y + 24);
+  mgCtx.stroke();
+  mgCtx.fillStyle = mgChargeActive ? '#ffaa00' : '#a07820';
+  mgCtx.fillRect(d.x + d.w + 10, d.y + 21, 8, 6);
+  
+  mgCtx.fillStyle = 'rgba(255,220,100,0.9)';
+  mgCtx.font = 'bold 11px "Cinzel", monospace';
+  mgCtx.textAlign = 'center';
+  mgCtx.fillText('DAVID', d.x + d.w / 2, d.y - 8);
+
+  const g = mgGoliath;
+  
+  mgCtx.fillStyle = 'rgba(0,0,0,0.4)';
+  mgCtx.beginPath();
+  mgCtx.ellipse(g.x + g.w / 2, g.y + g.h + 6, 32, 10, 0, 0, Math.PI * 2);
+  mgCtx.fill();
+  
+  mgCtx.fillStyle = '#4a3010';
+  mgCtx.fillRect(g.x + 8, g.y + g.h - 20, 20, 20);
+  mgCtx.fillRect(g.x + g.w - 28, g.y + g.h - 20, 20, 20);
+  
+  const bodyGrad = mgCtx.createLinearGradient(g.x, g.y + 25, g.x + g.w, g.y + 25);
+  bodyGrad.addColorStop(0, '#8a7040');
+  bodyGrad.addColorStop(0.5, g.rage ? '#d06020' : '#c0a050');
+  bodyGrad.addColorStop(1, '#8a7040');
+  mgCtx.fillStyle = bodyGrad;
+  mgCtx.beginPath();
+  mgCtx.roundRect(g.x + 4, g.y + 30, g.w - 8, g.h - 50, 6);
+  mgCtx.fill();
+  
+  mgCtx.strokeStyle = 'rgba(100,80,20,0.4)';
+  mgCtx.lineWidth = 1;
+  for (let row = 0; row < 4; row++) {
+    for (let col = 0; col < 4; col++) {
+      mgCtx.beginPath();
+      mgCtx.arc(g.x + 12 + col * 14, g.y + 42 + row * 14, 6, 0, Math.PI);
+      mgCtx.stroke();
+    }
+  }
+  
+  mgCtx.fillStyle = '#b09040';
+  mgCtx.fillRect(g.x - 8, g.y + 30, 14, 36);
+  mgCtx.fillRect(g.x + g.w - 6, g.y + 30, 14, 36);
+  
+  const helmGrad = mgCtx.createLinearGradient(g.x, g.y, g.x + g.w, g.y);
+  helmGrad.addColorStop(0, '#8a7040');
+  helmGrad.addColorStop(0.5, '#d0b060');
+  helmGrad.addColorStop(1, '#8a7040');
+  mgCtx.fillStyle = helmGrad;
+  mgCtx.beginPath();
+  mgCtx.arc(g.x + g.w / 2, g.y + 16, g.w / 2 - 6, Math.PI, 2 * Math.PI);
+  mgCtx.fill();
+  mgCtx.fillRect(g.x + 4, g.y + 16, g.w - 8, 18);
+  
+  mgCtx.fillStyle = '#c09060';
+  mgCtx.fillRect(g.x + 12, g.y + 16, g.w - 24, 22);
+  
+  let eyeRed = 30;
+  if (g.rage) eyeRed = 255;
+  else if (g.state === 'TAUNTING') eyeRed = 200;
+  else if (g.state === 'WINDING_UP') eyeRed = 150;
+  else if (g.state === 'STUNNED') eyeRed = 100;
+  else eyeRed = 80;
+  mgCtx.fillStyle = `rgb(${eyeRed}, 20, 0)`;
+  mgCtx.beginPath();
+  mgCtx.ellipse(g.x + g.w / 2 - 10, g.y + 24, 5, 4, 0, 0, Math.PI * 2);
+  mgCtx.fill();
+  mgCtx.beginPath();
+  mgCtx.ellipse(g.x + g.w / 2 + 10, g.y + 24, 5, 4, 0, 0, Math.PI * 2);
+  mgCtx.fill();
+  
+  mgCtx.strokeStyle = `rgba(255, 100, 0, ${0.3 + Math.sin(mgFrame * 0.1) * 0.2})`;
+  mgCtx.lineWidth = 2;
+  mgCtx.setLineDash([4, 4]);
+  mgCtx.strokeRect(g.x + 10, g.y + 2, g.w - 20, 22);
+  mgCtx.setLineDash([]);
+  
+  for (let h = 0; h < mgHits; h++) {
+    mgCtx.fillStyle = '#cc2200';
+    mgCtx.beginPath();
+    mgCtx.arc(g.x + g.w / 2 + (h - 1) * 12, g.y + 12, 5, 0, Math.PI * 2);
+    mgCtx.fill();
+  }
+  
+  mgCtx.fillStyle = '#8b6914';
+  mgCtx.fillRect(g.x - 12, g.y + 25, 6, 80);
+  mgCtx.fillStyle = '#c0c0c0';
+  mgCtx.beginPath();
+  mgCtx.moveTo(g.x - 12, g.y + 25);
+  mgCtx.lineTo(g.x - 6, g.y + 25);
+  mgCtx.lineTo(g.x - 9, g.y + 5);
+  mgCtx.closePath();
+  mgCtx.fill();
+  
+  mgCtx.fillStyle = g.rage ? 'rgba(255,80,80,0.9)' : 'rgba(255,100,80,0.9)';
+  mgCtx.font = 'bold 11px "Cinzel", monospace';
+  mgCtx.textAlign = 'center';
+  mgCtx.fillText(g.rage ? '⚡ GOLIATH ⚡' : 'GOLIATH', g.x + g.w / 2, g.y - 10);
+  
+  mgCtx.fillStyle = 'rgba(255,200,100,0.7)';
+  mgCtx.font = '9px "Cinzel", monospace';
+  mgCtx.fillText('▲ AIM HERE', g.x + g.w / 2, g.y + 1);
+
+  for (let j of mgJavelins) {
+    mgCtx.save();
+    mgCtx.translate(j.x, j.y);
+    mgCtx.rotate(j.angle);
+    mgCtx.fillStyle = '#8b6914';
+    mgCtx.fillRect(0, -2, 28, 4);
+    mgCtx.fillStyle = '#c0c0c0';
+    mgCtx.beginPath();
+    mgCtx.moveTo(28, -5);
+    mgCtx.lineTo(38, 0);
+    mgCtx.lineTo(28, 5);
+    mgCtx.closePath();
+    mgCtx.fill();
+    mgCtx.restore();
+  }
+
+  if (mgStone.active) {
+    for (let i = 0; i < mgStone.trail.length; i++) {
+      mgCtx.globalAlpha = 0.6 - i * 0.1;
+      mgCtx.fillStyle = '#ffaa44';
+      mgCtx.beginPath();
+      mgCtx.arc(mgStone.trail[i].x, mgStone.trail[i].y, 6 - i, 0, Math.PI * 2);
+      mgCtx.fill();
+    }
+    mgCtx.globalAlpha = 1;
+    mgCtx.fillStyle = '#c8a060';
+    mgCtx.beginPath();
+    mgCtx.arc(mgStone.x, mgStone.y, 8, 0, Math.PI * 2);
+    mgCtx.fill();
+    mgCtx.fillStyle = '#aa8844';
+    mgCtx.beginPath();
+    mgCtx.arc(mgStone.x - 1, mgStone.y - 1, 3, 0, Math.PI * 2);
+    mgCtx.fill();
+  }
+
+  if (mgChargeActive && !mgStone.active && mgPhase === 'play') {
+    const g2 = mgGoliath;
+    const power = 7 + Math.min(mgStone.charge, 60) * 0.15;
+    const fx = g2.x + 8, fy = g2.y + 2, fw = g2.w - 16, fh = 22;
+
+    let svx = Math.cos(mgAngle) * power, svy = Math.sin(mgAngle) * power;
+    let sx = mgDavid.x + mgDavid.w - 5, sy = mgDavid.y + 30;
+    let willHit = false, hitVy = svy;
+    for (let i = 0; i < 80; i++) {
+      svy += 0.3; sx += svx; sy += svy;
+      if (sx > fx && sx < fx + fw && sy > fy && sy < fy + fh) {
+        willHit = true; hitVy = svy; break;
+      }
+      if (sx > mgWidth + 60 || sy > mgHeight + 60 || sy < -60) break;
+    }
+
+    const isStraight = Math.abs(Math.atan2(hitVy, Math.cos(mgAngle) * power)) < 0.3;
+    const st = g2.state;
+    const canHit = willHit && (
+      (st === 'TAUNTING' || st === 'WINDING_UP' || st === 'STUNNED') ||
+      ((st === 'GUARDING' || st === 'RAGE') && !isStraight)
+    );
+    const dotColor = willHit ? (canHit ? '#44ff88' : '#ff4444') : '#ffdd88';
+
+    let vx = Math.cos(mgAngle) * power, vy = Math.sin(mgAngle) * power;
+    let x = mgDavid.x + mgDavid.w - 5, y = mgDavid.y + 30;
+    mgCtx.save();
+    for (let i = 0; i < 70; i++) {
+      vy += 0.3; x += vx; y += vy;
+      if (i % 2 === 0) {
+        mgCtx.globalAlpha = Math.max(0.08, 0.75 - i * 0.012);
+        mgCtx.fillStyle = dotColor;
+        mgCtx.beginPath();
+        mgCtx.arc(x, y, Math.max(1.5, 4.5 - i * 0.055), 0, Math.PI * 2);
+        mgCtx.fill();
+      }
+      if (x > mgWidth + 60 || y > mgHeight + 60 || y < -60) break;
+    }
+    mgCtx.globalAlpha = 0.45;
+    mgCtx.strokeStyle = dotColor;
+    mgCtx.lineWidth = 1.5;
+    mgCtx.setLineDash([3, 3]);
+    mgCtx.beginPath(); mgCtx.arc(x, y, 9, 0, Math.PI * 2); mgCtx.stroke();
+    mgCtx.setLineDash([]);
+    mgCtx.globalAlpha = 1;
+    mgCtx.restore();
+  }
+
+  if (mgChargeActive && !mgStone.active) {
+    let pct = (mgStone.charge || 0) / 60;
+    mgCtx.fillStyle = `rgba(255, ${200 - Math.round(pct * 200)}, 0, 0.9)`;
+    mgCtx.fillRect(mgDavid.x - 5, mgDavid.y - 20, pct * 60, 8);
+    mgCtx.strokeStyle = 'rgba(255,200,0,0.6)';
+    mgCtx.strokeRect(mgDavid.x - 5, mgDavid.y - 20, 60, 8);
+    mgCtx.fillStyle = 'rgba(255,200,100,0.9)';
+    mgCtx.font = 'bold 10px "Cinzel", monospace';
+    mgCtx.textAlign = 'center';
+    mgCtx.fillText(`⚡ ${Math.round(pct * 100)}%`, mgDavid.x + 25, mgDavid.y - 25);
+  }
+
+  if (mgDodgeActive) {
+    mgCtx.save();
+    mgCtx.globalAlpha = 0.4 + Math.sin(mgFrame * 0.3) * 0.2;
+    mgCtx.strokeStyle = '#44aaff';
+    mgCtx.lineWidth = 3;
+    mgCtx.beginPath();
+    mgCtx.arc(mgDavid.x + mgDavid.w / 2, mgDavid.y + mgDavid.h / 2, 42, 0, Math.PI * 2);
+    mgCtx.stroke();
+    mgCtx.restore();
+  }
+
+  mgCtx.globalAlpha = 1;
+}
+
+function mgGameLoop(now) {
+  if (!mgCanvas || !document.getElementById('s-minigame').classList.contains('active')) {
+    if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
+    mgAnimationId = null;
+    return;
+  }
+  mgAnimationId = requestAnimationFrame(mgGameLoop);
+  let delta = Math.min(32, now - mgLastTimestamp);
+  if (delta < 10) delta = 16;
+  mgLastTimestamp = now;
+  updateMG(delta);
+  drawMG();
+}
+
+setTimeout(() => { showScreen('s-title'); renderEpisodes(); checkCompleteBadge(); document.getElementById('username-inp').focus(); }, 2200);
 </script>
 </body>
 </html>
