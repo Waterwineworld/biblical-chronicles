@@ -282,56 +282,45 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   position: absolute;
   bottom: max(20px, env(safe-area-inset-bottom));
   left: max(16px, env(safe-area-inset-left));
-  right: max(16px, env(safe-area-inset-right));
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
   pointer-events: none;
   z-index: 30;
 }
 .mg-buttons > div { pointer-events: auto; }
 /* ── Analog Joystick (CoD-style) ── */
 .mg-joystick-zone {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
   user-select: none;
   -webkit-user-select: none;
 }
 .mg-joystick-touch-area {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.25);
-  border: 1.5px solid rgba(255,215,0,0.15);
-  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,215,0,0.08);
   touch-action: none;
   overflow: visible;
 }
 .mg-joystick-base {
   position: absolute;
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.5);
-  border: 2px solid rgba(255,215,0,0.45);
-  box-shadow: 0 0 18px rgba(201,168,76,0.15), inset 0 0 20px rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.28);
+  border: 1.5px solid rgba(255,215,0,0.28);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.12s;
+  transition: opacity 0.1s;
   transform: translate(-50%,-50%);
 }
 .mg-joystick-base.visible { opacity: 1; }
 .mg-joystick-knob {
   position: absolute;
-  width: 45px;
-  height: 45px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: radial-gradient(circle at 38% 35%, #f5e4a0, #c9a84c 60%, #8a6820);
-  border: 2.5px solid rgba(255,220,100,0.8);
-  box-shadow: 0 0 14px rgba(255,200,60,0.5), inset 0 2px 4px rgba(255,255,200,0.3);
+  background: radial-gradient(circle at 38% 35%, rgba(245,228,160,0.75), rgba(201,168,76,0.65) 60%, rgba(138,104,32,0.6));
+  border: 2px solid rgba(255,220,100,0.5);
   top: 50%; left: 50%;
   transform: translate(-50%,-50%);
   pointer-events: none;
@@ -341,9 +330,71 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%,-50%);
-  font-size: 16px;
-  color: rgba(100,70,10,0.4);
+  font-size: 14px;
+  color: rgba(100,70,10,0.35);
   pointer-events: none;
+}
+
+/* ── Vertical Aim Bar (right side) ── */
+.mg-aim-bar-zone {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 72px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: auto;
+  z-index: 30;
+}
+.mg-aim-bar {
+  position: relative;
+  width: 44px;
+  height: 60%;
+  border-radius: 22px;
+  background: rgba(192,57,43,0.08);
+  border: 1.5px solid rgba(255,100,60,0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  transition: background 0.1s, border-color 0.1s;
+}
+.mg-aim-bar.active {
+  background: rgba(192,57,43,0.15);
+  border-color: rgba(255,150,80,0.4);
+}
+.mg-aim-bar-label {
+  font-family: monospace;
+  font-size: 9px;
+  color: rgba(255,160,100,0.5);
+  letter-spacing: 1px;
+  text-align: center;
+  pointer-events: none;
+}
+.mg-aim-bar-icon {
+  font-size: 18px;
+  opacity: 0.35;
+  pointer-events: none;
+}
+/* Sliding indicator dot on the bar */
+.mg-aim-bar-cursor {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 35%, rgba(255,220,120,0.7), rgba(200,100,40,0.6));
+  border: 2px solid rgba(255,160,80,0.55);
+  pointer-events: none;
+  top: 50%; /* default center = 0° */
+  transition: top 0.04s;
 }
 .mg-right-actions {
   display: flex;
@@ -351,28 +402,6 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   gap: 16px;
   align-items: flex-end;
 }
-.mg-fire-btn {
-  width: 90px;
-  height: 90px;
-  background: #c0392b;
-  border-radius: 50%;
-  border: 3px solid #ffaa88;
-  font-size: 26px;
-  font-weight: bold;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  touch-action: none;
-  box-shadow: 0 0 10px rgba(255,50,0,0.5);
-  transition: background 0.05s linear, transform 0.05s linear;
-  user-select: none;
-  -webkit-user-select: none;
-}
-.mg-fire-btn.charging { background: #e8762b; transform: scale(0.96); }
-.mg-fire-btn.aiming   { background: #e05a4a; }
 /* OVERLAY - positioned on body with highest z-index to avoid clipping */
 .mg-full-overlay {
   position: fixed;
@@ -568,6 +597,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
       <div class="mg-state-badge" id="mgStateBadge">GUARDING</div>
       <div class="mg-powerups" id="mgPowerups"></div>
     </div>
+    <!-- Left: joystick -->
     <div class="mg-buttons">
       <div class="mg-joystick-zone">
         <div class="mg-joystick-touch-area" id="mgJoystickArea">
@@ -576,8 +606,14 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
           </div>
         </div>
       </div>
-      <div class="mg-right-actions">
-        <div class="mg-fire-btn" id="mgFireBtn">🪨<span style="font-size:10px;margin-top:2px;">DRAG</span></div>
+    </div>
+    <!-- Right: vertical aim bar -->
+    <div class="mg-aim-bar-zone" id="mgAimBarZone">
+      <div class="mg-aim-bar" id="mgAimBar">
+        <span class="mg-aim-bar-label">▲<br>AIM</span>
+        <span class="mg-aim-bar-icon">🪨</span>
+        <span class="mg-aim-bar-label">FIRE<br>▼</span>
+        <div class="mg-aim-bar-cursor" id="mgAimCursor"></div>
       </div>
     </div>
   </div>
@@ -592,6 +628,22 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 const FC={apiKey:"AIzaSyAN3uy58I9BEmjfcjt9LMSbUR6N81Y8sjs",authDomain:"bible-games-92bd2.firebaseapp.com",projectId:"bible-games-92bd2",storageBucket:"bible-games-92bd2.firebasestorage.app",messagingSenderId:"116456102774",appId:"1:116456102774:web:075284078c3c511eb93857"};
 let db=null;
 try{firebase.initializeApp(FC);try{firebase.analytics();}catch(e){}db=firebase.firestore();console.log('✅ Firebase OK');}catch(e){console.warn('Firebase:',e.message);}
+
+// ═══════════════════════════════════════════════════════════════
+//  FULLSCREEN SUPPORT
+// ═══════════════════════════════════════════════════════════════
+function requestFullscreen(el) {
+  const e = el || document.documentElement;
+  const fn = e.requestFullscreen || e.webkitRequestFullscreen || e.mozRequestFullScreen || e.msRequestFullscreen;
+  if (fn) { try { fn.call(e); } catch(err) {} }
+}
+function exitFullscreen() {
+  const fn = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+  if (fn) { try { fn.call(document); } catch(err) {} }
+}
+function isFullscreen() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+}
 
 // ── Get a player's existing best score for one episode ──
 async function fsGetPersonalBest(name,epId){
@@ -837,7 +889,7 @@ function startEp(id){
 function renderLives(){document.getElementById('liveswrap').innerHTML=[1,2,3].map(i=>`<span class="life ${i>G.lives?'lost':''}">🕯️</span>`).join('');}
 function setPhase(ph){G.phase=ph;const idx=['story','challenge','verdict'].indexOf(ph);['ph0','ph1','ph2'].forEach((id,i)=>{const el=document.getElementById(id);if(!el)return;el.className='pstep';if(i<idx)el.classList.add('done');else if(i===idx)el.classList.add('active');});}
 function confirmQuit(){const ov=document.createElement('div');ov.className='modal-ov';ov.innerHTML=`<div class="modal-bx"><div class="mttl">⚠️ Quit Episode?</div><div class="msub2">Your current progress will be lost.</div><div class="mrow"><button class="bgold" onclick="doQuit()">Yes, Quit</button><button class="bghost" onclick="this.closest('.modal-ov').remove()">Keep Playing</button></div></div>`;document.body.appendChild(ov);}
-function doQuit(){clearInterval(G.timer);clearTimeout(G.lineTimer);SoundFX.stopAmbient();document.querySelector('.modal-ov')?.remove();document.getElementById('atm').style.background='transparent';showScreen('s-title');}
+function doQuit(){clearInterval(G.timer);clearTimeout(G.lineTimer);SoundFX.stopAmbient();document.querySelector('.modal-ov')?.remove();document.getElementById('atm').style.background='transparent';if(isFullscreen())exitFullscreen();showScreen('s-title');}
 function renderScene(){const area=document.getElementById('game-area');if(!area){setTimeout(()=>renderScene(),80);return;}const sc=G.ep.scenes[G.scene];clearTimeout(G.lineTimer);G.lineIdx=0;const total=G.ep.scenes.length;const dots=G.ep.scenes.map((_,i)=>`<span class="sdot ${i<G.scene?'done':i===G.scene?'active':''}"></span>`).join('');area.innerHTML=`<div class="spanel"><div class="shdr"><span class="sico">${sc.icon}</span><div><div class="slbl">Scene ${G.scene+1} of ${total}</div><div class="snm">${sc.name}</div></div></div><div class="sbody"><div id="stlines"></div>${sc.scripture?`<div class="screv" id="screv"><div class="sclbl">📖 Scripture</div><div class="sctxt">"${sc.scripture.text}"</div><div class="scref">— ${sc.scripture.ref}</div></div>`:''}</div><div class="snav"><div class="sdots">${dots}</div><div style="display:flex;align-items:center;gap:12px;"><span class="sklnk" onclick="skipAll()">Skip</span><button class="bcont" id="btnnext" onclick="nextScene()" style="display:none;">${G.scene<total-1?'Next Scene →':'Begin Challenge →'}</button></div></div></div>`;revealLines(sc);}
 function revealLines(sc){const c=document.getElementById('stlines');if(!c)return;if(G.lineIdx>=sc.lines.length){const r=document.getElementById('screv');if(r)setTimeout(()=>r.classList.add('vis'),400);setTimeout(()=>{const b=document.getElementById('btnnext');if(b)b.style.display='inline-flex';},r?1400:500);return;}const l=sc.lines[G.lineIdx];const d=document.createElement('div');d.className=`stline ${l.t}`;d.textContent=l.text;c.appendChild(d);requestAnimationFrame(()=>setTimeout(()=>d.classList.add('vis'),30));G.lineIdx++;const delay=l.t==='dramatic'?1200:l.t==='whisper'?950:720;G.lineTimer=setTimeout(()=>revealLines(sc),delay);}
 function skipAll(){clearTimeout(G.lineTimer);const c=document.getElementById('stlines');if(!c)return;const sc=G.ep.scenes[G.scene];while(G.lineIdx<sc.lines.length){const l=sc.lines[G.lineIdx];if(!c.children[G.lineIdx]){const d=document.createElement('div');d.className=`stline ${l.t} vis`;d.textContent=l.text;c.appendChild(d);}G.lineIdx++;}const r=document.getElementById('screv');if(r)r.classList.add('vis');const b=document.getElementById('btnnext');if(b)b.style.display='inline-flex';}
@@ -1002,6 +1054,7 @@ function startMiniGame() {
 
 // ========== NEW initializeMiniGame FUNCTION (OUTSIDE startMiniGame) ==========
 function initializeMiniGame() {
+  requestFullscreen();
   setBodyScrollLock(true);
   
   mgCanvas = document.getElementById('mgCanvas');
@@ -1109,6 +1162,14 @@ function updateMGUI() {
   document.getElementById('mgStateBadge').innerText = mgGoliath.state;
 }
 
+function exitMiniGame() {
+  if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
+  mgAnimationId = null;
+  if (isFullscreen()) exitFullscreen();
+  setBodyScrollLock(false);
+  showScreen('s-title');
+}
+
 function showMGOverlay(type) {
   let ov = document.querySelector('.mg-full-overlay');
   if (ov) ov.remove();
@@ -1116,8 +1177,9 @@ function showMGOverlay(type) {
   ov.className = 'mg-full-overlay';
   if (type === 'start') {
     ov.innerHTML = `<h2>⚔️ David vs Goliath</h2>
-      <p>🕹️ <b>Left stick</b> — move David anywhere<br>🪨 <b>Drag FIRE button</b> — aim direction, release to throw<br>Charge longer = more power!<br>Hit Goliath's forehead <b>3 times!</b></p>
-      <button id="mgStartBtn">⚔️ BEGIN BATTLE</button>`;
+      <p>🕹️ <b>Left stick</b> — move David anywhere<br>📏 <b>Right bar</b> — slide up/down to aim, release to throw<br>Hold longer = more power!<br>Hit Goliath's forehead <b>3 times!</b></p>
+      <button id="mgStartBtn">⚔️ BEGIN BATTLE</button>
+      <button id="mgExitBtn" style="background:#444;color:#fff;">✕ Back to Menu</button>`;
     document.body.appendChild(ov);
     document.getElementById('mgStartBtn').onclick = () => {
       ov.remove();
@@ -1128,6 +1190,7 @@ function showMGOverlay(type) {
       mgLastTimestamp = 0;
       mgAnimationId = requestAnimationFrame(mgGameLoop);
     };
+    document.getElementById('mgExitBtn').onclick = () => { ov.remove(); exitMiniGame(); };
   } else if (type === 'victory') {
     ov.innerHTML = `<h2>🏆 VICTORY!</h2><p>Score: ${mgScore}<br>Max Combo: ${mgMaxCombo}x</p><button id="mgSaveBtn">💾 Save Score</button><button id="mgRestartBtn">Play Again</button><button id="mgMenuBtn">Back to Menu</button>`;
     document.body.appendChild(ov);
@@ -1152,31 +1215,29 @@ function showMGOverlay(type) {
       }else{
         btn.textContent='❌ Failed';btn.disabled=false;return;
       }
-      setTimeout(()=>{ov.remove();showScreen('s-leaderboard');loadLB('minigame');},1500);
+      setTimeout(()=>{ov.remove();exitMiniGame();showScreen('s-leaderboard');loadLB('minigame');},1500);
     };
     document.getElementById('mgRestartBtn').onclick = () => { ov.remove(); resetMG(); showMGOverlay('start'); };
-    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); setBodyScrollLock(false); showScreen('s-title'); };
+    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); exitMiniGame(); };
   } else if (type === 'gameover') {
     ov.innerHTML = `<h2>💀 DEFEATED</h2><p>Score: ${mgScore}</p><button id="mgRestartBtn">Try Again</button><button id="mgMenuBtn">Back to Menu</button>`;
     document.body.appendChild(ov);
     document.getElementById('mgRestartBtn').onclick = () => { ov.remove(); resetMG(); showMGOverlay('start'); };
-    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); setBodyScrollLock(false); showScreen('s-title'); };
+    document.getElementById('mgMenuBtn').onclick = () => { ov.remove(); exitMiniGame(); };
   }
 }
 
 function bindMGButtons() {
-  console.log("bindMGButtons: analog joystick mode");
+  console.log("bindMGButtons: joystick + vertical aim bar");
 
-  // ─── Joystick globals ─────────────────────────────────────────
-  const JOYSTICK_RADIUS = 45; // max knob travel radius (px)
-  let joyTouchId = null;
-  let joyBaseX = 0, joyBaseY = 0;
+  // ─── LEFT JOYSTICK ────────────────────────────────────────────
+  const JOYSTICK_RADIUS = 40;
+  let joyTouchId = null, joyBaseX = 0, joyBaseY = 0;
 
   const joystickArea = document.getElementById('mgJoystickArea');
   const joystickBase = document.getElementById('mgJoystickBase');
   const joystickKnob = document.getElementById('mgJoystickKnob');
 
-  // ─── LEFT JOYSTICK ────────────────────────────────────────────
   function joyStart(clientX, clientY) {
     const rect = joystickArea.getBoundingClientRect();
     const margin = JOYSTICK_RADIUS + 5;
@@ -1197,16 +1258,14 @@ function bindMGButtons() {
     const dy = (clientY - rect.top)  - joyBaseY;
     const dist = Math.hypot(dx, dy);
     const clamped = Math.min(dist, JOYSTICK_RADIUS);
-    const angle = Math.atan2(dy, dx);
-    const kx = Math.cos(angle) * clamped;
-    const ky = Math.sin(angle) * clamped;
-    // Move knob visually within the base circle
-    joystickKnob.style.left = (50 + (kx / JOYSTICK_RADIUS) * 42) + '%';
-    joystickKnob.style.top  = (50 + (ky / JOYSTICK_RADIUS) * 42) + '%';
-    // Normalised velocity with small dead zone and slight boost at edge
+    const ang = Math.atan2(dy, dx);
+    const kx = Math.cos(ang) * clamped;
+    const ky = Math.sin(ang) * clamped;
+    joystickKnob.style.left = (50 + (kx / JOYSTICK_RADIUS) * 44) + '%';
+    joystickKnob.style.top  = (50 + (ky / JOYSTICK_RADIUS) * 44) + '%';
     const norm = dist > 5 ? Math.min(1, (clamped / JOYSTICK_RADIUS) * 1.2) : 0;
-    mgJoyVX = Math.cos(angle) * norm;
-    mgJoyVY = Math.sin(angle) * norm;
+    mgJoyVX = Math.cos(ang) * norm;
+    mgJoyVY = Math.sin(ang) * norm;
   }
 
   function joyEnd() {
@@ -1235,105 +1294,115 @@ function bindMGButtons() {
   joystickArea.addEventListener('touchend',    (e) => { e.preventDefault(); joyEnd(); }, { passive: false });
   joystickArea.addEventListener('touchcancel', (e) => { e.preventDefault(); joyEnd(); }, { passive: false });
 
-  // Mouse support (desktop)
+  // Mouse support
   let mouseJoy = false;
   joystickArea.addEventListener('mousedown', (e) => { mouseJoy = true; joyStart(e.clientX, e.clientY); });
   document.addEventListener('mousemove', (e) => { if (mouseJoy) joyMove(e.clientX, e.clientY); });
   document.addEventListener('mouseup', () => { if (mouseJoy) { mouseJoy = false; joyEnd(); } });
 
-  // ─── RIGHT — FIRE BUTTON (drag to aim, release to throw) ──────
-  // The player holds the fire button, drags to set angle, releases to throw.
-  // Drag direction = throw direction. Longer hold = more charge/power.
-  const fireBtn = document.getElementById('mgFireBtn');
-  let fireTouchId = null;
-  let fireStartX = 0, fireStartY = 0;
-  let fireDragging = false;
-  const AIM_DRAG_THRESHOLD = 10; // px before we treat it as an aim drag
+  // ─── VERTICAL AIM BAR (right side) ───────────────────────────
+  // Slide up = aim high arc (-angle), slide down = lower arc (+angle).
+  // The bar height maps Y to angle range [-0.85, 0.45] radians.
+  // Hold = charge power. Release = fire.
+  const aimBarZone  = document.getElementById('mgAimBarZone');
+  const aimBar      = document.getElementById('mgAimBar');
+  const aimCursor   = document.getElementById('mgAimCursor');
 
-  function fireStart(clientX, clientY) {
-    fireStartX = clientX;
-    fireStartY = clientY;
-    fireDragging = false;
+  const AIM_ANGLE_TOP    = -0.85; // radians when thumb at top of bar
+  const AIM_ANGLE_BOTTOM =  0.45; // radians when thumb at bottom
+  const AIM_ANGLE_DEFAULT = 0;    // center = straight
+
+  let aimTouchId = null;
+  let aimActive  = false;
+
+  function getBarRect() { return aimBar.getBoundingClientRect(); }
+
+  function yToAngle(clientY) {
+    const rect = getBarRect();
+    const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+    const t = relY / rect.height; // 0=top, 1=bottom
+    return AIM_ANGLE_TOP + t * (AIM_ANGLE_BOTTOM - AIM_ANGLE_TOP);
+  }
+
+  function updateCursor(clientY) {
+    const rect = getBarRect();
+    const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+    const pct  = relY / rect.height * 100;
+    aimCursor.style.top = pct + '%';
+  }
+
+  function aimStart(clientY) {
+    aimActive = true;
     mgChargeActive = true;
     mgStone.charge = 0;
-    fireBtn.classList.add('charging');
-    // Default angle: toward Goliath
-    const davidCX = mgDavid.x + mgDavid.w / 2;
-    const davidCY = mgDavid.y + mgDavid.h / 2;
-    const gCX = mgGoliath.x + mgGoliath.w / 2;
-    const gCY = mgGoliath.y + mgGoliath.h / 2;
-    mgAngle = Math.atan2(gCY - davidCY, gCX - davidCX);
+    aimBar.classList.add('active');
+    mgAngle = yToAngle(clientY);
+    updateCursor(clientY);
   }
 
-  function fireMove(clientX, clientY) {
-    if (!mgChargeActive) return;
-    const dx = clientX - fireStartX;
-    const dy = clientY - fireStartY;
-    const dist = Math.hypot(dx, dy);
-    if (dist > AIM_DRAG_THRESHOLD) {
-      fireDragging = true;
-      // Drag direction IS the aim direction
-      mgAngle = Math.atan2(dy, dx);
-      fireBtn.classList.remove('charging');
-      fireBtn.classList.add('aiming');
-    }
+  function aimMove(clientY) {
+    if (!aimActive) return;
+    mgAngle = yToAngle(clientY);
+    updateCursor(clientY);
   }
 
-  function fireEnd() {
+  function aimEnd() {
+    if (!aimActive) return;
+    aimActive = false;
+    aimTouchId = null;
+    aimBar.classList.remove('active');
+    // Reset cursor to center
+    aimCursor.style.top = '50%';
     if (mgChargeActive && !mgStone.active) fireMGStone();
     mgChargeActive = false;
-    fireDragging = false;
-    fireTouchId = null;
-    fireBtn.classList.remove('charging', 'aiming');
   }
 
-  fireBtn.addEventListener('touchstart', (e) => {
+  aimBarZone.addEventListener('touchstart', (e) => {
     e.preventDefault();
-    if (fireTouchId !== null) return;
+    if (aimTouchId !== null) return;
     const t = e.changedTouches[0];
-    fireTouchId = t.identifier;
-    fireStart(t.clientX, t.clientY);
+    aimTouchId = t.identifier;
+    aimStart(t.clientY);
   }, { passive: false });
 
-  // Listen for fire touch move on the whole document so dragging outside the button still registers
+  // Track aim touch across whole document so sliding outside zone still works
   document.addEventListener('touchmove', (e) => {
-    if (fireTouchId === null) return;
+    if (aimTouchId === null) return;
     for (const t of e.changedTouches) {
-      if (t.identifier === fireTouchId) { fireMove(t.clientX, t.clientY); break; }
+      if (t.identifier === aimTouchId) { aimMove(t.clientY); break; }
     }
   }, { passive: false });
 
   document.addEventListener('touchend', (e) => {
-    if (fireTouchId === null) return;
+    if (aimTouchId === null) return;
     for (const t of e.changedTouches) {
-      if (t.identifier === fireTouchId) { fireEnd(); break; }
+      if (t.identifier === aimTouchId) { aimEnd(); break; }
     }
   });
 
   document.addEventListener('touchcancel', (e) => {
-    if (fireTouchId === null) return;
+    if (aimTouchId === null) return;
     for (const t of e.changedTouches) {
-      if (t.identifier === fireTouchId) { fireEnd(); break; }
+      if (t.identifier === aimTouchId) { aimEnd(); break; }
     }
   });
 
-  // Mouse support for fire button (desktop)
-  let mouseFire = false;
-  fireBtn.addEventListener('mousedown', (e) => { mouseFire = true; fireStart(e.clientX, e.clientY); });
-  document.addEventListener('mousemove', (e) => { if (mouseFire) fireMove(e.clientX, e.clientY); });
-  document.addEventListener('mouseup', () => { if (mouseFire) { mouseFire = false; fireEnd(); } });
+  // Mouse support for aim bar (desktop)
+  let mouseAim = false;
+  aimBarZone.addEventListener('mousedown', (e) => { mouseAim = true; aimStart(e.clientY); });
+  document.addEventListener('mousemove', (e) => { if (mouseAim) aimMove(e.clientY); });
+  document.addEventListener('mouseup', () => { if (mouseAim) { mouseAim = false; aimEnd(); } });
 
   // ─── Quit button ──────────────────────────────────────────────
   const quitBtn = document.getElementById('mgQuitBtn');
   if (quitBtn) {
     quitBtn.addEventListener('click', () => {
       if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
-      setBodyScrollLock(false);
-      showScreen('s-title');
+      exitMiniGame();
     });
   }
 
-  // ─── Keyboard support (desktop) ───────────────────────────────
+  // ─── Keyboard (desktop) ───────────────────────────────────────
   let keyUp = false, keyDown = false, keyLeft = false, keyRight = false;
   let spacePressed = false;
 
@@ -1345,7 +1414,10 @@ function bindMGButtons() {
     if (key === 'ArrowLeft')  { keyLeft  = true; }
     if (key === 'ArrowRight') { keyRight = true; }
     mgMoveUp = keyUp; mgMoveDown = keyDown; mgMoveLeft = keyLeft; mgMoveRight = keyRight;
-    if ((key === ' ') && !spacePressed) { spacePressed = true; mgChargeActive = true; mgStone.charge = 0; }
+    if (key === 'w' || key === 'W') mgAngle = Math.max(-0.85, mgAngle - 0.06);
+    if (key === 's' || key === 'S') mgAngle = Math.min( 0.45, mgAngle + 0.06);
+    if (key === ' ' && !spacePressed) { spacePressed = true; mgChargeActive = true; mgStone.charge = 0; }
+    if (key === 'Escape') { if (mgAnimationId) cancelAnimationFrame(mgAnimationId); exitMiniGame(); }
   });
 
   window.addEventListener('keyup', (e) => {
