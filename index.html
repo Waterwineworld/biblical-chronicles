@@ -278,20 +278,6 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   pointer-events: none;
   font-size: 12px;
 }
-.mg-dodge-indicator {
-  position: absolute;
-  bottom: max(10px, env(safe-area-inset-bottom));
-  left: 50%;
-  transform: translateX(-50%);
-  background: #000000aa;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-family: monospace;
-  color: #ccc;
-  pointer-events: none;
-  white-space: nowrap;
-}
 .mg-buttons {
   position: absolute;
   bottom: max(20px, env(safe-area-inset-bottom));
@@ -315,30 +301,19 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 }
 .mg-joystick-touch-area {
   position: relative;
-  width: 170px;
-  height: 170px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.35);
-  border: 1.5px solid rgba(255,215,0,0.2);
+  background: rgba(0,0,0,0.25);
+  border: 1.5px solid rgba(255,215,0,0.15);
   backdrop-filter: blur(8px);
   touch-action: none;
   overflow: visible;
 }
-/* Subtle ring guides */
-.mg-joystick-touch-area::before {
-  content: '';
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%,-50%);
-  width: 80px; height: 80px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,215,0,0.1);
-  pointer-events: none;
-}
 .mg-joystick-base {
   position: absolute;
-  width: 140px;
-  height: 140px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   background: rgba(0,0,0,0.5);
   border: 2px solid rgba(255,215,0,0.45);
@@ -351,8 +326,8 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .mg-joystick-base.visible { opacity: 1; }
 .mg-joystick-knob {
   position: absolute;
-  width: 58px;
-  height: 58px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   background: radial-gradient(circle at 38% 35%, #f5e4a0, #c9a84c 60%, #8a6820);
   border: 2.5px solid rgba(255,220,100,0.8);
@@ -360,42 +335,15 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   top: 50%; left: 50%;
   transform: translate(-50%,-50%);
   pointer-events: none;
-  transition: transform 0.05s;
 }
-/* Direction arrows faintly etched into knob */
 .mg-joystick-knob::after {
   content: '✛';
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%,-50%);
-  font-size: 18px;
+  font-size: 16px;
   color: rgba(100,70,10,0.4);
   pointer-events: none;
-}
-.mg-angle-row {
-  margin-top: 10px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-.mg-angle-row button {
-  background: #2a2a3acc;
-  border: 1px solid #e8c96a;
-  border-radius: 40px;
-  padding: 6px 14px;
-  font-size: 14px;
-  font-weight: bold;
-  color: #ffaa66;
-  cursor: pointer;
-  touch-action: manipulation;
-}
-.mg-angle-value {
-  background: #000000aa;
-  border-radius: 20px;
-  padding: 4px 12px;
-  font-family: monospace;
-  font-size: 14px;
-  color: #ffaa66;
 }
 .mg-right-actions {
   display: flex;
@@ -404,12 +352,12 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   align-items: flex-end;
 }
 .mg-fire-btn {
-  width: 85px;
-  height: 85px;
+  width: 90px;
+  height: 90px;
   background: #c0392b;
   border-radius: 50%;
   border: 3px solid #ffaa88;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: bold;
   color: white;
   display: flex;
@@ -417,25 +365,14 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  touch-action: manipulation;
+  touch-action: none;
   box-shadow: 0 0 10px rgba(255,50,0,0.5);
-  transition: 0.05s linear;
+  transition: background 0.05s linear, transform 0.05s linear;
+  user-select: none;
+  -webkit-user-select: none;
 }
-.mg-fire-btn:active { transform: scale(0.94); background: #e05a4a; }
-.mg-dodge-btn {
-  background: #2c6e9e;
-  border: 2px solid #4af;
-  border-radius: 60px;
-  padding: 10px 20px;
-  font-size: 16px;
-  font-weight: bold;
-  color: white;
-  cursor: pointer;
-  touch-action: manipulation;
-  text-align: center;
-  transition: 0.05s linear;
-}
-.mg-dodge-btn:active { transform: scale(0.96); background: #4a9eff; }
+.mg-fire-btn.charging { background: #e8762b; transform: scale(0.96); }
+.mg-fire-btn.aiming   { background: #e05a4a; }
 /* OVERLAY - positioned on body with highest z-index to avoid clipping */
 .mg-full-overlay {
   position: fixed;
@@ -630,7 +567,6 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
       </div>
       <div class="mg-state-badge" id="mgStateBadge">GUARDING</div>
       <div class="mg-powerups" id="mgPowerups"></div>
-      <div class="mg-dodge-indicator" id="mgDodgeIndicator">Dodge Roll: Ready</div>
     </div>
     <div class="mg-buttons">
       <div class="mg-joystick-zone">
@@ -639,15 +575,9 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
             <div class="mg-joystick-knob" id="mgJoystickKnob"></div>
           </div>
         </div>
-        <div class="mg-angle-row">
-          <button id="mgAnglePlus">+Angle</button>
-          <button id="mgAngleMinus">-Angle</button>
-          <div class="mg-angle-value" id="mgAngleValue">0°</div>
-        </div>
       </div>
       <div class="mg-right-actions">
-        <div class="mg-fire-btn" id="mgFireBtn">🪨<span style="font-size:10px;">HOLD</span></div>
-        <div class="mg-dodge-btn" id="mgDodgeBtn">💨 DODGE</div>
+        <div class="mg-fire-btn" id="mgFireBtn">🪨<span style="font-size:10px;margin-top:2px;">DRAG</span></div>
       </div>
     </div>
   </div>
@@ -993,7 +923,6 @@ let mgHits = 0, mgLives = 3, mgScore = 0, mgCombo = 0, mgMaxCombo = 0;
 let mgPhase = 'play';
 let mgAngle = 0;
 let mgChargeActive = false;
-let mgDodgeActive = false, mgDodgeCooldown = 0;
 let mgShake = 0;
 let mgFrame = 0;
 let mgBatchSize = 0, mgBatchCooldown = 0;
@@ -1149,7 +1078,6 @@ function resetMG() {
   mgPhase = 'play';
   mgAngle = 0;
   mgChargeActive = false;
-  mgDodgeActive = false; mgDodgeCooldown = 0;
   mgShake = 0;
   mgFrame = 0;
   mgBatchSize = 0; mgBatchCooldown = 0;
@@ -1163,10 +1091,6 @@ function updateMGUI() {
   document.getElementById('mgLives').innerHTML = '❤️'.repeat(mgLives) + '🖤'.repeat(3 - mgLives);
   document.getElementById('mgScore').innerText = mgScore;
   document.getElementById('mgStateBadge').innerText = mgGoliath.state;
-  document.getElementById('mgAngleValue').innerText = Math.round(mgAngle * 180 / Math.PI) + '°';
-  if (mgDodgeActive) document.getElementById('mgDodgeIndicator').innerText = '💨 DODGE ACTIVE!';
-  else if (mgDodgeCooldown > 0) document.getElementById('mgDodgeIndicator').innerText = `⏳ Dodge: ${Math.ceil(mgDodgeCooldown / 60)}s`;
-  else document.getElementById('mgDodgeIndicator').innerText = '✅ Dodge Roll Ready';
 }
 
 function showMGOverlay(type) {
@@ -1176,7 +1100,7 @@ function showMGOverlay(type) {
   ov.className = 'mg-full-overlay';
   if (type === 'start') {
     ov.innerHTML = `<h2>⚔️ David vs Goliath</h2>
-      <p>Drag the <b>left joystick</b> to move David<br>Hold <b>FIRE</b> to charge & aim<br>Use <b>+Angle / -Angle</b> to adjust trajectory<br>Press <b>DODGE</b> for invincible roll<br>Hit Goliath's forehead <b>3 times!</b></p>
+      <p>🕹️ <b>Left stick</b> — move David anywhere<br>🪨 <b>Drag FIRE button</b> — aim direction, release to throw<br>Charge longer = more power!<br>Hit Goliath's forehead <b>3 times!</b></p>
       <button id="mgStartBtn">⚔️ BEGIN BATTLE</button>`;
     document.body.appendChild(ov);
     document.getElementById('mgStartBtn').onclick = () => {
@@ -1228,7 +1152,7 @@ function bindMGButtons() {
   console.log("bindMGButtons: analog joystick mode");
 
   // ─── Joystick globals ─────────────────────────────────────────
-  const JOYSTICK_RADIUS = 55; // max knob travel from base centre (px)
+  const JOYSTICK_RADIUS = 45; // max knob travel radius (px)
   let joyTouchId = null;
   let joyBaseX = 0, joyBaseY = 0;
 
@@ -1236,23 +1160,17 @@ function bindMGButtons() {
   const joystickBase = document.getElementById('mgJoystickBase');
   const joystickKnob = document.getElementById('mgJoystickKnob');
 
+  // ─── LEFT JOYSTICK ────────────────────────────────────────────
   function joyStart(clientX, clientY) {
     const rect = joystickArea.getBoundingClientRect();
-    // Clamp base position so the base circle stays inside the touch area
     const margin = JOYSTICK_RADIUS + 5;
     joyBaseX = Math.max(margin, Math.min(rect.width  - margin, clientX - rect.left));
     joyBaseY = Math.max(margin, Math.min(rect.height - margin, clientY - rect.top));
-
-    // Position base
     joystickBase.style.left = joyBaseX + 'px';
     joystickBase.style.top  = joyBaseY + 'px';
     joystickBase.classList.add('visible');
-
-    // Reset knob to centre
     joystickKnob.style.left = '50%';
     joystickKnob.style.top  = '50%';
-    joystickKnob.style.transform = 'translate(-50%,-50%)';
-
     mgJoyVX = 0; mgJoyVY = 0; mgJoyActive = true;
   }
 
@@ -1266,13 +1184,11 @@ function bindMGButtons() {
     const angle = Math.atan2(dy, dx);
     const kx = Math.cos(angle) * clamped;
     const ky = Math.sin(angle) * clamped;
-
-    // Move knob visually (offset from base centre)
-    joystickKnob.style.left = (50 + (kx / 70) * 50) + '%';
-    joystickKnob.style.top  = (50 + (ky / 70) * 50) + '%';
-
-    // Normalised velocity (0…1)
-    const norm = dist > 8 ? clamped / JOYSTICK_RADIUS : 0;  // dead zone 8px
+    // Move knob visually within the base circle
+    joystickKnob.style.left = (50 + (kx / JOYSTICK_RADIUS) * 42) + '%';
+    joystickKnob.style.top  = (50 + (ky / JOYSTICK_RADIUS) * 42) + '%';
+    // Normalised velocity with small dead zone and slight boost at edge
+    const norm = dist > 5 ? Math.min(1, (clamped / JOYSTICK_RADIUS) * 1.2) : 0;
     mgJoyVX = Math.cos(angle) * norm;
     mgJoyVY = Math.sin(angle) * norm;
   }
@@ -1283,13 +1199,11 @@ function bindMGButtons() {
     joystickBase.classList.remove('visible');
     joystickKnob.style.left = '50%';
     joystickKnob.style.top  = '50%';
-    joystickKnob.style.transform = 'translate(-50%,-50%)';
   }
 
-  // Touch events on joystick area
   joystickArea.addEventListener('touchstart', (e) => {
     e.preventDefault();
-    if (joyTouchId !== null) return;       // already active
+    if (joyTouchId !== null) return;
     const t = e.changedTouches[0];
     joyTouchId = t.identifier;
     joyStart(t.clientX, t.clientY);
@@ -1305,82 +1219,93 @@ function bindMGButtons() {
   joystickArea.addEventListener('touchend',    (e) => { e.preventDefault(); joyEnd(); }, { passive: false });
   joystickArea.addEventListener('touchcancel', (e) => { e.preventDefault(); joyEnd(); }, { passive: false });
 
-  // Mouse support (desktop testing)
+  // Mouse support (desktop)
   let mouseJoy = false;
   joystickArea.addEventListener('mousedown', (e) => { mouseJoy = true; joyStart(e.clientX, e.clientY); });
   document.addEventListener('mousemove', (e) => { if (mouseJoy) joyMove(e.clientX, e.clientY); });
   document.addEventListener('mouseup', () => { if (mouseJoy) { mouseJoy = false; joyEnd(); } });
 
-  // ─── Angle buttons ────────────────────────────────────────────
-  const anglePlus  = document.getElementById('mgAnglePlus');
-  const angleMinus = document.getElementById('mgAngleMinus');
-
-  let anglePlusActive = false, angleMinusActive = false;
-  let angleTouchId1 = null, angleTouchId2 = null;
-
-  function setupAngleBtn(btn, setActive, clearId) {
-    btn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      const t = e.changedTouches[0];
-      setActive(t.identifier, true);
-    }, { passive: false });
-    btn.addEventListener('touchend',    (e) => { e.preventDefault(); setActive(null, false); }, { passive: false });
-    btn.addEventListener('touchcancel', (e) => { e.preventDefault(); setActive(null, false); }, { passive: false });
-    btn.addEventListener('mousedown', () => setActive('mouse', true));
-    btn.addEventListener('mouseup',   () => setActive(null, false));
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const dir = btn.id === 'mgAnglePlus' ? 1 : -1;
-      mgAngleAdjust = dir;
-      setTimeout(() => { mgAngleAdjust = 0; }, 150);
-      SoundFX.beep(dir > 0 ? 650 : 550, 0.04);
-    });
-  }
-
-  setupAngleBtn(anglePlus,  (id, on) => { angleTouchId1 = id; mgAngleAdjust = on ? 1  : (angleTouchId2 ? -1 : 0); });
-  setupAngleBtn(angleMinus, (id, on) => { angleTouchId2 = id; mgAngleAdjust = on ? -1 : (angleTouchId1 ?  1 : 0); });
-
-  // ─── Fire button ──────────────────────────────────────────────
-  const fireBtn  = document.getElementById('mgFireBtn');
+  // ─── RIGHT — FIRE BUTTON (drag to aim, release to throw) ──────
+  // The player holds the fire button, drags to set angle, releases to throw.
+  // Drag direction = throw direction. Longer hold = more charge/power.
+  const fireBtn = document.getElementById('mgFireBtn');
   let fireTouchId = null;
+  let fireStartX = 0, fireStartY = 0;
+  let fireDragging = false;
+  const AIM_DRAG_THRESHOLD = 10; // px before we treat it as an aim drag
 
-  function handleFireStart(e) {
-    e.preventDefault();
-    const t = e.changedTouches ? e.changedTouches[0] : null;
-    if (t) fireTouchId = t.identifier;
+  function fireStart(clientX, clientY) {
+    fireStartX = clientX;
+    fireStartY = clientY;
+    fireDragging = false;
     mgChargeActive = true;
-    fireBtn.style.transform = 'scale(0.94)';
-    fireBtn.style.background = '#e05a4a';
+    mgStone.charge = 0;
+    fireBtn.classList.add('charging');
+    // Default angle: toward Goliath
+    const davidCX = mgDavid.x + mgDavid.w / 2;
+    const davidCY = mgDavid.y + mgDavid.h / 2;
+    const gCX = mgGoliath.x + mgGoliath.w / 2;
+    const gCY = mgGoliath.y + mgGoliath.h / 2;
+    mgAngle = Math.atan2(gCY - davidCY, gCX - davidCX);
   }
-  function handleFireEnd(e) {
-    e.preventDefault();
-    fireTouchId = null;
+
+  function fireMove(clientX, clientY) {
+    if (!mgChargeActive) return;
+    const dx = clientX - fireStartX;
+    const dy = clientY - fireStartY;
+    const dist = Math.hypot(dx, dy);
+    if (dist > AIM_DRAG_THRESHOLD) {
+      fireDragging = true;
+      // Drag direction IS the aim direction
+      mgAngle = Math.atan2(dy, dx);
+      fireBtn.classList.remove('charging');
+      fireBtn.classList.add('aiming');
+    }
+  }
+
+  function fireEnd() {
     if (mgChargeActive && !mgStone.active) fireMGStone();
     mgChargeActive = false;
-    fireBtn.style.transform = '';
-    fireBtn.style.background = '';
+    fireDragging = false;
+    fireTouchId = null;
+    fireBtn.classList.remove('charging', 'aiming');
   }
-  fireBtn.addEventListener('touchstart',  handleFireStart);
-  fireBtn.addEventListener('touchend',    handleFireEnd);
-  fireBtn.addEventListener('touchcancel', handleFireEnd);
-  fireBtn.addEventListener('mousedown',   handleFireStart);
-  fireBtn.addEventListener('mouseup',     handleFireEnd);
 
-  // ─── Dodge button ─────────────────────────────────────────────
-  const dodgeBtn = document.getElementById('mgDodgeBtn');
-  dodgeBtn.addEventListener('touchstart', (e) => {
+  fireBtn.addEventListener('touchstart', (e) => {
     e.preventDefault();
-    if (mgDodgeCooldown <= 0 && !mgDodgeActive && mgPhase === 'play') {
-      mgDodgeActive = true;
-      SoundFX.beep(550, 0.15);
+    if (fireTouchId !== null) return;
+    const t = e.changedTouches[0];
+    fireTouchId = t.identifier;
+    fireStart(t.clientX, t.clientY);
+  }, { passive: false });
+
+  // Listen for fire touch move on the whole document so dragging outside the button still registers
+  document.addEventListener('touchmove', (e) => {
+    if (fireTouchId === null) return;
+    for (const t of e.changedTouches) {
+      if (t.identifier === fireTouchId) { fireMove(t.clientX, t.clientY); break; }
     }
   }, { passive: false });
-  dodgeBtn.addEventListener('click', () => {
-    if (mgDodgeCooldown <= 0 && !mgDodgeActive && mgPhase === 'play') {
-      mgDodgeActive = true;
-      SoundFX.beep(550, 0.15);
+
+  document.addEventListener('touchend', (e) => {
+    if (fireTouchId === null) return;
+    for (const t of e.changedTouches) {
+      if (t.identifier === fireTouchId) { fireEnd(); break; }
     }
   });
+
+  document.addEventListener('touchcancel', (e) => {
+    if (fireTouchId === null) return;
+    for (const t of e.changedTouches) {
+      if (t.identifier === fireTouchId) { fireEnd(); break; }
+    }
+  });
+
+  // Mouse support for fire button (desktop)
+  let mouseFire = false;
+  fireBtn.addEventListener('mousedown', (e) => { mouseFire = true; fireStart(e.clientX, e.clientY); });
+  document.addEventListener('mousemove', (e) => { if (mouseFire) fireMove(e.clientX, e.clientY); });
+  document.addEventListener('mouseup', () => { if (mouseFire) { mouseFire = false; fireEnd(); } });
 
   // ─── Quit button ──────────────────────────────────────────────
   const quitBtn = document.getElementById('mgQuitBtn');
@@ -1398,16 +1323,16 @@ function bindMGButtons() {
 
   window.addEventListener('keydown', (e) => {
     const key = e.key;
-    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Space'].includes(key)) e.preventDefault();
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(key)) e.preventDefault();
     if (key === 'ArrowUp')    { keyUp    = true; }
     if (key === 'ArrowDown')  { keyDown  = true; }
     if (key === 'ArrowLeft')  { keyLeft  = true; }
     if (key === 'ArrowRight') { keyRight = true; }
     mgMoveUp = keyUp; mgMoveDown = keyDown; mgMoveLeft = keyLeft; mgMoveRight = keyRight;
-    if ((key === ' ' || key === 'Space') && !spacePressed) { spacePressed = true; mgChargeActive = true; }
-    if (key === 'ArrowUp'   || key === 'w') mgAngleAdjust =  1;
-    if (key === 'ArrowDown' || key === 's') mgAngleAdjust = -1;
-    if (key === 'Shift') { if (mgDodgeCooldown <= 0 && !mgDodgeActive && mgPhase === 'play') mgDodgeActive = true; }
+    // Q/E adjust angle on keyboard
+    if (key === 'q' || key === 'Q') { mgAngle = Math.max(-1.2, mgAngle - 0.08); }
+    if (key === 'e' || key === 'E') { mgAngle = Math.min( 1.2, mgAngle + 0.08); }
+    if ((key === ' ') && !spacePressed) { spacePressed = true; mgChargeActive = true; mgStone.charge = 0; }
   });
 
   window.addEventListener('keyup', (e) => {
@@ -1417,10 +1342,9 @@ function bindMGButtons() {
     if (key === 'ArrowLeft')  { keyLeft  = false; }
     if (key === 'ArrowRight') { keyRight = false; }
     mgMoveUp = keyUp; mgMoveDown = keyDown; mgMoveLeft = keyLeft; mgMoveRight = keyRight;
-    if (key === ' ' || key === 'Space') {
+    if (key === ' ') {
       if (spacePressed) { spacePressed = false; if (mgChargeActive && !mgStone.active) fireMGStone(); mgChargeActive = false; }
     }
-    if (!keyUp && !keyDown) mgAngleAdjust = 0;
   });
 }
 
@@ -1446,14 +1370,6 @@ function updateMG(delta) {
   if (moveX !== 0 && moveY !== 0 && mgJoyVX === 0) { moveX *= 0.707; moveY *= 0.707; }
   mgDavid.x = Math.max(40, Math.min(mgWidth - mgDavid.w - 40, mgDavid.x + moveX * mgDavid.speed));
   mgDavid.y = Math.max(60, Math.min(mgHeight - mgDavid.h - 60, mgDavid.y + moveY * mgDavid.speed));
-
-  // ========== FIXED ANGLE ADJUSTMENT (WORKS ANYTIME, NOT JUST WHILE CHARGING) ==========
-  let totalAngleAdjust = mgAngleAdjust;
-  if (totalAngleAdjust !== 0) {
-    mgAngle += totalAngleAdjust * 0.04;
-    mgAngle = Math.max(-0.9, Math.min(0.9, mgAngle));
-    updateMGUI();
-  }
 
   if (mgChargeActive && !mgStone.active) {
     mgStone.charge = Math.min(60, (mgStone.charge || 0) + 1.5);
@@ -1493,21 +1409,16 @@ function updateMG(delta) {
     j.x += j.vx;
     j.y += j.vy;
     if (j.x > mgDavid.x && j.x < mgDavid.x + mgDavid.w && j.y > mgDavid.y && j.y < mgDavid.y + mgDavid.h) {
-      if (!mgDodgeActive) {
-        mgLives--;
-        mgCombo = 0;
-        updateMGUI();
-        mgShake = 10;
-        SoundFX.play('hurt');
-        mgJavelins.splice(i, 1);
-        i--;
-        if (mgLives <= 0) {
-          mgPhase = 'gameover';
-          showMGOverlay('gameover');
-        }
-      } else {
-        mgJavelins.splice(i, 1);
-        i--;
+      mgLives--;
+      mgCombo = 0;
+      updateMGUI();
+      mgShake = 10;
+      SoundFX.play('hurt');
+      mgJavelins.splice(i, 1);
+      i--;
+      if (mgLives <= 0) {
+        mgPhase = 'gameover';
+        showMGOverlay('gameover');
       }
     } else if (j.x > mgWidth + 100 || j.x < -100 || j.y > mgHeight + 100 || j.y < -100) {
       mgJavelins.splice(i, 1);
@@ -1576,12 +1487,6 @@ function updateMG(delta) {
     }
   }
 
-  if (mgDodgeActive) {
-    mgDodgeActive = false;
-    mgDodgeCooldown = 2000;
-  }
-  if (mgDodgeCooldown > 0) mgDodgeCooldown -= delta;
-  if (mgDodgeCooldown < 0) mgDodgeCooldown = 0;
 }
 
 function drawMG() {
@@ -1852,17 +1757,6 @@ function drawMG() {
     mgCtx.font = 'bold 10px "Cinzel", monospace';
     mgCtx.textAlign = 'center';
     mgCtx.fillText(`⚡ ${Math.round(pct * 100)}%`, mgDavid.x + 25, mgDavid.y - 25);
-  }
-
-  if (mgDodgeActive) {
-    mgCtx.save();
-    mgCtx.globalAlpha = 0.4 + Math.sin(mgFrame * 0.3) * 0.2;
-    mgCtx.strokeStyle = '#44aaff';
-    mgCtx.lineWidth = 3;
-    mgCtx.beginPath();
-    mgCtx.arc(mgDavid.x + mgDavid.w / 2, mgDavid.y + mgDavid.h / 2, 42, 0, Math.PI * 2);
-    mgCtx.stroke();
-    mgCtx.restore();
   }
 
   mgCtx.globalAlpha = 1;
