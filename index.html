@@ -928,7 +928,6 @@ let mgFrame = 0;
 let mgBatchSize = 0, mgBatchCooldown = 0;
 let mgMoveLeft = false, mgMoveRight = false, mgMoveUp = false, mgMoveDown = false;
 let mgJoyVX = 0, mgJoyVY = 0, mgJoyActive = false;
-let mgAngleAdjust = 0;
 
 function setBodyScrollLock(lock) {
   if (lock) {
@@ -1021,7 +1020,25 @@ function initializeMiniGame() {
     console.error("Cannot get 2D context!");
     return;
   }
-  
+
+  // Fix 1: roundRect polyfill for older Android WebViews
+  if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+      if (w < 2 * r) r = w / 2;
+      if (h < 2 * r) r = h / 2;
+      this.moveTo(x+r, y);
+      this.lineTo(x+w-r, y);
+      this.quadraticCurveTo(x+w, y, x+w, y+r);
+      this.lineTo(x+w, y+h-r);
+      this.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+      this.lineTo(x+r, y+h);
+      this.quadraticCurveTo(x, y+h, x, y+h-r);
+      this.lineTo(x, y+r);
+      this.quadraticCurveTo(x, y, x+r, y);
+      return this;
+    };
+  }
+
   console.log("Canvas size:", mgWidth, mgHeight);
   
   resizeMGCanvas();
@@ -1083,7 +1100,6 @@ function resetMG() {
   mgBatchSize = 0; mgBatchCooldown = 0;
   mgMoveLeft = false; mgMoveRight = false; mgMoveUp = false; mgMoveDown = false;
   mgJoyVX = 0; mgJoyVY = 0; mgJoyActive = false;
-  mgAngleAdjust = 0;
   updateMGUI();
 }
 
@@ -1329,9 +1345,6 @@ function bindMGButtons() {
     if (key === 'ArrowLeft')  { keyLeft  = true; }
     if (key === 'ArrowRight') { keyRight = true; }
     mgMoveUp = keyUp; mgMoveDown = keyDown; mgMoveLeft = keyLeft; mgMoveRight = keyRight;
-    // Q/E adjust angle on keyboard
-    if (key === 'q' || key === 'Q') { mgAngle = Math.max(-1.2, mgAngle - 0.08); }
-    if (key === 'e' || key === 'E') { mgAngle = Math.min( 1.2, mgAngle + 0.08); }
     if ((key === ' ') && !spacePressed) { spacePressed = true; mgChargeActive = true; mgStone.charge = 0; }
   });
 
@@ -1417,6 +1430,7 @@ function updateMG(delta) {
       mgJavelins.splice(i, 1);
       i--;
       if (mgLives <= 0) {
+        updateMGUI();
         mgPhase = 'gameover';
         showMGOverlay('gameover');
       }
