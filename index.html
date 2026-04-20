@@ -13,6 +13,7 @@
 :root{--bg:#080608;--bg2:#100d14;--gold:#c9a84c;--gold2:#e8c96a;--gold3:#f5e0a0;--gold-dim:#6b5a28;--red2:#c0392b;--ember:#d4541a;--parch:#f0e4c8;--parch2:#d4c4a0;--parch3:#b8a880;--blue2:#2e6da4;--green2:#27ae60;--white:#fff8f0;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);font-family:'Libre Baskerville',serif;color:var(--parch);min-height:100vh;overflow-x:hidden;}
+/* Prevent body scroll when mini-game is active */
 body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 #bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
 #atm{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;transition:background 1.5s;}
@@ -22,134 +23,6 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 @keyframes sIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fl{from{transform:translateY(0);filter:drop-shadow(0 0 20px rgba(201,168,76,.5))}to{transform:translateY(-10px);filter:drop-shadow(0 0 40px rgba(201,168,76,.9))}}
 
-/* ========== MISSING STYLES ADDED ========== */
-/* Flash effect */
-.ff {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 999;
-  opacity: 0;
-  transition: opacity 0.2s ease-out;
-}
-.ff.show { opacity: 1; }
-.ff.cfl { background: radial-gradient(circle at center, rgba(39,174,96,0.5), rgba(39,174,96,0.1), transparent); }
-.ff.wfl { background: radial-gradient(circle at center, rgba(192,57,43,0.5), rgba(192,57,43,0.1), transparent); }
-
-/* Particles */
-.particle {
-  position: fixed;
-  pointer-events: none;
-  z-index: 1000;
-  font-size: 24px;
-  animation: floatUp 2.5s ease-out forwards;
-}
-@keyframes floatUp {
-  0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
-  50% { opacity: 0.8; }
-  100% { transform: translateY(-150px) scale(0.3) rotate(360deg); opacity: 0; }
-}
-
-/* Confetti */
-.confetti-piece {
-  position: fixed;
-  pointer-events: none;
-  z-index: 1000;
-  width: 12px;
-  height: 18px;
-  animation: confettiFall linear forwards;
-}
-@keyframes confettiFall {
-  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-}
-
-/* Modal overlay */
-.modal-ov {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(6px);
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: fadeIn 0.2s ease;
-}
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.modal-bx {
-  background: linear-gradient(160deg, #1a1420, #0c0910);
-  border: 2px solid var(--gold);
-  border-radius: 16px;
-  padding: 28px 32px;
-  max-width: 340px;
-  text-align: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-}
-.mttl { font-family: 'Cinzel', serif; font-size: 20px; color: var(--gold2); margin-bottom: 12px; font-weight: 700; }
-.msub2 { font-size: 13px; color: var(--parch2); margin-bottom: 24px; line-height: 1.5; }
-.mrow { display: flex; gap: 16px; justify-content: center; }
-
-/* Button styles */
-.bgold, .bghost, .bcont {
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-family: 'Cinzel', serif;
-  font-size: 12px;
-  letter-spacing: 1.5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: none;
-  font-weight: 600;
-}
-.bgold {
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
-  color: #1a0f00;
-  box-shadow: 0 2px 8px rgba(201,168,76,0.3);
-}
-.bgold:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(201,168,76,0.5);
-}
-.bghost {
-  background: transparent;
-  border: 1px solid var(--gold-dim);
-  color: var(--gold-dim);
-}
-.bghost:hover {
-  border-color: var(--gold);
-  color: var(--gold);
-  background: rgba(201,168,76,0.1);
-}
-.bcont {
-  background: rgba(201,168,76,0.12);
-  border: 1px solid var(--gold-dim);
-  color: var(--gold2);
-}
-.bcont:hover {
-  background: rgba(201,168,76,0.25);
-  border-color: var(--gold);
-}
-.divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
-  margin: 24px 0;
-}
-.brow {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 8px;
-}
-
-/* ========== EXISTING STYLES (kept as is) ========== */
 /* TITLE */
 #s-title{text-align:center;padding-top:40px;}
 .emblem{font-size:64px;display:block;margin-bottom:10px;animation:fl 4s ease-in-out infinite alternate;}
@@ -320,7 +193,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .lbbd{font-size:10px;color:var(--parch3);text-align:right;}
 .lbts{font-size:10px;color:rgba(184,168,128,.5);text-align:right;}
 
-/* MINI-GAME STYLES */
+/* ========== MINI-GAME STYLES ========== */
 #s-minigame {
   position: fixed;
   top: 0;
@@ -413,6 +286,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   z-index: 30;
 }
 .mg-buttons > div { pointer-events: auto; }
+/* ── Analog Joystick (CoD-style) ── */
 .mg-joystick-zone {
   user-select: none;
   -webkit-user-select: none;
@@ -460,6 +334,8 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   color: rgba(100,70,10,0.35);
   pointer-events: none;
 }
+
+/* ── Vertical Aim Bar (right side) ── */
 .mg-aim-bar-zone {
   position: absolute;
   top: 0;
@@ -506,6 +382,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   opacity: 0.35;
   pointer-events: none;
 }
+/* Sliding indicator dot on the bar */
 .mg-aim-bar-cursor {
   position: absolute;
   left: 50%;
@@ -516,7 +393,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   background: radial-gradient(circle at 38% 35%, rgba(255,220,120,0.7), rgba(200,100,40,0.6));
   border: 2px solid rgba(255,160,80,0.55);
   pointer-events: none;
-  top: 50%;
+  top: 50%; /* default center = 0° */
   transition: top 0.04s;
 }
 .mg-right-actions {
@@ -525,6 +402,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   gap: 16px;
   align-items: flex-end;
 }
+/* OVERLAY - positioned on body with highest z-index to avoid clipping */
 .mg-full-overlay {
   position: fixed;
   top: 0;
@@ -553,6 +431,8 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   margin: 6px;
   cursor: pointer;
 }
+
+/* Force landscape orientation for mini-game */
 @media (orientation: portrait) {
   .portrait-warning {
     display: flex;
@@ -561,6 +441,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
     display: none;
   }
 }
+
 .portrait-warning {
   display: none;
   position: fixed;
@@ -589,6 +470,56 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .portrait-warning small {
   font-size: 14px;
   color: var(--parch3);
+}
+
+/* ========== LOADING SCREEN ========== */
+.load-icon{font-size:64px;display:block;text-align:center;margin:80px auto 20px;animation:fl 2s ease-in-out infinite alternate;}
+.load-title{font-family:'Cinzel',serif;font-size:clamp(18px,5vw,28px);font-weight:900;color:var(--gold2);text-align:center;letter-spacing:4px;margin-bottom:28px;}
+.load-bar-wrap{max-width:280px;margin:0 auto 16px;height:4px;background:rgba(201,168,76,.12);border-radius:2px;overflow:hidden;}
+.load-bar{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2),var(--gold3));border-radius:2px;animation:loadFill 1.9s ease-in-out forwards;}
+@keyframes loadFill{0%{width:0}60%{width:75%}85%{width:92%}100%{width:100%}}
+.load-msg{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--gold-dim);text-align:center;text-transform:uppercase;}
+
+/* ========== BUTTONS ========== */
+.bgold,.bghost,.bcont{display:inline-flex;align-items:center;justify-content:center;padding:11px 22px;border-radius:7px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:1.5px;cursor:pointer;transition:all .25s;border:none;text-transform:uppercase;}
+.bgold{background:linear-gradient(135deg,#a07828,var(--gold2),#e8d080,var(--gold));color:#1a0f00;font-weight:700;box-shadow:0 2px 12px rgba(201,168,76,.3);}
+.bgold:hover{transform:translateY(-3px);box-shadow:0 6px 24px rgba(201,168,76,.5);filter:brightness(1.1);}
+.bgold:active{transform:translateY(0);box-shadow:0 2px 8px rgba(201,168,76,.25);}
+.bghost{background:transparent;border:1px solid var(--gold-dim);color:var(--gold-dim);}
+.bghost:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.06);}
+.bcont{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);color:var(--gold2);}
+.bcont:hover{background:rgba(201,168,76,.2);border-color:var(--gold);color:var(--gold3);}
+.brow{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:12px 0;}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);margin:22px 0;opacity:.6;}
+
+/* ========== MODAL ========== */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(6px);z-index:10000;display:flex;align-items:center;justify-content:center;animation:sIn .25s ease;}
+.modal-bx{background:linear-gradient(160deg,rgba(26,18,38,.98),rgba(10,7,16,.99));border:1px solid var(--gold);border-radius:14px;padding:28px 26px;max-width:320px;width:90%;text-align:center;box-shadow:0 0 60px rgba(201,168,76,.15),0 20px 60px rgba(0,0,0,.6);}
+.mttl{font-family:'Cinzel',serif;font-size:17px;color:var(--gold2);margin-bottom:10px;letter-spacing:1px;}
+.msub2{font-size:13px;color:var(--parch2);margin-bottom:22px;line-height:1.6;font-style:italic;}
+.mrow{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+
+/* ========== SCREEN FLASH ========== */
+.ff{position:fixed;inset:0;pointer-events:none;z-index:998;opacity:0;transition:opacity .18s;}
+.ff.show{opacity:1;}
+.ff.cfl{background:radial-gradient(ellipse at center,rgba(39,174,96,.28) 0%,rgba(39,174,96,.08) 50%,transparent 75%);}
+.ff.wfl{background:radial-gradient(ellipse at center,rgba(192,57,43,.28) 0%,rgba(192,57,43,.08) 50%,transparent 75%);}
+
+/* ========== PARTICLES ========== */
+.particle{position:fixed;pointer-events:none;z-index:1000;font-size:22px;animation:particleFloat 2s cubic-bezier(.25,.46,.45,.94) forwards;will-change:transform,opacity;}
+@keyframes particleFloat{
+  0%  {transform:translateY(0)     scale(1)    rotate(0deg);   opacity:1;}
+  40% {transform:translateY(-55px) scale(1.15) rotate(12deg);  opacity:.9;}
+  100%{transform:translateY(-120px)scale(.4)   rotate(-20deg); opacity:0;}
+}
+
+/* ========== CONFETTI ========== */
+.confetti-piece{position:fixed;pointer-events:none;z-index:1000;width:9px;height:14px;border-radius:2px;animation:confettiFall linear forwards;will-change:transform,opacity;}
+@keyframes confettiFall{
+  0%  {transform:translateY(-10px) rotate(0deg)   scaleX(1);  opacity:1;}
+  25% {transform:translateY(25vh)  rotate(120deg) scaleX(-1); opacity:1;}
+  60% {transform:translateY(60vh)  rotate(270deg) scaleX(1);  opacity:.85;}
+  100%{transform:translateY(105vh) rotate(420deg) scaleX(-1); opacity:0;}
 }
 </style>
 </head>
@@ -630,7 +561,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   <p style="font-size:11px;color:var(--parch3);font-style:italic;text-align:center;">The story plays first — then you are tested. Pay close attention.</p>
 </div>
 
-<!-- GAME -->
+<!-- GAME (Main Episodes) -->
 <div id="s-game" class="screen">
   <div class="ghdr">
     <div>
@@ -698,7 +629,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   <div class="brow"><button class="bgold" onclick="showScreen('s-title')">← Back</button></div>
 </div>
 
-<!-- MINI-GAME -->
+<!-- MINI-GAME (Android Optimized with Touch-Drag) -->
 <div id="s-minigame" class="screen">
   <div class="portrait-warning" id="portraitWarning">
     <span>📱↻</span>
@@ -716,6 +647,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
       <div class="mg-state-badge" id="mgStateBadge">GUARDING</div>
       <div class="mg-powerups" id="mgPowerups"></div>
     </div>
+    <!-- Left: joystick -->
     <div class="mg-buttons">
       <div class="mg-joystick-zone">
         <div class="mg-joystick-touch-area" id="mgJoystickArea">
@@ -725,6 +657,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
         </div>
       </div>
     </div>
+    <!-- Right: vertical aim bar -->
     <div class="mg-aim-bar-zone" id="mgAimBarZone">
       <div class="mg-aim-bar" id="mgAimBar">
         <span class="mg-aim-bar-label">▲<br>AIM</span>
@@ -758,7 +691,11 @@ function exitFullscreen() {
   const fn = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
   if (fn) { try { fn.call(document); } catch(err) {} }
 }
+function isFullscreen() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+}
 
+// ── Get a player's existing best score for one episode ──
 async function fsGetPersonalBest(name,epId){
   if(!db)return null;
   try{
@@ -772,16 +709,21 @@ async function fsGetPersonalBest(name,epId){
   }catch(e){console.error(e);return null;}
 }
 
+// ── Option A: delete old record, write new one (only if higher) ──
+// Returns: 'new_best' | 'not_best' | 'first' | 'error'
 async function fsSavePersonalBest(name,score,epId,rank,correct,total,speedPts,streak){
   if(!db)return'error';
   try{
     const existing=await fsGetPersonalBest(name,epId);
     if(existing&&existing.score>=score){
+      // New score doesn't beat old best — don't save
       return{status:'not_best',best:existing.score};
     }
+    // Delete old record if it exists (Option A — clean leaderboard)
     if(existing){
       await db.collection('bc_scores').doc(existing.id).delete();
     }
+    // Write new best
     await db.collection('bc_scores').add({
       name:name.slice(0,25),score,episodeId:epId,
       episodeTitle:EPS.find(e=>e.id===epId)?.title||epId,
@@ -834,7 +776,7 @@ const SoundFX={
         case 'hurt': o.type='sawtooth';o.frequency.setValueAtTime(180,t);g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);o.start(t);o.stop(t+.5);break;
         case 'powerup': o.frequency.setValueAtTime(880,t);o.frequency.setValueAtTime(1047,t+.1);o.frequency.setValueAtTime(1319,t+.2);g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.4);o.start(t);o.stop(t+.4);break;
         case 'dodge': o.frequency.setValueAtTime(440,t);o.frequency.exponentialRampToValueAtTime(880,t+.15);g.gain.setValueAtTime(.1,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);o.start(t);o.stop(t+.2);break;
-        case 'victory': [523,659,784,659,784,1047,1319].forEach((f,i)=>{const oo=this.ctx.createOscillator(),gg=this.ctx.createGain();oo.connect(gg);gg.connect(this.ctx.destination);oo.frequency.value=f;gg.gain.setValueAtTime(.2,t+i*.12);gg.gain.exponentialRampToValueAtTime(.001,t+i*.12+.25);oo.start(t+i*.12);oo.stop(t+i*.12+.3);});return;
+        case 'victory': [523,659,784,659,784,1047].forEach((f,i)=>{const oo=this.ctx.createOscillator(),gg=this.ctx.createGain();oo.connect(gg);gg.connect(this.ctx.destination);oo.frequency.value=f;gg.gain.setValueAtTime(.2,t+i*.12);gg.gain.exponentialRampToValueAtTime(.001,t+i*.12+.25);oo.start(t+i*.12);oo.stop(t+i*.12+.3);});return;
         case 'armoured': o.type='square';o.frequency.value=150;g.gain.setValueAtTime(.1,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);o.start(t);o.stop(t+.3);break;
       }
     }catch(e){}
@@ -856,7 +798,7 @@ const SoundFX={
 function updateSoundBtn(){const btns=document.querySelectorAll('[onclick*="SoundFX.toggle"]');btns.forEach(b=>b.textContent=SoundFX.enabled?'🔊 Sound':'🔇 Sound');}
 
 // ═══════════════════════════════════════════════════════════════
-//  EPISODE DATA
+//  EPISODE DATA (3 episodes)
 // ═══════════════════════════════════════════════════════════════
 const EPS=[
 {id:'david-goliath',icon:'🪨',num:'Episode I',title:'The Shepherd Who Slew a Giant',book:'1 Samuel 17',desc:'A boy, a sling, and the God of Israel. One of the greatest upsets in human history.',difficulty:1,atmosphere:'rgba(20,8,0,0.5)',ambient:'battle',
@@ -871,7 +813,7 @@ questions:[
 {type:'mcq',diff:2,q:'What animals had David already killed?',hint:'He told King Saul about two specific animals.',opts:['Wolves and bears','Lions and bears','Lions and leopards','Bears and hyenas'],correct:1,explanation:'David killed both a lion and a bear while protecting his sheep.',scripture:'"Your servant has killed both the lion and the bear." — 1 Samuel 17:36'},
 {type:'mcq',diff:2,q:'How many stones did David take from the stream?',hint:'The Bible gives the exact number.',opts:['One','Three','Five','Ten'],correct:2,explanation:'David chose exactly five smooth stones. He only needed one.',scripture:'"He chose five smooth stones from the stream." — 1 Samuel 17:40'},
 {type:'mcq',diff:3,q:'Where exactly did the stone hit Goliath?',hint:'The Bible is very specific about this one spot.',opts:['In his chest','In his throat','In the forehead','In his eye'],correct:2,explanation:'The stone struck Goliath\'s forehead — his only exposed area.',scripture:'"The stone sank into his forehead, and he fell facedown." — 1 Samuel 17:49'},
-{type:'fill',diff:3,q:'Complete David\'s declaration: "I come against you in the name of ___"',hint:'Not a weapon — a name.',answer:'the lord almighty',acceptedAnswers:['the lord almighty','the lord of hosts','god','the lord'],explanation:'David came in the NAME of the Lord Almighty — not with human weapons.',scripture:'"I come against you in the name of the Lord Almighty." — 1 Samuel 17:45'},
+{type:'fill',diff:3,q:'Complete David\'s declaration: "I come against you in the name of ___"',hint:'Not a weapon — a name. (Using the hint costs 10 speed points)',answer:'the lord almighty',acceptedAnswers:['the lord almighty','the lord of hosts','god','the lord'],explanation:'David came in the NAME of the Lord Almighty — not with human weapons.',scripture:'"I come against you in the name of the Lord Almighty." — 1 Samuel 17:45'},
 {type:'mcq',diff:3,q:'What did the Philistine army do when Goliath fell?',hint:'Think about what losing your champion means.',opts:['Surrendered immediately','Fought harder','Turned and ran','Sent a second champion'],correct:2,explanation:'The entire Philistine army fled in panic when their champion fell.',scripture:'"When the Philistines saw their hero was dead, they turned and ran." — 1 Samuel 17:51'}]},
 {id:'daniel-lions',icon:'🦁',num:'Episode II',title:'The Man Who Would Not Stop Praying',book:'Daniel 6',desc:'A law was passed to destroy him. The lions were hungry. Daniel knelt anyway.',difficulty:2,atmosphere:'rgba(6,0,12,0.5)',ambient:'daniel',
 scenes:[
@@ -885,7 +827,7 @@ questions:[
 {type:'mcq',diff:2,q:'How many times each day did Daniel pray?',opts:['Once','Twice','Three times','Five times'],correct:2,explanation:'Daniel prayed three times a day — a habit no law could break.',scripture:'"Three times a day he got down on his knees and prayed." — Daniel 6:10'},
 {type:'mcq',diff:2,q:'What did Darius do the night Daniel was in the den?',hint:'He was deeply troubled by what he had allowed.',opts:['Celebrated','Slept soundly','Fasted and could not sleep','Wrote a new law'],correct:2,explanation:'Darius fasted all night, unable to sleep — tormented by what he had allowed.',scripture:'"He fasted and could not sleep." — Daniel 6:18'},
 {type:'mcq',diff:3,q:'How did Daniel explain why the lions did not hurt him?',opts:['Lions were not hungry','God sent an angel to shut the lions\' mouths','He prayed all night','Lions recognised his righteousness'],correct:1,explanation:'God sent His angel to shut the lions\' mouths.',scripture:'"My God sent his angel, and he shut the mouths of the lions." — Daniel 6:22'},
-{type:'fill',diff:3,q:'Daniel 6:23 — "no wound was found on him, because he had ___ in his God."',hint:'One powerful word explains everything.',answer:'trusted',acceptedAnswers:['trusted','trust','believed','faith'],explanation:'Daniel was unharmed because he TRUSTED God.',scripture:'"No wound was found on him, because he had trusted in his God." — Daniel 6:23'},
+{type:'fill',diff:3,q:'Daniel 6:23 — "no wound was found on him, because he had ___ in his God."',hint:'One powerful word explains everything. (Using the hint costs 10 speed points)',answer:'trusted',acceptedAnswers:['trusted','trust','believed','faith'],explanation:'Daniel was unharmed because he TRUSTED God.',scripture:'"No wound was found on him, because he had trusted in his God." — Daniel 6:23'},
 {type:'mcq',diff:3,q:'What did Darius do AFTER Daniel was rescued?',opts:['Made Daniel king','Issued a decree all must fear Daniel\'s God','Destroyed the den','Apologised privately'],correct:1,explanation:'Darius issued a royal decree across his empire to fear the God of Daniel.',scripture:'"All people must fear and reverence the God of Daniel." — Daniel 6:26'}]},
 {id:'moses-exodus',icon:'🔥',num:'Episode III',title:'The Voice in the Burning Bush',book:'Exodus 3–4',desc:'A fugitive shepherd hears his name called from a bush that refuses to burn up.',difficulty:2,atmosphere:'rgba(16,8,0,0.5)',ambient:'moses',
 scenes:[
@@ -899,15 +841,20 @@ questions:[
 {type:'mcq',diff:2,q:'How long had Moses been in the wilderness?',hint:'He fled Egypt as a young man and was old when called.',opts:['Twenty years','Thirty years','Forty years','Ten years'],correct:2,explanation:'Moses fled Egypt at 40 and stood before Pharaoh at 80 — forty years in the wilderness.',scripture:'Acts 7:23 and 7:30 show forty years in Egypt then forty in Midian.'},
 {type:'mcq',diff:2,q:'What name did God reveal to Moses?',opts:['Lord of Hosts','The Almighty','I AM WHO I AM','God of Heaven'],correct:2,explanation:'"I AM WHO I AM" — YHWH — the eternal, self-existent God.',scripture:'"God said to Moses, \'I AM WHO I AM.\'" — Exodus 3:14'},
 {type:'mcq',diff:3,q:'What excuse did Moses give for not wanting to speak?',opts:['Too old','Did not know the way','Not eloquent — slow of speech','No authority'],correct:2,explanation:'Moses was "slow of speech and tongue" — God promised to be with his mouth.',scripture:'"I am slow of speech and tongue." — Exodus 4:10'},
-{type:'fill',diff:3,q:'God said: "I have heard their cry on account of their ___."',hint:'The cruel people forcing the Israelites to work.',answer:'taskmasters',acceptedAnswers:['taskmasters','task masters','slave drivers','oppressors'],explanation:'God heard the cry "on account of their taskmasters."',scripture:'"I have heard their cry on account of their taskmasters." — Exodus 3:7 (ESV)'},
+{type:'fill',diff:3,q:'God said: "I have heard their cry on account of their ___."',hint:'The cruel people forcing the Israelites to work. (Using the hint costs 10 speed points)',answer:'taskmasters',acceptedAnswers:['taskmasters','task masters','slave drivers','oppressors'],explanation:'God heard the cry "on account of their taskmasters."',scripture:'"I have heard their cry on account of their taskmasters." — Exodus 3:7 (ESV)'},
 {type:'mcq',diff:3,q:'Who would speak to Pharaoh on Moses\'s behalf?',opts:['Joshua','Caleb','Aaron','Miriam'],correct:2,explanation:'Aaron, Moses\'s brother, was appointed as his spokesman.',scripture:'"He will speak to the people for you." — Exodus 4:16'}]}
 ];
 
+// ═══════════════════════════════════════════════════════════════
+//  MAIN GAME STATE (episodes)
+// ═══════════════════════════════════════════════════════════════
 let username='';
 let G={ep:null,scene:0,phase:'story',lives:3,score:0,qIdx:0,correct:0,timer:null,timeLeft:0,timeTotal:0,correctPts:0,speedPts:0,answered:false,lineIdx:0,lineTimer:null,pendingSave:null,saved:false,streak:0,bestStreak:0,hintUsed:false,lastSavedScore:null};
 let completedEpisodes=new Set(JSON.parse(localStorage.getItem('bc_completed')||'[]'));
 
-// Star canvas background
+// ═══════════════════════════════════════════════════════════════
+//  STAR CANVAS
+// ═══════════════════════════════════════════════════════════════
 (function(){
   const c=document.getElementById('bg-canvas'),ctx=c.getContext('2d');
   let W,H,pts=[];
@@ -918,8 +865,12 @@ let completedEpisodes=new Set(JSON.parse(localStorage.getItem('bc_completed')||'
   draw();
 })();
 
+// ═══════════════════════════════════════════════════════════════
+//  LOADING SCREEN
+// ═══════════════════════════════════════════════════════════════
 setTimeout(()=>{
   showScreen('s-title');renderEpisodes();checkCompleteBadge();
+  // Pre-fill saved username (returning player)
   const saved=localStorage.getItem('bc_username');
   const inp=document.getElementById('username-inp');
   if(saved&&saved.trim()){
@@ -932,6 +883,9 @@ setTimeout(()=>{
   }
 },2200);
 
+// ═══════════════════════════════════════════════════════════════
+//  USERNAME & EPISODE RENDERING
+// ═══════════════════════════════════════════════════════════════
 function onNameType(){
   const v=document.getElementById('username-inp').value.trim();
   username=v;
@@ -939,6 +893,7 @@ function onNameType(){
   const g=document.getElementById('ugreet');
   g.className='ugreet';
   if(v.length>1){
+    // Check if returning player
     const saved=localStorage.getItem('bc_username');
     if(saved&&saved.toLowerCase()===v.toLowerCase()){
       g.textContent=`Welcome back, ${v}! 🙏 Your progress is remembered.`;
@@ -962,6 +917,9 @@ function renderEpisodes(){
 }
 function checkCompleteBadge(){if(EPS.every(ep=>completedEpisodes.has(ep.id)))document.getElementById('complete-badge').classList.add('show');}
 
+// ═══════════════════════════════════════════════════════════════
+//  MAIN EPISODE LOGIC (unchanged)
+// ═══════════════════════════════════════════════════════════════
 function startEp(id){
   if(!username.trim()){
     const inp=document.getElementById('username-inp');const greet=document.getElementById('ugreet');
@@ -1002,17 +960,11 @@ function loseLife(){G.lives=Math.max(0,G.lives-1);renderLives();}
 function nextQ(){G.qIdx++;G.answered=false;if(G.lives<=0){showVerdict();return;}renderChallenge();}
 function flash(ok){const e=document.getElementById('ff');e.className=`ff ${ok?'cfl':'wfl'} show`;setTimeout(()=>e.classList.remove('show'),300);}
 function spawn(em,n){for(let i=0;i<n;i++)setTimeout(()=>{const p=document.createElement('div');p.className='particle';p.textContent=em;p.style.left=Math.random()*80+10+'%';p.style.top=Math.random()*50+20+'%';document.body.appendChild(p);setTimeout(()=>p.remove(),2000);},i*200);}
-function spawnConfetti(){const cols=['#ffd700','#c9a84c','#ff6b6b','#4ecdc4','#45b7d1','#96ceb4','#ffeaa7'];for(let i=0;i<120;i++){setTimeout(()=>{const p=document.createElement('div');p.className='confetti-piece';p.style.left=Math.random()*100+'%';p.style.top='-10px';p.style.background=cols[Math.floor(Math.random()*cols.length)];p.style.transform=`rotate(${Math.random()*360}deg)`;p.style.animationDuration=(1.5+Math.random()*3)+'s';p.style.animationDelay=(Math.random()*1.5)+'s';document.body.appendChild(p);setTimeout(()=>p.remove(),5000);},i*25);}}
-function elaborateCelebration(){
-  for(let i=0;i<3;i++)setTimeout(()=>spawnConfetti(),i*800);
-  for(let i=0;i<12;i++)setTimeout(()=>spawn('✨',8),i*200);
-  for(let i=0;i<8;i++)setTimeout(()=>spawn('⭐',6),i*300);
-  for(let i=0;i<5;i++)setTimeout(()=>spawn('🌟',4),i*400);
-  for(let i=0;i<3;i++)setTimeout(()=>spawn('🎉',10),i*500);
-}
+function spawnConfetti(){const cols=['#ffd700','#c9a84c','#ff6b6b','#4ecdc4','#45b7d1','#96ceb4','#ffeaa7'];for(let i=0;i<80;i++){setTimeout(()=>{const p=document.createElement('div');p.className='confetti-piece';p.style.left=Math.random()*100+'%';p.style.top='-10px';p.style.background=cols[Math.floor(Math.random()*cols.length)];p.style.transform=`rotate(${Math.random()*360}deg)`;p.style.animationDuration=(2+Math.random()*3)+'s';p.style.animationDelay=(Math.random()*1)+'s';document.body.appendChild(p);setTimeout(()=>p.remove(),5000);},i*30);}}
 const RANKS=[{min:0,name:'Novice',crown:'📖',cls:'novice',sub:'Keep reading — every scripture is a step forward.'},{min:40,name:'Scribe',crown:'✍️',cls:'scribe',sub:'You know the stories well. The Word is taking root.'},{min:70,name:'Prophet',crown:'🌟',cls:'prophet',sub:'Remarkable! The Spirit is teaching you.'},{min:90,name:'Apostle',crown:'👑',cls:'apostle',sub:'Extraordinary! You have hidden His Word in your heart.'}];
 const VVERSES=[{text:'"I have hidden your word in my heart that I might not sin against you."',ref:'Psalm 119:11'},{text:'"Your word is a lamp to my feet and a light to my path."',ref:'Psalm 119:105'},{text:'"Faith comes from hearing the message, and the message is heard through the word about Christ."',ref:'Romans 10:17'},{text:'"Do not merely listen to the word. Do what it says."',ref:'James 1:22'}];
-function showVerdict(){clearInterval(G.timer);SoundFX.stopAmbient();setPhase('verdict');const tot=G.ep.questions.length;const pct=tot>0?Math.round(G.correct/tot*100):0;const rank=RANKS.slice().reverse().find(r=>pct>=r.min)||RANKS[0];const v=VVERSES[Math.floor(Math.random()*VVERSES.length)];G.pendingSave={score:G.score,epId:G.ep.id,rank:rank.name,correct:G.correct,total:tot,speedPts:G.speedPts,streak:G.bestStreak};document.getElementById('vcrown').textContent=rank.crown;document.getElementById('vplayer').textContent='👤 '+getUsername();document.getElementById('vrank').textContent=rank.name;document.getElementById('vrank').className=`vrank ${rank.cls}`;document.getElementById('vsub').textContent=rank.sub;document.getElementById('vscore').textContent=G.score;document.getElementById('vcor').textContent=G.correct+'/'+tot;document.getElementById('vtot').textContent=pct+'%';document.getElementById('vspd').textContent=G.speedPts;document.getElementById('vstr').textContent=G.bestStreak;document.getElementById('vverse').innerHTML=`"${v.text}"<cite>— ${v.ref}</cite>`;completedEpisodes.add(G.ep.id);localStorage.setItem('bc_completed',JSON.stringify([...completedEpisodes]));if(pct>=90){elaborateCelebration();}else if(pct>=70){spawnConfetti();spawn('🌟',8);}showScreen('s-verdict');
+function showVerdict(){clearInterval(G.timer);SoundFX.stopAmbient();setPhase('verdict');const tot=G.ep.questions.length;const pct=tot>0?Math.round(G.correct/tot*100):0;const rank=RANKS.slice().reverse().find(r=>pct>=r.min)||RANKS[0];const v=VVERSES[Math.floor(Math.random()*VVERSES.length)];G.pendingSave={score:G.score,epId:G.ep.id,rank:rank.name,correct:G.correct,total:tot,speedPts:G.speedPts,streak:G.bestStreak};document.getElementById('vcrown').textContent=rank.crown;document.getElementById('vplayer').textContent='👤 '+getUsername();document.getElementById('vrank').textContent=rank.name;document.getElementById('vrank').className=`vrank ${rank.cls}`;document.getElementById('vsub').textContent=rank.sub;document.getElementById('vscore').textContent=G.score;document.getElementById('vcor').textContent=G.correct+'/'+tot;document.getElementById('vtot').textContent=pct+'%';document.getElementById('vspd').textContent=G.speedPts;document.getElementById('vstr').textContent=G.bestStreak;document.getElementById('vverse').innerHTML=`"${v.text}"<cite>— ${v.ref}</cite>`;completedEpisodes.add(G.ep.id);localStorage.setItem('bc_completed',JSON.stringify([...completedEpisodes]));if(pct>=90){spawn('✨',8);spawnConfetti();}else if(pct>=70)spawn('🌟',5);showScreen('s-verdict');
+  // Show battle button only for David & Goliath episode
   const battleWrap=document.getElementById('battle-btn-wrap');
   if(battleWrap)battleWrap.style.display=G.ep.id==='david-goliath'?'block':'none';
 }
@@ -1027,19 +979,22 @@ async function autoSaveScore(btn){
   }
   G.saved=true;
   G.lastSavedScore={name:getUsername(),score:s.score};
+  // Persist username for next visit
   localStorage.setItem('bc_username',getUsername());
   if(result.status==='new_best'){
     btn.textContent='🏆 New Personal Best!';
-    elaborateCelebration();
+    spawn('🌟',6);spawnConfetti();
     const sub=document.getElementById('vsub');
     if(sub)sub.textContent=`🎉 New personal best! You beat your previous score of ${result.prev}!`;
   }else if(result.status==='first'){
     btn.textContent='✅ Score Saved!';
-    spawn('✨',6);
+    spawn('✨',4);
   }else{
+    // not_best
     btn.textContent=`Your best is still ${result.best} 💪`;
     const sub=document.getElementById('vsub');
     if(sub)sub.textContent=`Your personal best is ${result.best}. Keep going — you can beat it!`;
+    // Still go to leaderboard so they can see their standing
     setTimeout(()=>{showScreen('s-leaderboard');loadLB('all');},2000);
     return;
   }
@@ -1053,11 +1008,14 @@ function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
 
 // ═══════════════════════════════════════════════════════════════
-//  MINI-GAME
+//  MINI-GAME (Android Optimized with Touch-Drag)
 // ═══════════════════════════════════════════════════════════════
+
 let mgCanvas, mgCtx, mgWidth, mgHeight;
 let mgAnimationId = null;
 let mgLastTimestamp = 0;
+
+// Game state
 let mgDavid = { x: 100, y: 200, w: 40, h: 60, speed: 6 };
 let mgGoliath = { x: 600, y: 200, w: 70, h: 110, speed: 0.8, walkDir: 1, rage: false, state: 'GUARDING', stateTimer: 5000 };
 let mgStone = { active: false, x: 0, y: 0, vx: 0, vy: 0, charge: 0, trail: [] };
@@ -1074,11 +1032,16 @@ let mgMoveLeft = false, mgMoveRight = false, mgMoveUp = false, mgMoveDown = fals
 let mgJoyVX = 0, mgJoyVY = 0, mgJoyActive = false;
 
 function setBodyScrollLock(lock) {
-  if (lock) { document.body.classList.add('mg-active'); }
-  else { document.body.classList.remove('mg-active'); }
+  if (lock) {
+    document.body.classList.add('mg-active');
+  } else {
+    document.body.classList.remove('mg-active');
+  }
 }
 
+// ========== CORRECTED startMiniGame FUNCTION ==========
 function startMiniGame() {
+  // Check if username exists
   if (!username || username.trim() === '') {
     const inp = document.getElementById('username-inp');
     const greet = document.getElementById('ugreet');
@@ -1096,15 +1059,21 @@ function startMiniGame() {
     showScreen('s-title');
     return;
   }
+  
+  console.log("startMiniGame called");
   showScreen('s-minigame');
+  
+  // Function to check orientation and show/hide warning
   function checkAndInit() {
     if (window.matchMedia("(orientation: portrait)").matches) {
+      // Portrait mode - show warning, hide game container
       const warning = document.getElementById('portraitWarning');
       if (warning) warning.style.display = 'flex';
       const container = document.querySelector('.minigame-container');
       if (container) container.style.display = 'none';
       return false;
     } else {
+      // Landscape mode - hide warning, show game container
       const warning = document.getElementById('portraitWarning');
       if (warning) warning.style.display = 'none';
       const container = document.querySelector('.minigame-container');
@@ -1112,9 +1081,13 @@ function startMiniGame() {
       return true;
     }
   }
+  
+  // Initial check - if portrait, don't initialize, just show warning and wait
   if (!checkAndInit()) {
+    // Listen for orientation change to initialize when rotated
     const orientationHandler = () => {
       if (checkAndInit()) {
+        // Now landscape - initialize the game
         initializeMiniGame();
         window.removeEventListener('orientationchange', orientationHandler);
         window.removeEventListener('resize', orientationHandler);
@@ -1122,21 +1095,36 @@ function startMiniGame() {
     };
     window.addEventListener('orientationchange', orientationHandler);
     window.addEventListener('resize', orientationHandler);
-    return;
+    return; // Stop here - don't initialize yet
   }
+  
+  // If we get here, device is already in landscape - initialize normally
   initializeMiniGame();
 }
 
+// ========== NEW initializeMiniGame FUNCTION (OUTSIDE startMiniGame) ==========
 function initializeMiniGame() {
   requestFullscreen();
   setBodyScrollLock(true);
+  
   mgCanvas = document.getElementById('mgCanvas');
-  if (!mgCanvas) { console.error("Canvas not found!"); return; }
+  if (!mgCanvas) {
+    console.error("Canvas not found!");
+    return;
+  }
+  
   mgWidth = window.innerWidth;
   mgHeight = window.innerHeight;
   mgCanvas.width = mgWidth;
   mgCanvas.height = mgHeight;
+  
   mgCtx = mgCanvas.getContext('2d');
+  if (!mgCtx) {
+    console.error("Cannot get 2D context!");
+    return;
+  }
+
+  // Fix 1: roundRect polyfill for older Android WebViews
   if (!CanvasRenderingContext2D.prototype.roundRect) {
     CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
       if (w < 2 * r) r = w / 2;
@@ -1153,21 +1141,43 @@ function initializeMiniGame() {
       return this;
     };
   }
+
+  console.log("Canvas size:", mgWidth, mgHeight);
+  
   resizeMGCanvas();
   resetMG();
   bindMGButtons();
-  setTimeout(() => { showMGOverlay('start'); }, 100);
-  window.addEventListener('resize', () => { resizeMGCanvas(); });
-  window.addEventListener('orientationchange', () => { setTimeout(() => { resizeMGCanvas(); }, 100); });
+  
+  setTimeout(() => {
+    showMGOverlay('start');
+  }, 100);
+  
+  window.addEventListener('resize', () => {
+    resizeMGCanvas();
+  });
+  
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      resizeMGCanvas();
+    }, 100);
+  });
 }
 
 function resizeMGCanvas() {
+  // Check orientation and adjust if needed
+  if (window.matchMedia("(orientation: portrait)").matches) {
+    // Still resize but warning will be shown
+  }
+  
   mgWidth = window.innerWidth;
   mgHeight = window.innerHeight;
+  
   if (mgWidth < 100) mgWidth = 800;
   if (mgHeight < 100) mgHeight = 500;
+  
   mgCanvas.width = mgWidth;
   mgCanvas.height = mgHeight;
+  
   if (mgDavid) {
     mgDavid.x = Math.min(Math.max(mgDavid.x, 40), mgWidth - mgDavid.w - 40);
     mgDavid.y = Math.min(Math.max(mgDavid.y, 60), mgHeight - mgDavid.h - 60);
@@ -1246,11 +1256,9 @@ function showMGOverlay(type) {
       G.lastSavedScore={name:getUsername(),score:mgScore};
       if(result.status==='new_best'){
         btn.textContent='🏆 New Personal Best!';
-        elaborateCelebration();
         const p=ov.querySelector('p');if(p)p.innerHTML+=`<br>🎉 You beat your previous best of ${result.prev}!`;
       }else if(result.status==='first'){
         btn.textContent='✅ Score Saved!';
-        spawnConfetti();
       }else if(result.status==='not_best'){
         btn.textContent=`Best is still ${result.best} 💪`;
         const p=ov.querySelector('p');if(p)p.innerHTML+=`<br>Your personal best is ${result.best}. Keep going!`;
@@ -1270,81 +1278,208 @@ function showMGOverlay(type) {
 }
 
 function bindMGButtons() {
+  console.log("bindMGButtons: joystick + vertical aim bar");
+
+  // ─── LEFT JOYSTICK ────────────────────────────────────────────
   const JOYSTICK_RADIUS = 40;
   let joyTouchId = null, joyBaseX = 0, joyBaseY = 0;
+
   const joystickArea = document.getElementById('mgJoystickArea');
   const joystickBase = document.getElementById('mgJoystickBase');
   const joystickKnob = document.getElementById('mgJoystickKnob');
+
   function joyStart(clientX, clientY) {
     const rect = joystickArea.getBoundingClientRect();
     const margin = JOYSTICK_RADIUS + 5;
-    joyBaseX = Math.max(margin, Math.min(rect.width - margin, clientX - rect.left));
+    joyBaseX = Math.max(margin, Math.min(rect.width  - margin, clientX - rect.left));
     joyBaseY = Math.max(margin, Math.min(rect.height - margin, clientY - rect.top));
     joystickBase.style.left = joyBaseX + 'px';
-    joystickBase.style.top = joyBaseY + 'px';
+    joystickBase.style.top  = joyBaseY + 'px';
     joystickBase.classList.add('visible');
     joystickKnob.style.left = '50%';
-    joystickKnob.style.top = '50%';
+    joystickKnob.style.top  = '50%';
     mgJoyVX = 0; mgJoyVY = 0; mgJoyActive = true;
   }
+
   function joyMove(clientX, clientY) {
     if (!mgJoyActive) return;
     const rect = joystickArea.getBoundingClientRect();
     const dx = (clientX - rect.left) - joyBaseX;
-    const dy = (clientY - rect.top) - joyBaseY;
+    const dy = (clientY - rect.top)  - joyBaseY;
     const dist = Math.hypot(dx, dy);
     const clamped = Math.min(dist, JOYSTICK_RADIUS);
     const ang = Math.atan2(dy, dx);
     const kx = Math.cos(ang) * clamped;
     const ky = Math.sin(ang) * clamped;
     joystickKnob.style.left = (50 + (kx / JOYSTICK_RADIUS) * 44) + '%';
-    joystickKnob.style.top = (50 + (ky / JOYSTICK_RADIUS) * 44) + '%';
+    joystickKnob.style.top  = (50 + (ky / JOYSTICK_RADIUS) * 44) + '%';
     const norm = dist > 5 ? Math.min(1, (clamped / JOYSTICK_RADIUS) * 1.2) : 0;
     mgJoyVX = Math.cos(ang) * norm;
     mgJoyVY = Math.sin(ang) * norm;
   }
-  function joyEnd() { joyTouchId = null; mgJoyVX = 0; mgJoyVY = 0; mgJoyActive = false; joystickBase.classList.remove('visible'); joystickKnob.style.left = '50%'; joystickKnob.style.top = '50%'; }
-  joystickArea.addEventListener('touchstart', (e) => { e.preventDefault(); if (joyTouchId !== null) return; const t = e.changedTouches[0]; joyTouchId = t.identifier; joyStart(t.clientX, t.clientY); }, { passive: false });
-  joystickArea.addEventListener('touchmove', (e) => { e.preventDefault(); for (const t of e.changedTouches) { if (t.identifier === joyTouchId) { joyMove(t.clientX, t.clientY); break; } } }, { passive: false });
-  joystickArea.addEventListener('touchend', (e) => { e.preventDefault(); joyEnd(); }, { passive: false });
+
+  function joyEnd() {
+    joyTouchId = null;
+    mgJoyVX = 0; mgJoyVY = 0; mgJoyActive = false;
+    joystickBase.classList.remove('visible');
+    joystickKnob.style.left = '50%';
+    joystickKnob.style.top  = '50%';
+  }
+
+  joystickArea.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (joyTouchId !== null) return;
+    const t = e.changedTouches[0];
+    joyTouchId = t.identifier;
+    joyStart(t.clientX, t.clientY);
+  }, { passive: false });
+
+  joystickArea.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      if (t.identifier === joyTouchId) { joyMove(t.clientX, t.clientY); break; }
+    }
+  }, { passive: false });
+
+  joystickArea.addEventListener('touchend',    (e) => { e.preventDefault(); joyEnd(); }, { passive: false });
   joystickArea.addEventListener('touchcancel', (e) => { e.preventDefault(); joyEnd(); }, { passive: false });
+
+  // Mouse support
   let mouseJoy = false;
   joystickArea.addEventListener('mousedown', (e) => { mouseJoy = true; joyStart(e.clientX, e.clientY); });
   document.addEventListener('mousemove', (e) => { if (mouseJoy) joyMove(e.clientX, e.clientY); });
   document.addEventListener('mouseup', () => { if (mouseJoy) { mouseJoy = false; joyEnd(); } });
-  const aimBarZone = document.getElementById('mgAimBarZone');
-  const aimBar = document.getElementById('mgAimBar');
-  const aimCursor = document.getElementById('mgAimCursor');
-  const AIM_ANGLE_TOP = -0.85, AIM_ANGLE_BOTTOM = 0.45;
-  let aimTouchId = null, aimActive = false;
+
+  // ─── VERTICAL AIM BAR (right side) ───────────────────────────
+  // Slide up = aim high arc (-angle), slide down = lower arc (+angle).
+  // The bar height maps Y to angle range [-0.85, 0.45] radians.
+  // Hold = charge power. Release = fire.
+  const aimBarZone  = document.getElementById('mgAimBarZone');
+  const aimBar      = document.getElementById('mgAimBar');
+  const aimCursor   = document.getElementById('mgAimCursor');
+
+  const AIM_ANGLE_TOP    = -0.85; // radians when thumb at top of bar
+  const AIM_ANGLE_BOTTOM =  0.45; // radians when thumb at bottom
+  const AIM_ANGLE_DEFAULT = 0;    // center = straight
+
+  let aimTouchId = null;
+  let aimActive  = false;
+
   function getBarRect() { return aimBar.getBoundingClientRect(); }
-  function yToAngle(clientY) { const rect = getBarRect(); const relY = Math.max(0, Math.min(rect.height, clientY - rect.top)); const t = relY / rect.height; return AIM_ANGLE_TOP + t * (AIM_ANGLE_BOTTOM - AIM_ANGLE_TOP); }
-  function updateCursor(clientY) { const rect = getBarRect(); const relY = Math.max(0, Math.min(rect.height, clientY - rect.top)); const pct = relY / rect.height * 100; aimCursor.style.top = pct + '%'; }
-  function aimStart(clientY) { aimActive = true; mgChargeActive = true; mgStone.charge = 0; aimBar.classList.add('active'); mgAngle = yToAngle(clientY); updateCursor(clientY); }
-  function aimMove(clientY) { if (!aimActive) return; mgAngle = yToAngle(clientY); updateCursor(clientY); }
-  function aimEnd() { if (!aimActive) return; aimActive = false; aimTouchId = null; aimBar.classList.remove('active'); aimCursor.style.top = '50%'; if (mgChargeActive && !mgStone.active) fireMGStone(); mgChargeActive = false; }
-  aimBarZone.addEventListener('touchstart', (e) => { e.preventDefault(); if (aimTouchId !== null) return; const t = e.changedTouches[0]; aimTouchId = t.identifier; aimStart(t.clientY); }, { passive: false });
-  document.addEventListener('touchmove', (e) => { if (aimTouchId === null) return; for (const t of e.changedTouches) { if (t.identifier === aimTouchId) { aimMove(t.clientY); break; } } }, { passive: false });
-  document.addEventListener('touchend', (e) => { if (aimTouchId === null) return; for (const t of e.changedTouches) { if (t.identifier === aimTouchId) { aimEnd(); break; } } });
-  document.addEventListener('touchcancel', (e) => { if (aimTouchId === null) return; for (const t of e.changedTouches) { if (t.identifier === aimTouchId) { aimEnd(); break; } } });
+
+  function yToAngle(clientY) {
+    const rect = getBarRect();
+    const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+    const t = relY / rect.height; // 0=top, 1=bottom
+    return AIM_ANGLE_TOP + t * (AIM_ANGLE_BOTTOM - AIM_ANGLE_TOP);
+  }
+
+  function updateCursor(clientY) {
+    const rect = getBarRect();
+    const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+    const pct  = relY / rect.height * 100;
+    aimCursor.style.top = pct + '%';
+  }
+
+  function aimStart(clientY) {
+    aimActive = true;
+    mgChargeActive = true;
+    mgStone.charge = 0;
+    aimBar.classList.add('active');
+    mgAngle = yToAngle(clientY);
+    updateCursor(clientY);
+  }
+
+  function aimMove(clientY) {
+    if (!aimActive) return;
+    mgAngle = yToAngle(clientY);
+    updateCursor(clientY);
+  }
+
+  function aimEnd() {
+    if (!aimActive) return;
+    aimActive = false;
+    aimTouchId = null;
+    aimBar.classList.remove('active');
+    // Reset cursor to center
+    aimCursor.style.top = '50%';
+    if (mgChargeActive && !mgStone.active) fireMGStone();
+    mgChargeActive = false;
+  }
+
+  aimBarZone.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (aimTouchId !== null) return;
+    const t = e.changedTouches[0];
+    aimTouchId = t.identifier;
+    aimStart(t.clientY);
+  }, { passive: false });
+
+  // Track aim touch across whole document so sliding outside zone still works
+  document.addEventListener('touchmove', (e) => {
+    if (aimTouchId === null) return;
+    for (const t of e.changedTouches) {
+      if (t.identifier === aimTouchId) { aimMove(t.clientY); break; }
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchend', (e) => {
+    if (aimTouchId === null) return;
+    for (const t of e.changedTouches) {
+      if (t.identifier === aimTouchId) { aimEnd(); break; }
+    }
+  });
+
+  document.addEventListener('touchcancel', (e) => {
+    if (aimTouchId === null) return;
+    for (const t of e.changedTouches) {
+      if (t.identifier === aimTouchId) { aimEnd(); break; }
+    }
+  });
+
+  // Mouse support for aim bar (desktop)
   let mouseAim = false;
   aimBarZone.addEventListener('mousedown', (e) => { mouseAim = true; aimStart(e.clientY); });
   document.addEventListener('mousemove', (e) => { if (mouseAim) aimMove(e.clientY); });
   document.addEventListener('mouseup', () => { if (mouseAim) { mouseAim = false; aimEnd(); } });
+
+  // ─── Quit button ──────────────────────────────────────────────
   const quitBtn = document.getElementById('mgQuitBtn');
-  if (quitBtn) { quitBtn.addEventListener('click', () => { if (mgAnimationId) cancelAnimationFrame(mgAnimationId); exitMiniGame(); }); }
-  let keyUp=false,keyDown=false,keyLeft=false,keyRight=false,spacePressed=false;
-  window.addEventListener('keydown', (e) => { const key=e.key; if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(key)) e.preventDefault();
-    if(key==='ArrowUp') keyUp=true; if(key==='ArrowDown') keyDown=true; if(key==='ArrowLeft') keyLeft=true; if(key==='ArrowRight') keyRight=true;
-    mgMoveUp=keyUp; mgMoveDown=keyDown; mgMoveLeft=keyLeft; mgMoveRight=keyRight;
-    if(key==='w'||key==='W') mgAngle=Math.max(-0.85,mgAngle-0.06); if(key==='s'||key==='S') mgAngle=Math.min(0.45,mgAngle+0.06);
-    if(key===' '&&!spacePressed){spacePressed=true;mgChargeActive=true;mgStone.charge=0;}
-    if(key==='Escape'){if(mgAnimationId)cancelAnimationFrame(mgAnimationId);exitMiniGame();}
+  if (quitBtn) {
+    quitBtn.addEventListener('click', () => {
+      if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
+      exitMiniGame();
+    });
+  }
+
+  // ─── Keyboard (desktop) ───────────────────────────────────────
+  let keyUp = false, keyDown = false, keyLeft = false, keyRight = false;
+  let spacePressed = false;
+
+  window.addEventListener('keydown', (e) => {
+    const key = e.key;
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(key)) e.preventDefault();
+    if (key === 'ArrowUp')    { keyUp    = true; }
+    if (key === 'ArrowDown')  { keyDown  = true; }
+    if (key === 'ArrowLeft')  { keyLeft  = true; }
+    if (key === 'ArrowRight') { keyRight = true; }
+    mgMoveUp = keyUp; mgMoveDown = keyDown; mgMoveLeft = keyLeft; mgMoveRight = keyRight;
+    if (key === 'w' || key === 'W') mgAngle = Math.max(-0.85, mgAngle - 0.06);
+    if (key === 's' || key === 'S') mgAngle = Math.min( 0.45, mgAngle + 0.06);
+    if (key === ' ' && !spacePressed) { spacePressed = true; mgChargeActive = true; mgStone.charge = 0; }
+    if (key === 'Escape') { if (mgAnimationId) cancelAnimationFrame(mgAnimationId); exitMiniGame(); }
   });
-  window.addEventListener('keyup', (e) => { const key=e.key;
-    if(key==='ArrowUp') keyUp=false; if(key==='ArrowDown') keyDown=false; if(key==='ArrowLeft') keyLeft=false; if(key==='ArrowRight') keyRight=false;
-    mgMoveUp=keyUp; mgMoveDown=keyDown; mgMoveLeft=keyLeft; mgMoveRight=keyRight;
-    if(key===' ') { if(spacePressed){spacePressed=false;if(mgChargeActive&&!mgStone.active)fireMGStone();mgChargeActive=false;} }
+
+  window.addEventListener('keyup', (e) => {
+    const key = e.key;
+    if (key === 'ArrowUp')    { keyUp    = false; }
+    if (key === 'ArrowDown')  { keyDown  = false; }
+    if (key === 'ArrowLeft')  { keyLeft  = false; }
+    if (key === 'ArrowRight') { keyRight = false; }
+    mgMoveUp = keyUp; mgMoveDown = keyDown; mgMoveLeft = keyLeft; mgMoveRight = keyRight;
+    if (key === ' ') {
+      if (spacePressed) { spacePressed = false; if (mgChargeActive && !mgStone.active) fireMGStone(); mgChargeActive = false; }
+    }
   });
 }
 
@@ -1362,12 +1497,19 @@ function fireMGStone() {
 
 function updateMG(delta) {
   if (mgPhase !== 'play') return;
+
+  // Movement: joystick takes priority over D-pad booleans (keyboard still works via booleans)
   let moveX = mgJoyVX !== 0 ? mgJoyVX : (mgMoveRight ? 1 : mgMoveLeft ? -1 : 0);
   let moveY = mgJoyVY !== 0 ? mgJoyVY : (mgMoveDown ? 1 : mgMoveUp ? -1 : 0);
+  // Normalize diagonal keyboard movement
   if (moveX !== 0 && moveY !== 0 && mgJoyVX === 0) { moveX *= 0.707; moveY *= 0.707; }
   mgDavid.x = Math.max(40, Math.min(mgWidth - mgDavid.w - 40, mgDavid.x + moveX * mgDavid.speed));
   mgDavid.y = Math.max(60, Math.min(mgHeight - mgDavid.h - 60, mgDavid.y + moveY * mgDavid.speed));
-  if (mgChargeActive && !mgStone.active) { mgStone.charge = Math.min(60, (mgStone.charge || 0) + 1.5); }
+
+  if (mgChargeActive && !mgStone.active) {
+    mgStone.charge = Math.min(60, (mgStone.charge || 0) + 1.5);
+  }
+
   if (mgGoliath.stateTimer > 0) mgGoliath.stateTimer -= delta;
   else {
     let rand = Math.random();
@@ -1376,33 +1518,57 @@ function updateMG(delta) {
     mgGoliath.stateTimer = (mgGoliath.state === 'TAUNTING' ? 2500 : mgGoliath.state === 'WINDING_UP' ? 1800 : 4000);
     updateMGUI();
   }
+
   mgGoliath.x += mgGoliath.walkDir * mgGoliath.speed;
   if (mgGoliath.x < mgWidth - 250) mgGoliath.walkDir = 1;
   if (mgGoliath.x > mgWidth - 100) mgGoliath.walkDir = -1;
   mgGoliath.y = mgHeight - 180;
+
   if (mgBatchCooldown > 0) mgBatchCooldown -= delta;
-  else if (mgBatchSize <= 0) { mgBatchSize = mgGoliath.rage ? 4 : Math.floor(Math.random() * 3) + 2; mgBatchCooldown = 200; }
-  else if (mgBatchCooldown <= 0) {
+  else if (mgBatchSize <= 0) {
+    mgBatchSize = mgGoliath.rage ? 4 : Math.floor(Math.random() * 3) + 2;
+    mgBatchCooldown = 200;
+  } else if (mgBatchCooldown <= 0) {
     let startX = mgGoliath.x - 10, startY = mgGoliath.y + 45;
     let targetX = mgDavid.x + mgDavid.w / 2, targetY = mgDavid.y + mgDavid.h / 2;
     let dx = targetX - startX, dy = targetY - startY, dist = Math.hypot(dx, dy);
     let spd = 4 + (mgGoliath.rage ? 1 : 0);
     mgJavelins.push({ x: startX, y: startY, vx: (dx / dist) * spd, vy: (dy / dist) * spd, angle: Math.atan2(dy, dx) });
-    mgBatchSize--; mgBatchCooldown = 250;
+    mgBatchSize--;
+    mgBatchCooldown = 250;
     if (mgBatchSize === 0) mgBatchCooldown = 1800;
   }
+
   for (let i = 0; i < mgJavelins.length; i++) {
     let j = mgJavelins[i];
-    j.x += j.vx; j.y += j.vy;
+    j.x += j.vx;
+    j.y += j.vy;
     if (j.x > mgDavid.x && j.x < mgDavid.x + mgDavid.w && j.y > mgDavid.y && j.y < mgDavid.y + mgDavid.h) {
-      mgLives--; mgCombo = 0; updateMGUI(); mgShake = 10; SoundFX.play('hurt'); mgJavelins.splice(i, 1); i--;
-      if (mgLives <= 0) { updateMGUI(); mgPhase = 'gameover'; showMGOverlay('gameover'); }
-    } else if (j.x > mgWidth + 100 || j.x < -100 || j.y > mgHeight + 100 || j.y < -100) { mgJavelins.splice(i, 1); i--; }
+      mgLives--;
+      mgCombo = 0;
+      updateMGUI();
+      mgShake = 10;
+      SoundFX.play('hurt');
+      mgJavelins.splice(i, 1);
+      i--;
+      if (mgLives <= 0) {
+        updateMGUI();
+        mgPhase = 'gameover';
+        showMGOverlay('gameover');
+      }
+    } else if (j.x > mgWidth + 100 || j.x < -100 || j.y > mgHeight + 100 || j.y < -100) {
+      mgJavelins.splice(i, 1);
+      i--;
+    }
   }
+
   if (mgStone.active) {
-    mgStone.x += mgStone.vx; mgStone.vy += 0.3; mgStone.y += mgStone.vy;
+    mgStone.x += mgStone.vx;
+    mgStone.vy += 0.3;
+    mgStone.y += mgStone.vy;
     mgStone.trail.unshift({ x: mgStone.x, y: mgStone.y });
     if (mgStone.trail.length > 6) mgStone.trail.pop();
+
     let fx = mgGoliath.x + 8, fy = mgGoliath.y + 2, fw = mgGoliath.w - 16, fh = 22;
     if (mgStone.x > fx && mgStone.x < fx + fw && mgStone.y > fy && mgStone.y < fy + fh) {
       let canHit = false;
@@ -1412,90 +1578,323 @@ function updateMG(delta) {
       if (mgGoliath.state === 'RAGE' && !isStraight) canHit = true;
       if (canHit) {
         let pts = 150 + Math.floor(mgStone.charge * 5);
-        mgScore += pts; mgCombo++; if (mgCombo > mgMaxCombo) mgMaxCombo = mgCombo; mgHits++;
-        SoundFX.play('hit'); mgShake = 12; mgStone.active = false; mgStone.trail = []; updateMGUI();
-        if (mgHits >= 3) { mgPhase = 'victory'; showMGOverlay('victory'); }
-        else { mgGoliath.state = 'STUNNED'; mgGoliath.stateTimer = 1500; if (mgHits === 2) mgGoliath.rage = true; }
-      } else { SoundFX.play('armoured'); mgStone.active = false; mgStone.trail = []; mgCombo = Math.max(0, mgCombo - 1); updateMGUI(); }
+        mgScore += pts;
+        mgCombo++;
+        if (mgCombo > mgMaxCombo) mgMaxCombo = mgCombo;
+        mgHits++;
+        SoundFX.play('hit');
+        mgShake = 12;
+        mgStone.active = false;
+        mgStone.trail = [];
+        updateMGUI();
+        if (mgHits >= 3) {
+          mgPhase = 'victory';
+          showMGOverlay('victory');
+        } else {
+          mgGoliath.state = 'STUNNED';
+          mgGoliath.stateTimer = 1500;
+          if (mgHits === 2) mgGoliath.rage = true;
+        }
+      } else {
+        SoundFX.play('armoured');
+        mgStone.active = false;
+        mgStone.trail = [];
+        mgCombo = Math.max(0, mgCombo - 1);
+        updateMGUI();
+      }
       return;
     }
+
     let bx = mgGoliath.x + 4, by = mgGoliath.y + 30, bw = mgGoliath.w - 8, bh = mgGoliath.h - 50;
     if (mgStone.x > bx && mgStone.x < bx + bw && mgStone.y > by && mgStone.y < by + bh) {
-      SoundFX.play('armoured'); mgStone.active = false; mgStone.trail = []; mgCombo = Math.max(0, mgCombo - 1); updateMGUI(); return;
+      SoundFX.play('armoured');
+      mgStone.active = false;
+      mgStone.trail = [];
+      mgCombo = Math.max(0, mgCombo - 1);
+      updateMGUI();
+      return;
     }
+
     if (mgStone.x > mgWidth + 100 || mgStone.x < -100 || mgStone.y > mgHeight + 100 || mgStone.y < -100) {
-      mgStone.active = false; mgStone.trail = []; mgCombo = Math.max(0, mgCombo - 1); updateMGUI();
+      mgStone.active = false;
+      mgStone.trail = [];
+      mgCombo = Math.max(0, mgCombo - 1);
+      updateMGUI();
     }
   }
+
 }
 
 function drawMG() {
   mgCtx.clearRect(0, 0, mgWidth, mgHeight);
-  if (mgShake > 0) { mgCtx.translate((Math.random() - 0.5) * mgShake, (Math.random() - 0.5) * mgShake); mgShake *= 0.9; }
+  if (mgShake > 0) {
+    mgCtx.translate((Math.random() - 0.5) * mgShake, (Math.random() - 0.5) * mgShake);
+    mgShake *= 0.9;
+  }
+
   const skyGrad = mgCtx.createLinearGradient(0, 0, 0, mgHeight);
   skyGrad.addColorStop(0, mgGoliath.rage ? '#2a0000' : '#1a2a1a');
   skyGrad.addColorStop(0.6, mgGoliath.rage ? '#3d1500' : '#2a3a1a');
   skyGrad.addColorStop(1, '#4a2a0a');
-  mgCtx.fillStyle = skyGrad; mgCtx.fillRect(0, 0, mgWidth, mgHeight);
+  mgCtx.fillStyle = skyGrad;
+  mgCtx.fillRect(0, 0, mgWidth, mgHeight);
+  
   const sunGrad = mgCtx.createRadialGradient(mgWidth - 60, 60, 0, mgWidth - 60, 60, 80);
-  sunGrad.addColorStop(0, '#ffdd88'); sunGrad.addColorStop(0.5, '#ffaa44'); sunGrad.addColorStop(1, 'rgba(255,100,0,0)');
-  mgCtx.fillStyle = sunGrad; mgCtx.fillRect(0, 0, mgWidth, mgHeight);
+  sunGrad.addColorStop(0, '#ffdd88');
+  sunGrad.addColorStop(0.5, '#ffaa44');
+  sunGrad.addColorStop(1, 'rgba(255,100,0,0)');
+  mgCtx.fillStyle = sunGrad;
+  mgCtx.fillRect(0, 0, mgWidth, mgHeight);
+  
   const groundGrad = mgCtx.createLinearGradient(0, mgHeight - 80, 0, mgHeight);
-  groundGrad.addColorStop(0, '#5a3a1a'); groundGrad.addColorStop(1, '#3a1a00');
-  mgCtx.fillStyle = groundGrad; mgCtx.fillRect(0, mgHeight - 80, mgWidth, 80);
+  groundGrad.addColorStop(0, '#5a3a1a');
+  groundGrad.addColorStop(1, '#3a1a00');
+  mgCtx.fillStyle = groundGrad;
+  mgCtx.fillRect(0, mgHeight - 80, mgWidth, 80);
+  
   mgCtx.fillStyle = 'rgba(70,50,20,0.5)';
-  mgCtx.beginPath(); mgCtx.ellipse(120, mgHeight - 85, 150, 40, 0, 0, Math.PI * 2); mgCtx.fill();
-  mgCtx.beginPath(); mgCtx.ellipse(550, mgHeight - 90, 200, 45, 0, 0, Math.PI * 2); mgCtx.fill();
+  mgCtx.beginPath();
+  mgCtx.ellipse(120, mgHeight - 85, 150, 40, 0, 0, Math.PI * 2);
+  mgCtx.fill();
+  mgCtx.beginPath();
+  mgCtx.ellipse(550, mgHeight - 90, 200, 45, 0, 0, Math.PI * 2);
+  mgCtx.fill();
+
   const d = mgDavid;
-  mgCtx.fillStyle = 'rgba(0,0,0,0.3)'; mgCtx.beginPath(); mgCtx.ellipse(d.x + d.w / 2, d.y + d.h + 4, 20, 6, 0, 0, Math.PI * 2); mgCtx.fill();
-  mgCtx.fillStyle = '#8b6914'; mgCtx.beginPath(); mgCtx.roundRect(d.x + 5, d.y + 22, d.w - 10, d.h - 22, 4); mgCtx.fill();
-  mgCtx.fillStyle = '#a07820'; mgCtx.fillRect(d.x + 5, d.y + 22, d.w - 10, 8);
-  mgCtx.fillStyle = '#c8a060'; mgCtx.fillRect(d.x - 5, d.y + 24, 10, 20); mgCtx.fillRect(d.x + d.w - 5, d.y + 24, 10, 20);
-  mgCtx.fillStyle = '#c8a060'; mgCtx.beginPath(); mgCtx.arc(d.x + d.w / 2, d.y + 12, 14, 0, Math.PI * 2); mgCtx.fill();
-  mgCtx.fillStyle = '#5a3010'; mgCtx.beginPath(); mgCtx.arc(d.x + d.w / 2, d.y + 6, 14, Math.PI, 2 * Math.PI); mgCtx.fill();
-  mgCtx.fillStyle = '#2a1800'; mgCtx.fillRect(d.x + d.w / 2 - 6, d.y + 11, 4, 3); mgCtx.fillRect(d.x + d.w / 2 + 2, d.y + 11, 4, 3);
-  mgCtx.strokeStyle = mgChargeActive ? '#ffaa00' : '#8b6914'; mgCtx.lineWidth = 2;
-  mgCtx.beginPath(); mgCtx.moveTo(d.x + d.w - 5, d.y + 30); mgCtx.lineTo(d.x + d.w + 15, d.y + 24); mgCtx.stroke();
-  mgCtx.fillStyle = mgChargeActive ? '#ffaa00' : '#a07820'; mgCtx.fillRect(d.x + d.w + 10, d.y + 21, 8, 6);
-  mgCtx.fillStyle = 'rgba(255,220,100,0.9)'; mgCtx.font = 'bold 11px "Cinzel", monospace'; mgCtx.textAlign = 'center'; mgCtx.fillText('DAVID', d.x + d.w / 2, d.y - 8);
+  
+  mgCtx.fillStyle = 'rgba(0,0,0,0.3)';
+  mgCtx.beginPath();
+  mgCtx.ellipse(d.x + d.w / 2, d.y + d.h + 4, 20, 6, 0, 0, Math.PI * 2);
+  mgCtx.fill();
+  
+  mgCtx.fillStyle = '#8b6914';
+  mgCtx.beginPath();
+  mgCtx.roundRect(d.x + 5, d.y + 22, d.w - 10, d.h - 22, 4);
+  mgCtx.fill();
+  
+  mgCtx.fillStyle = '#a07820';
+  mgCtx.fillRect(d.x + 5, d.y + 22, d.w - 10, 8);
+  
+  mgCtx.fillStyle = '#c8a060';
+  mgCtx.fillRect(d.x - 5, d.y + 24, 10, 20);
+  mgCtx.fillRect(d.x + d.w - 5, d.y + 24, 10, 20);
+  
+  mgCtx.fillStyle = '#c8a060';
+  mgCtx.beginPath();
+  mgCtx.arc(d.x + d.w / 2, d.y + 12, 14, 0, Math.PI * 2);
+  mgCtx.fill();
+  
+  mgCtx.fillStyle = '#5a3010';
+  mgCtx.beginPath();
+  mgCtx.arc(d.x + d.w / 2, d.y + 6, 14, Math.PI, 2 * Math.PI);
+  mgCtx.fill();
+  
+  mgCtx.fillStyle = '#2a1800';
+  mgCtx.fillRect(d.x + d.w / 2 - 6, d.y + 11, 4, 3);
+  mgCtx.fillRect(d.x + d.w / 2 + 2, d.y + 11, 4, 3);
+  
+  mgCtx.strokeStyle = mgChargeActive ? '#ffaa00' : '#8b6914';
+  mgCtx.lineWidth = 2;
+  mgCtx.beginPath();
+  mgCtx.moveTo(d.x + d.w - 5, d.y + 30);
+  mgCtx.lineTo(d.x + d.w + 15, d.y + 24);
+  mgCtx.stroke();
+  mgCtx.fillStyle = mgChargeActive ? '#ffaa00' : '#a07820';
+  mgCtx.fillRect(d.x + d.w + 10, d.y + 21, 8, 6);
+  
+  mgCtx.fillStyle = 'rgba(255,220,100,0.9)';
+  mgCtx.font = 'bold 11px "Cinzel", monospace';
+  mgCtx.textAlign = 'center';
+  mgCtx.fillText('DAVID', d.x + d.w / 2, d.y - 8);
+
   const g = mgGoliath;
-  mgCtx.fillStyle = 'rgba(0,0,0,0.4)'; mgCtx.beginPath(); mgCtx.ellipse(g.x + g.w / 2, g.y + g.h + 6, 32, 10, 0, 0, Math.PI * 2); mgCtx.fill();
-  mgCtx.fillStyle = '#4a3010'; mgCtx.fillRect(g.x + 8, g.y + g.h - 20, 20, 20); mgCtx.fillRect(g.x + g.w - 28, g.y + g.h - 20, 20, 20);
+  
+  mgCtx.fillStyle = 'rgba(0,0,0,0.4)';
+  mgCtx.beginPath();
+  mgCtx.ellipse(g.x + g.w / 2, g.y + g.h + 6, 32, 10, 0, 0, Math.PI * 2);
+  mgCtx.fill();
+  
+  mgCtx.fillStyle = '#4a3010';
+  mgCtx.fillRect(g.x + 8, g.y + g.h - 20, 20, 20);
+  mgCtx.fillRect(g.x + g.w - 28, g.y + g.h - 20, 20, 20);
+  
   const bodyGrad = mgCtx.createLinearGradient(g.x, g.y + 25, g.x + g.w, g.y + 25);
-  bodyGrad.addColorStop(0, '#8a7040'); bodyGrad.addColorStop(0.5, g.rage ? '#d06020' : '#c0a050'); bodyGrad.addColorStop(1, '#8a7040');
-  mgCtx.fillStyle = bodyGrad; mgCtx.beginPath(); mgCtx.roundRect(g.x + 4, g.y + 30, g.w - 8, g.h - 50, 6); mgCtx.fill();
-  mgCtx.strokeStyle = 'rgba(100,80,20,0.4)'; mgCtx.lineWidth = 1;
-  for (let row = 0; row < 4; row++) { for (let col = 0; col < 4; col++) { mgCtx.beginPath(); mgCtx.arc(g.x + 12 + col * 14, g.y + 42 + row * 14, 6, 0, Math.PI); mgCtx.stroke(); } }
-  mgCtx.fillStyle = '#b09040'; mgCtx.fillRect(g.x - 8, g.y + 30, 14, 36); mgCtx.fillRect(g.x + g.w - 6, g.y + 30, 14, 36);
+  bodyGrad.addColorStop(0, '#8a7040');
+  bodyGrad.addColorStop(0.5, g.rage ? '#d06020' : '#c0a050');
+  bodyGrad.addColorStop(1, '#8a7040');
+  mgCtx.fillStyle = bodyGrad;
+  mgCtx.beginPath();
+  mgCtx.roundRect(g.x + 4, g.y + 30, g.w - 8, g.h - 50, 6);
+  mgCtx.fill();
+  
+  mgCtx.strokeStyle = 'rgba(100,80,20,0.4)';
+  mgCtx.lineWidth = 1;
+  for (let row = 0; row < 4; row++) {
+    for (let col = 0; col < 4; col++) {
+      mgCtx.beginPath();
+      mgCtx.arc(g.x + 12 + col * 14, g.y + 42 + row * 14, 6, 0, Math.PI);
+      mgCtx.stroke();
+    }
+  }
+  
+  mgCtx.fillStyle = '#b09040';
+  mgCtx.fillRect(g.x - 8, g.y + 30, 14, 36);
+  mgCtx.fillRect(g.x + g.w - 6, g.y + 30, 14, 36);
+  
   const helmGrad = mgCtx.createLinearGradient(g.x, g.y, g.x + g.w, g.y);
-  helmGrad.addColorStop(0, '#8a7040'); helmGrad.addColorStop(0.5, '#d0b060'); helmGrad.addColorStop(1, '#8a7040');
-  mgCtx.fillStyle = helmGrad; mgCtx.beginPath(); mgCtx.arc(g.x + g.w / 2, g.y + 16, g.w / 2 - 6, Math.PI, 2 * Math.PI); mgCtx.fill(); mgCtx.fillRect(g.x + 4, g.y + 16, g.w - 8, 18);
-  mgCtx.fillStyle = '#c09060'; mgCtx.fillRect(g.x + 12, g.y + 16, g.w - 24, 22);
-  let eyeRed = 30; if (g.rage) eyeRed = 255; else if (g.state === 'TAUNTING') eyeRed = 200; else if (g.state === 'WINDING_UP') eyeRed = 150; else if (g.state === 'STUNNED') eyeRed = 100; else eyeRed = 80;
-  mgCtx.fillStyle = `rgb(${eyeRed}, 20, 0)`; mgCtx.beginPath(); mgCtx.ellipse(g.x + g.w / 2 - 10, g.y + 24, 5, 4, 0, 0, Math.PI * 2); mgCtx.fill();
-  mgCtx.beginPath(); mgCtx.ellipse(g.x + g.w / 2 + 10, g.y + 24, 5, 4, 0, 0, Math.PI * 2); mgCtx.fill();
-  mgCtx.strokeStyle = `rgba(255, 100, 0, ${0.3 + Math.sin(mgFrame * 0.1) * 0.2})`; mgCtx.lineWidth = 2; mgCtx.setLineDash([4, 4]); mgCtx.strokeRect(g.x + 10, g.y + 2, g.w - 20, 22); mgCtx.setLineDash([]);
-  for (let h = 0; h < mgHits; h++) { mgCtx.fillStyle = '#cc2200'; mgCtx.beginPath(); mgCtx.arc(g.x + g.w / 2 + (h - 1) * 12, g.y + 12, 5, 0, Math.PI * 2); mgCtx.fill(); }
-  mgCtx.fillStyle = '#8b6914'; mgCtx.fillRect(g.x - 12, g.y + 25, 6, 80); mgCtx.fillStyle = '#c0c0c0'; mgCtx.beginPath(); mgCtx.moveTo(g.x - 12, g.y + 25); mgCtx.lineTo(g.x - 6, g.y + 25); mgCtx.lineTo(g.x - 9, g.y + 5); mgCtx.closePath(); mgCtx.fill();
-  mgCtx.fillStyle = g.rage ? 'rgba(255,80,80,0.9)' : 'rgba(255,100,80,0.9)'; mgCtx.font = 'bold 11px "Cinzel", monospace'; mgCtx.textAlign = 'center'; mgCtx.fillText(g.rage ? '⚡ GOLIATH ⚡' : 'GOLIATH', g.x + g.w / 2, g.y - 10);
-  mgCtx.fillStyle = 'rgba(255,200,100,0.7)'; mgCtx.font = '9px "Cinzel", monospace'; mgCtx.fillText('▲ AIM HERE', g.x + g.w / 2, g.y + 1);
-  for (let j of mgJavelins) { mgCtx.save(); mgCtx.translate(j.x, j.y); mgCtx.rotate(j.angle); mgCtx.fillStyle = '#8b6914'; mgCtx.fillRect(0, -2, 28, 4); mgCtx.fillStyle = '#c0c0c0'; mgCtx.beginPath(); mgCtx.moveTo(28, -5); mgCtx.lineTo(38, 0); mgCtx.lineTo(28, 5); mgCtx.closePath(); mgCtx.fill(); mgCtx.restore(); }
+  helmGrad.addColorStop(0, '#8a7040');
+  helmGrad.addColorStop(0.5, '#d0b060');
+  helmGrad.addColorStop(1, '#8a7040');
+  mgCtx.fillStyle = helmGrad;
+  mgCtx.beginPath();
+  mgCtx.arc(g.x + g.w / 2, g.y + 16, g.w / 2 - 6, Math.PI, 2 * Math.PI);
+  mgCtx.fill();
+  mgCtx.fillRect(g.x + 4, g.y + 16, g.w - 8, 18);
+  
+  mgCtx.fillStyle = '#c09060';
+  mgCtx.fillRect(g.x + 12, g.y + 16, g.w - 24, 22);
+  
+  let eyeRed = 30;
+  if (g.rage) eyeRed = 255;
+  else if (g.state === 'TAUNTING') eyeRed = 200;
+  else if (g.state === 'WINDING_UP') eyeRed = 150;
+  else if (g.state === 'STUNNED') eyeRed = 100;
+  else eyeRed = 80;
+  mgCtx.fillStyle = `rgb(${eyeRed}, 20, 0)`;
+  mgCtx.beginPath();
+  mgCtx.ellipse(g.x + g.w / 2 - 10, g.y + 24, 5, 4, 0, 0, Math.PI * 2);
+  mgCtx.fill();
+  mgCtx.beginPath();
+  mgCtx.ellipse(g.x + g.w / 2 + 10, g.y + 24, 5, 4, 0, 0, Math.PI * 2);
+  mgCtx.fill();
+  
+  mgCtx.strokeStyle = `rgba(255, 100, 0, ${0.3 + Math.sin(mgFrame * 0.1) * 0.2})`;
+  mgCtx.lineWidth = 2;
+  mgCtx.setLineDash([4, 4]);
+  mgCtx.strokeRect(g.x + 10, g.y + 2, g.w - 20, 22);
+  mgCtx.setLineDash([]);
+  
+  for (let h = 0; h < mgHits; h++) {
+    mgCtx.fillStyle = '#cc2200';
+    mgCtx.beginPath();
+    mgCtx.arc(g.x + g.w / 2 + (h - 1) * 12, g.y + 12, 5, 0, Math.PI * 2);
+    mgCtx.fill();
+  }
+  
+  mgCtx.fillStyle = '#8b6914';
+  mgCtx.fillRect(g.x - 12, g.y + 25, 6, 80);
+  mgCtx.fillStyle = '#c0c0c0';
+  mgCtx.beginPath();
+  mgCtx.moveTo(g.x - 12, g.y + 25);
+  mgCtx.lineTo(g.x - 6, g.y + 25);
+  mgCtx.lineTo(g.x - 9, g.y + 5);
+  mgCtx.closePath();
+  mgCtx.fill();
+  
+  mgCtx.fillStyle = g.rage ? 'rgba(255,80,80,0.9)' : 'rgba(255,100,80,0.9)';
+  mgCtx.font = 'bold 11px "Cinzel", monospace';
+  mgCtx.textAlign = 'center';
+  mgCtx.fillText(g.rage ? '⚡ GOLIATH ⚡' : 'GOLIATH', g.x + g.w / 2, g.y - 10);
+  
+  mgCtx.fillStyle = 'rgba(255,200,100,0.7)';
+  mgCtx.font = '9px "Cinzel", monospace';
+  mgCtx.fillText('▲ AIM HERE', g.x + g.w / 2, g.y + 1);
+
+  for (let j of mgJavelins) {
+    mgCtx.save();
+    mgCtx.translate(j.x, j.y);
+    mgCtx.rotate(j.angle);
+    mgCtx.fillStyle = '#8b6914';
+    mgCtx.fillRect(0, -2, 28, 4);
+    mgCtx.fillStyle = '#c0c0c0';
+    mgCtx.beginPath();
+    mgCtx.moveTo(28, -5);
+    mgCtx.lineTo(38, 0);
+    mgCtx.lineTo(28, 5);
+    mgCtx.closePath();
+    mgCtx.fill();
+    mgCtx.restore();
+  }
+
   if (mgStone.active) {
-    for (let i = 0; i < mgStone.trail.length; i++) { mgCtx.globalAlpha = 0.6 - i * 0.1; mgCtx.fillStyle = '#ffaa44'; mgCtx.beginPath(); mgCtx.arc(mgStone.trail[i].x, mgStone.trail[i].y, 6 - i, 0, Math.PI * 2); mgCtx.fill(); }
-    mgCtx.globalAlpha = 1; mgCtx.fillStyle = '#c8a060'; mgCtx.beginPath(); mgCtx.arc(mgStone.x, mgStone.y, 8, 0, Math.PI * 2); mgCtx.fill(); mgCtx.fillStyle = '#aa8844'; mgCtx.beginPath(); mgCtx.arc(mgStone.x - 1, mgStone.y - 1, 3, 0, Math.PI * 2); mgCtx.fill();
+    for (let i = 0; i < mgStone.trail.length; i++) {
+      mgCtx.globalAlpha = 0.6 - i * 0.1;
+      mgCtx.fillStyle = '#ffaa44';
+      mgCtx.beginPath();
+      mgCtx.arc(mgStone.trail[i].x, mgStone.trail[i].y, 6 - i, 0, Math.PI * 2);
+      mgCtx.fill();
+    }
+    mgCtx.globalAlpha = 1;
+    mgCtx.fillStyle = '#c8a060';
+    mgCtx.beginPath();
+    mgCtx.arc(mgStone.x, mgStone.y, 8, 0, Math.PI * 2);
+    mgCtx.fill();
+    mgCtx.fillStyle = '#aa8844';
+    mgCtx.beginPath();
+    mgCtx.arc(mgStone.x - 1, mgStone.y - 1, 3, 0, Math.PI * 2);
+    mgCtx.fill();
   }
+
   if (mgChargeActive && !mgStone.active && mgPhase === 'play') {
-    const g2 = mgGoliath; const power = 7 + Math.min(mgStone.charge, 60) * 0.15; const fx = g2.x + 8, fy = g2.y + 2, fw = g2.w - 16, fh = 22;
-    let svx = Math.cos(mgAngle) * power, svy = Math.sin(mgAngle) * power; let sx = mgDavid.x + mgDavid.w - 5, sy = mgDavid.y + 30; let willHit = false, hitVy = svy;
-    for (let i = 0; i < 80; i++) { svy += 0.3; sx += svx; sy += svy; if (sx > fx && sx < fx + fw && sy > fy && sy < fy + fh) { willHit = true; hitVy = svy; break; } if (sx > mgWidth + 60 || sy > mgHeight + 60 || sy < -60) break; }
-    const isStraight = Math.abs(Math.atan2(hitVy, Math.cos(mgAngle) * power)) < 0.3; const st = g2.state;
-    const canHit = willHit && ( (st === 'TAUNTING' || st === 'WINDING_UP' || st === 'STUNNED') || ((st === 'GUARDING' || st === 'RAGE') && !isStraight) );
+    const g2 = mgGoliath;
+    const power = 7 + Math.min(mgStone.charge, 60) * 0.15;
+    const fx = g2.x + 8, fy = g2.y + 2, fw = g2.w - 16, fh = 22;
+
+    let svx = Math.cos(mgAngle) * power, svy = Math.sin(mgAngle) * power;
+    let sx = mgDavid.x + mgDavid.w - 5, sy = mgDavid.y + 30;
+    let willHit = false, hitVy = svy;
+    for (let i = 0; i < 80; i++) {
+      svy += 0.3; sx += svx; sy += svy;
+      if (sx > fx && sx < fx + fw && sy > fy && sy < fy + fh) {
+        willHit = true; hitVy = svy; break;
+      }
+      if (sx > mgWidth + 60 || sy > mgHeight + 60 || sy < -60) break;
+    }
+
+    const isStraight = Math.abs(Math.atan2(hitVy, Math.cos(mgAngle) * power)) < 0.3;
+    const st = g2.state;
+    const canHit = willHit && (
+      (st === 'TAUNTING' || st === 'WINDING_UP' || st === 'STUNNED') ||
+      ((st === 'GUARDING' || st === 'RAGE') && !isStraight)
+    );
     const dotColor = willHit ? (canHit ? '#44ff88' : '#ff4444') : '#ffdd88';
-    let vx = Math.cos(mgAngle) * power, vy = Math.sin(mgAngle) * power; let x = mgDavid.x + mgDavid.w - 5, y = mgDavid.y + 30;
-    mgCtx.save(); for (let i = 0; i < 70; i++) { vy += 0.3; x += vx; y += vy; if (i % 2 === 0) { mgCtx.globalAlpha = Math.max(0.08, 0.75 - i * 0.012); mgCtx.fillStyle = dotColor; mgCtx.beginPath(); mgCtx.arc(x, y, Math.max(1.5, 4.5 - i * 0.055), 0, Math.PI * 2); mgCtx.fill(); } if (x > mgWidth + 60 || y > mgHeight + 60 || y < -60) break; }
-    mgCtx.globalAlpha = 0.45; mgCtx.strokeStyle = dotColor; mgCtx.lineWidth = 1.5; mgCtx.setLineDash([3, 3]); mgCtx.beginPath(); mgCtx.arc(x, y, 9, 0, Math.PI * 2); mgCtx.stroke(); mgCtx.setLineDash([]); mgCtx.globalAlpha = 1; mgCtx.restore();
+
+    let vx = Math.cos(mgAngle) * power, vy = Math.sin(mgAngle) * power;
+    let x = mgDavid.x + mgDavid.w - 5, y = mgDavid.y + 30;
+    mgCtx.save();
+    for (let i = 0; i < 70; i++) {
+      vy += 0.3; x += vx; y += vy;
+      if (i % 2 === 0) {
+        mgCtx.globalAlpha = Math.max(0.08, 0.75 - i * 0.012);
+        mgCtx.fillStyle = dotColor;
+        mgCtx.beginPath();
+        mgCtx.arc(x, y, Math.max(1.5, 4.5 - i * 0.055), 0, Math.PI * 2);
+        mgCtx.fill();
+      }
+      if (x > mgWidth + 60 || y > mgHeight + 60 || y < -60) break;
+    }
+    mgCtx.globalAlpha = 0.45;
+    mgCtx.strokeStyle = dotColor;
+    mgCtx.lineWidth = 1.5;
+    mgCtx.setLineDash([3, 3]);
+    mgCtx.beginPath(); mgCtx.arc(x, y, 9, 0, Math.PI * 2); mgCtx.stroke();
+    mgCtx.setLineDash([]);
+    mgCtx.globalAlpha = 1;
+    mgCtx.restore();
   }
-  if (mgChargeActive && !mgStone.active) { let pct = (mgStone.charge || 0) / 60; mgCtx.fillStyle = `rgba(255, ${200 - Math.round(pct * 200)}, 0, 0.9)`; mgCtx.fillRect(mgDavid.x - 5, mgDavid.y - 20, pct * 60, 8); mgCtx.strokeStyle = 'rgba(255,200,0,0.6)'; mgCtx.strokeRect(mgDavid.x - 5, mgDavid.y - 20, 60, 8); mgCtx.fillStyle = 'rgba(255,200,100,0.9)'; mgCtx.font = 'bold 10px "Cinzel", monospace'; mgCtx.textAlign = 'center'; mgCtx.fillText(`⚡ ${Math.round(pct * 100)}%`, mgDavid.x + 25, mgDavid.y - 25); }
+
+  if (mgChargeActive && !mgStone.active) {
+    let pct = (mgStone.charge || 0) / 60;
+    mgCtx.fillStyle = `rgba(255, ${200 - Math.round(pct * 200)}, 0, 0.9)`;
+    mgCtx.fillRect(mgDavid.x - 5, mgDavid.y - 20, pct * 60, 8);
+    mgCtx.strokeStyle = 'rgba(255,200,0,0.6)';
+    mgCtx.strokeRect(mgDavid.x - 5, mgDavid.y - 20, 60, 8);
+    mgCtx.fillStyle = 'rgba(255,200,100,0.9)';
+    mgCtx.font = 'bold 10px "Cinzel", monospace';
+    mgCtx.textAlign = 'center';
+    mgCtx.fillText(`⚡ ${Math.round(pct * 100)}%`, mgDavid.x + 25, mgDavid.y - 25);
+  }
+
   mgCtx.globalAlpha = 1;
 }
 
