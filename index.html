@@ -4,6 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>The Biblical Chronicles – Complete Edition</title>
+
+<!-- PWA / Installable App -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#c9a84c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BC Chronicles">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<!-- SEO & Social -->
+<meta name="description" content="Explore Bible stories through quizzes and epic battles. David vs Goliath, Daniel and the Lions, Moses and the Burning Bush.">
+<meta name="keywords" content="bible quiz, bible game, david and goliath, christian game, bible stories">
+<meta property="og:title" content="The Biblical Chronicles">
+<meta property="og:description" content="Stories of Faith — Trials of Knowledge">
+<meta property="og:type" content="game">
+<meta name="twitter:card" content="summary">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
@@ -27,59 +44,59 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 #s-title{text-align:center;padding-top:40px;}
 .emblem{font-size:64px;display:block;margin-bottom:10px;animation:fl 4s ease-in-out infinite alternate;}
 .mtitle{font-family:'Cinzel',serif;font-size:clamp(22px,7vw,48px);font-weight:900;color:var(--gold2);text-shadow:0 0 40px rgba(201,168,76,.5),0 2px 8px rgba(0,0,0,.9);letter-spacing:3px;}
-.msub{font-family:'Cinzel',serif;font-size:clamp(9px,2.5vw,12px);color:var(--gold-dim);letter-spacing:8px;text-transform:uppercase;margin:8px 0 20px;}
+.msub{font-family:'Cinzel',serif;font-size:clamp(13px,2.5vw,16px);color:var(--gold-dim);letter-spacing:8px;text-transform:uppercase;margin:8px 0 20px;}
 .tquote{max-width:480px;margin:0 auto 24px;font-style:italic;font-size:15px;line-height:1.8;color:var(--parch2);border-left:2px solid var(--gold-dim);padding-left:18px;text-align:left;}
-.tquote cite{display:block;font-style:normal;font-family:'Cinzel',serif;font-size:10px;color:var(--gold-dim);letter-spacing:2px;margin-top:6px;}
+.tquote cite{display:block;font-style:normal;font-family:'Cinzel',serif;font-size:13px;color:var(--gold-dim);letter-spacing:2px;margin-top:6px;}
 .complete-badge{display:none;max-width:400px;margin:0 auto 16px;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));border:1px solid var(--gold);border-radius:8px;padding:12px 20px;text-align:center;}
 .complete-badge.show{display:block;animation:sIn .6s ease;}
 .cb-title{font-family:'Cinzel',serif;font-size:13px;color:var(--gold2);letter-spacing:2px;}
 .cb-sub{font-size:12px;color:var(--parch3);font-style:italic;margin-top:4px;}
 .ubox{max-width:400px;margin:0 auto 24px;background:linear-gradient(160deg,rgba(26,20,32,.95),rgba(12,9,16,.98));border:1px solid rgba(201,168,76,.3);border-radius:10px;padding:18px 22px;text-align:center;}
-.ubox-ttl{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:10px;}
+.ubox-ttl{font-family:'Cinzel',serif;font-size:14px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:10px;}
 .uinp{width:100%;background:rgba(8,6,12,.9);border:1px solid rgba(201,168,76,.25);border-radius:6px;padding:11px 16px;color:var(--gold3);font-family:'Playfair Display',serif;font-size:17px;outline:none;transition:border-color .3s;text-align:center;}
 .uinp:focus{border-color:var(--gold);}
 .uinp::placeholder{color:rgba(201,168,76,.3);font-style:italic;}
 .uinp.error{border-color:var(--red2);animation:wshk .3s ease;}
 .ugreet{font-size:13px;color:var(--parch3);margin-top:8px;font-style:italic;min-height:18px;}
 .ugreet.err{color:#e87070;}
-.ep-lbl{font-family:'Cinzel',serif;font-size:10px;letter-spacing:4px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:12px;}
+.ep-lbl{font-family:'Cinzel',serif;font-size:13px;letter-spacing:4px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:12px;}
 .ep-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:12px;}
 .ep-card{background:linear-gradient(160deg,rgba(26,20,32,.95),rgba(12,9,16,.98));border:1px solid rgba(201,168,76,.18);border-radius:8px;padding:18px 15px;cursor:pointer;transition:all .3s;text-align:left;position:relative;overflow:hidden;}
 .ep-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity .3s;}
 .ep-card:hover{border-color:var(--gold);transform:translateY(-4px);box-shadow:0 12px 40px rgba(201,168,76,.15);}
 .ep-card:hover::after{opacity:1;}
 .ep-card.done-card{border-color:rgba(201,168,76,.4);}
-.ep-done-tag{position:absolute;top:10px;right:10px;background:rgba(39,174,96,.2);border:1px solid rgba(39,174,96,.4);border-radius:20px;padding:2px 8px;font-family:'Cinzel',serif;font-size:9px;color:#5ddb8e;letter-spacing:1px;}
+.ep-done-tag{position:absolute;top:10px;right:10px;background:rgba(39,174,96,.2);border:1px solid rgba(39,174,96,.4);border-radius:20px;padding:2px 8px;font-family:'Cinzel',serif;font-size:13px;color:#5ddb8e;letter-spacing:1px;}
 .ep-ico{font-size:28px;margin-bottom:7px;display:block;}
-.ep-num{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:3px;}
+.ep-num{font-family:'Cinzel',serif;font-size:13px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:3px;}
 .ep-ttl{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--gold2);margin-bottom:4px;line-height:1.2;}
-.ep-bk{font-size:11px;color:var(--parch3);font-style:italic;margin-bottom:7px;}
+.ep-bk{font-size:14px;color:var(--parch3);font-style:italic;margin-bottom:7px;}
 .ep-dsc{font-size:12px;color:var(--parch2);line-height:1.5;margin-bottom:9px;}
 .ep-dif{display:inline-flex;gap:4px;align-items:center;}
 .ddot{width:8px;height:8px;border-radius:50%;background:var(--gold-dim);}
 .ddot.lit{background:var(--gold2);}
 .special-card{border-color:rgba(224,92,26,.4)!important;background:linear-gradient(160deg,rgba(30,15,8,.95),rgba(12,9,16,.98))!important;}
 .special-card:hover{border-color:var(--ember)!important;box-shadow:0 12px 40px rgba(224,92,26,.2)!important;}
-.special-badge{display:inline-block;background:rgba(224,92,26,.2);border:1px solid rgba(224,92,26,.5);border-radius:20px;padding:2px 10px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:var(--ember);text-transform:uppercase;margin-bottom:6px;}
+.special-badge{display:inline-block;background:rgba(224,92,26,.2);border:1px solid rgba(224,92,26,.5);border-radius:20px;padding:2px 10px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:2px;color:var(--ember);text-transform:uppercase;margin-bottom:6px;}
 
 /* GAME HEADER */
 #s-game{padding-top:14px;}
 .ghdr{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;background:rgba(12,9,16,.9);border:1px solid rgba(201,168,76,.15);border-radius:8px;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
-.hep{font-family:'Cinzel',serif;font-size:10px;color:var(--gold-dim);letter-spacing:2px;text-transform:uppercase;}
+.hep{font-family:'Cinzel',serif;font-size:13px;color:var(--gold-dim);letter-spacing:2px;text-transform:uppercase;}
 .httl{font-family:'Playfair Display',serif;font-size:14px;color:var(--gold2);font-weight:700;}
-.huser{font-family:'Cinzel',serif;font-size:11px;color:var(--gold-dim);}
+.huser{font-family:'Cinzel',serif;font-size:14px;color:var(--gold-dim);}
 .hright{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
 .liveswrap{display:flex;gap:5px;}
 .life{font-size:16px;transition:all .3s;}
 .life.lost{opacity:.2;filter:grayscale(1);}
 .sbox{font-family:'Cinzel',serif;font-size:13px;color:var(--gold2);background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);padding:4px 12px;border-radius:20px;}
-.quitbtn{background:transparent;border:1px solid rgba(192,57,43,.3);color:rgba(192,57,43,.7);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;padding:5px 12px;border-radius:4px;cursor:pointer;transition:all .3s;}
+.quitbtn{background:transparent;border:1px solid rgba(192,57,43,.3);color:rgba(192,57,43,.7);font-family:'Cinzel',serif;font-size:13px;letter-spacing:1px;padding:5px 12px;border-radius:4px;cursor:pointer;transition:all .3s;}
 .quitbtn:hover{border-color:var(--red2);color:var(--red2);background:rgba(192,57,43,.08);}
 .pbar{display:flex;gap:8px;align-items:center;margin-bottom:14px;padding:0 2px;}
 .pstep{flex:1;height:3px;border-radius:2px;background:rgba(201,168,76,.15);transition:background .5s;}
 .pstep.done{background:var(--gold);}
 .pstep.active{background:var(--gold2);box-shadow:0 0 8px var(--gold2);}
-.plbl{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;}
+.plbl{font-family:'Cinzel',serif;font-size:13px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;}
 .streak-banner{display:none;background:linear-gradient(135deg,rgba(39,174,96,.15),rgba(39,174,96,.05));border:1px solid rgba(39,174,96,.35);border-radius:6px;padding:8px 16px;margin-bottom:10px;text-align:center;font-family:'Cinzel',serif;font-size:12px;color:#5ddb8e;letter-spacing:2px;animation:sIn .4s ease;}
 .streak-banner.show{display:block;}
 
@@ -87,7 +104,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .spanel{background:linear-gradient(170deg,rgba(20,14,28,.97),rgba(8,6,12,.99));border:1px solid rgba(201,168,76,.2);border-radius:10px;overflow:hidden;margin-bottom:14px;}
 .shdr{padding:13px 20px 10px;border-bottom:1px solid rgba(201,168,76,.1);display:flex;align-items:center;gap:12px;}
 .sico{font-size:24px;}
-.slbl{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;}
+.slbl{font-family:'Cinzel',serif;font-size:13px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;}
 .snm{font-family:'Playfair Display',serif;font-size:15px;color:var(--gold2);font-weight:700;}
 .sbody{padding:20px 24px;min-height:160px;}
 .stline{font-size:clamp(14px,3vw,17px);line-height:1.95;color:var(--white);opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s;margin-bottom:0;}
@@ -97,23 +114,23 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .stline.beat{margin-bottom:12px;}
 .screv{margin:18px 0;padding:15px 18px;background:rgba(201,168,76,.06);border-left:3px solid var(--gold);border-radius:0 6px 6px 0;opacity:0;transform:translateX(-10px);transition:all .6s;}
 .screv.vis{opacity:1;transform:translateX(0);}
-.sclbl{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:5px;}
+.sclbl{font-family:'Cinzel',serif;font-size:13px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:5px;}
 .sctxt{font-style:italic;font-size:clamp(13px,2.5vw,15px);color:var(--gold3);line-height:1.7;}
-.scref{font-family:'Cinzel',serif;font-size:10px;color:var(--gold-dim);margin-top:4px;letter-spacing:1px;}
+.scref{font-family:'Cinzel',serif;font-size:13px;color:var(--gold-dim);margin-top:4px;letter-spacing:1px;}
 .snav{padding:12px 20px;border-top:1px solid rgba(201,168,76,.1);display:flex;justify-content:space-between;align-items:center;}
 .sdots{display:flex;gap:6px;}
 .sdot{width:8px;height:8px;border-radius:50%;background:rgba(201,168,76,.2);transition:all .3s;}
 .sdot.active{background:var(--gold2);box-shadow:0 0 6px var(--gold2);}
 .sdot.done{background:rgba(201,168,76,.5);}
-.sklnk{font-family:'Cinzel',serif;font-size:10px;color:var(--gold-dim);letter-spacing:1px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;margin-right:12px;}
+.sklnk{font-family:'Cinzel',serif;font-size:13px;color:var(--gold-dim);letter-spacing:1px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;margin-right:12px;}
 .sklnk:hover{color:var(--gold);}
 
 /* CHALLENGE */
 .cpanel{background:linear-gradient(170deg,rgba(18,12,26,.97),rgba(8,5,14,.99));border:1px solid rgba(201,168,76,.25);border-radius:10px;overflow:hidden;margin-bottom:14px;animation:sIn .4s ease;}
 .chdr{background:linear-gradient(135deg,rgba(139,26,26,.3),rgba(8,5,14,0));padding:16px 20px 12px;border-bottom:1px solid rgba(201,168,76,.12);}
-.ctype{font-family:'Cinzel',serif;font-size:9px;letter-spacing:4px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:4px;}
+.ctype{font-family:'Cinzel',serif;font-size:13px;letter-spacing:4px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:4px;}
 .cq{font-family:'Playfair Display',serif;font-size:clamp(14px,3.5vw,19px);color:var(--white);font-weight:700;line-height:1.4;}
-.chint-btn{background:transparent;border:1px solid rgba(201,168,76,.2);color:var(--gold-dim);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;padding:4px 12px;border-radius:4px;cursor:pointer;margin-top:6px;transition:all .3s;}
+.chint-btn{background:transparent;border:1px solid rgba(201,168,76,.2);color:var(--gold-dim);font-family:'Cinzel',serif;font-size:13px;letter-spacing:1px;padding:4px 12px;border-radius:4px;cursor:pointer;margin-top:6px;transition:all .3s;}
 .chint-btn:hover{border-color:var(--gold);color:var(--gold);}
 .chint-txt{font-size:12px;color:var(--parch3);font-style:italic;margin-top:6px;display:none;}
 .chint-txt.show{display:block;animation:sIn .3s ease;}
@@ -121,7 +138,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .ttrack{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;}
 .tfill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--green2),var(--gold2));transition:width 1s linear,background .5s;}
 .tfill.urg{background:linear-gradient(90deg,var(--red2),var(--ember));}
-.tnum{font-family:'Cinzel',serif;font-size:11px;color:var(--parch3);text-align:right;margin-top:3px;}
+.tnum{font-family:'Cinzel',serif;font-size:14px;color:var(--parch3);text-align:right;margin-top:3px;}
 .owrap{padding:16px 20px 20px;display:flex;flex-direction:column;gap:8px;}
 .obtn{background:linear-gradient(135deg,rgba(26,18,38,.9),rgba(14,10,20,.95));border:1px solid rgba(201,168,76,.2);border-radius:7px;padding:12px 15px;text-align:left;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:12px;color:var(--parch);font-family:'Libre Baskerville',serif;font-size:clamp(13px,2.5vw,15px);line-height:1.4;width:100%;}
 .obtn:hover:not(:disabled){border-color:var(--gold);background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(14,10,20,.95));transform:translateX(4px);}
@@ -130,7 +147,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .obtn.wrong{border-color:var(--red2);background:rgba(192,57,43,.12);color:#e87070;animation:wshk .4s ease;}
 @keyframes cpop{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
 @keyframes wshk{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.olet{width:27px;height:27px;border-radius:50%;flex-shrink:0;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:11px;color:var(--gold-dim);transition:all .25s;}
+.olet{width:27px;height:27px;border-radius:50%;flex-shrink:0;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:14px;color:var(--gold-dim);transition:all .25s;}
 .obtn:hover:not(:disabled) .olet{background:rgba(201,168,76,.2);color:var(--gold2);}
 .obtn.correct .olet{background:rgba(39,174,96,.2);border-color:#27ae60;color:#5ddb8e;}
 .obtn.wrong .olet{background:rgba(192,57,43,.2);border-color:var(--red2);color:#e87070;}
@@ -139,8 +156,8 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .finp:focus{border-color:var(--gold);}
 .finp.correct{border-color:#27ae60;color:#5ddb8e;}
 .finp.wrong{border-color:var(--red2);color:#e87070;animation:wshk .4s ease;}
-.qctr{font-family:'Cinzel',serif;font-size:10px;color:var(--gold-dim);letter-spacing:2px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;}
-.qstreak{color:var(--green2);font-size:11px;}
+.qctr{font-family:'Cinzel',serif;font-size:13px;color:var(--gold-dim);letter-spacing:2px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;}
+.qstreak{color:var(--green2);font-size:14px;}
 .afb{padding:13px 20px;margin:0 20px 16px;border-radius:8px;display:none;animation:sIn .4s ease;}
 .afb.show{display:block;}
 .afb.cfb{background:rgba(39,174,96,.1);border:1px solid rgba(39,174,96,.3);}
@@ -162,13 +179,13 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .vplayer{font-family:'Cinzel',serif;font-size:14px;color:var(--gold-dim);margin-bottom:10px;letter-spacing:2px;}
 .srev{display:inline-block;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:8px;padding:16px 34px;margin-bottom:20px;}
 .sbig{font-family:'Playfair Display',serif;font-size:50px;font-weight:900;color:var(--gold2);line-height:1;}
-.slbl2{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;color:var(--gold-dim);margin-top:4px;}
+.slbl2{font-family:'Cinzel',serif;font-size:13px;letter-spacing:3px;color:var(--gold-dim);margin-top:4px;}
 .strow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
 .stpill{background:rgba(26,18,38,.8);border:1px solid rgba(201,168,76,.18);border-radius:30px;padding:8px 18px;text-align:center;min-width:76px;}
 .stn{font-family:'Cinzel',serif;font-size:19px;color:var(--gold2);}
-.stl{font-size:10px;color:var(--parch3);}
+.stl{font-size:13px;color:var(--parch3);}
 .vverse{max-width:500px;margin:0 auto 22px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.18);border-radius:8px;padding:16px 20px;font-style:italic;font-size:15px;line-height:1.8;color:var(--parch);}
-.vverse cite{display:block;font-style:normal;font-family:'Cinzel',serif;font-size:10px;color:var(--gold-dim);margin-top:6px;letter-spacing:2px;}
+.vverse cite{display:block;font-style:normal;font-family:'Cinzel',serif;font-size:13px;color:var(--gold-dim);margin-top:6px;letter-spacing:2px;}
 
 /* LEADERBOARD */
 #s-leaderboard{padding-top:22px;}
@@ -176,7 +193,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .lbttl{font-family:'Cinzel',serif;font-size:clamp(18px,5vw,30px);font-weight:900;color:var(--gold2);margin-bottom:5px;}
 .lbsub{font-size:12px;color:var(--parch3);font-style:italic;}
 .lbtabs{display:flex;gap:7px;justify-content:center;margin-bottom:14px;flex-wrap:wrap;}
-.lbtab{background:transparent;border:1px solid rgba(201,168,76,.25);color:var(--gold-dim);font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:7px 14px;border-radius:4px;cursor:pointer;transition:all .3s;}
+.lbtab{background:transparent;border:1px solid rgba(201,168,76,.25);color:var(--gold-dim);font-family:'Cinzel',serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;padding:7px 14px;border-radius:4px;cursor:pointer;transition:all .3s;}
 .lbtab.act,.lbtab:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.08);}
 .lblist{background:linear-gradient(170deg,rgba(18,12,26,.97),rgba(8,5,14,.99));border:1px solid rgba(201,168,76,.2);border-radius:10px;overflow:hidden;margin-bottom:16px;}
 .lbload{padding:36px;text-align:center;color:var(--parch3);font-style:italic;}
@@ -188,10 +205,10 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .lbrn.t1{color:#ffd700;font-size:18px;}.lbrn.t2{color:#c0c0c0;font-size:16px;}.lbrn.t3{color:#cd7f32;font-size:15px;}
 .lbinfo{flex:1;}
 .lbname{font-family:'Playfair Display',serif;font-size:14px;color:var(--parch);}
-.lbep{font-size:11px;color:var(--parch3);font-style:italic;}
+.lbep{font-size:14px;color:var(--parch3);font-style:italic;}
 .lbsc{font-family:'Cinzel',serif;font-size:15px;color:var(--gold2);text-align:right;}
-.lbbd{font-size:10px;color:var(--parch3);text-align:right;}
-.lbts{font-size:10px;color:rgba(184,168,128,.5);text-align:right;}
+.lbbd{font-size:13px;color:var(--parch3);text-align:right;}
+.lbts{font-size:13px;color:rgba(184,168,128,.5);text-align:right;}
 
 /* ========== MINI-GAME STYLES ========== */
 #s-minigame {
@@ -373,7 +390,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 }
 .mg-aim-bar-label {
   font-family: monospace;
-  font-size: 9px;
+  font-size: 13px;
   color: rgba(255,160,100,0.5);
   letter-spacing: 1px;
   text-align: center;
@@ -480,7 +497,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .load-bar-wrap{max-width:280px;margin:0 auto 16px;height:4px;background:rgba(201,168,76,.12);border-radius:2px;overflow:hidden;}
 .load-bar{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2),var(--gold3));border-radius:2px;animation:loadFill 1.9s ease-in-out forwards;}
 @keyframes loadFill{0%{width:0}60%{width:75%}85%{width:92%}100%{width:100%}}
-.load-msg{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--gold-dim);text-align:center;text-transform:uppercase;}
+.load-msg{font-family:'Cinzel',serif;font-size:14px;letter-spacing:3px;color:var(--gold-dim);text-align:center;text-transform:uppercase;}
 
 /* ========== BUTTONS ========== */
 .bgold,.bghost,.bcont{display:inline-flex;align-items:center;justify-content:center;padding:11px 22px;border-radius:7px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:1.5px;cursor:pointer;transition:all .25s;border:none;text-transform:uppercase;}
@@ -520,7 +537,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 /* ========== SUBSCRIPTION GATE ========== */
 .sub-gate-price{background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.06));border:1px solid rgba(201,168,76,.35);border-radius:12px;padding:14px 28px;margin:10px auto;text-align:center;max-width:240px;}
 .sub-gate-amount{font-family:'Cinzel',serif;font-size:26px;font-weight:900;color:var(--gold2);line-height:1;}
-.sub-gate-label{font-size:10px;color:var(--parch3);letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
+.sub-gate-label{font-size:13px;color:var(--parch3);letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
 .sub-pay-btn{background:linear-gradient(135deg,#a07828,#e8c96a,#a07828);color:#1a0f00;font-family:'Cinzel',serif;font-size:14px;font-weight:900;letter-spacing:1px;padding:15px 36px;border:none;border-radius:8px;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,.4);transition:all .25s;}
 .sub-pay-btn:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(201,168,76,.6);}
 
@@ -528,7 +545,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .mg-stone-count{background:rgba(0,0,0,0.55);border:1px solid rgba(201,168,76,0.4);border-radius:20px;padding:3px 10px;font-family:monospace;font-weight:bold;font-size:14px;color:#e8c96a;display:flex;align-items:center;gap:4px;transition:all 0.3s;}
 .mg-stone-count.low{border-color:rgba(255,80,80,0.7);color:#ff8888;animation:stonePulse 0.8s ease-in-out infinite alternate;}
 @keyframes stonePulse{from{box-shadow:0 0 4px rgba(255,80,80,0.3);}to{box-shadow:0 0 12px rgba(255,80,80,0.7);}}
-.mg-get-stones-btn{position:absolute;bottom:max(22px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:rgba(139,26,26,0.82);border:1.5px solid rgba(255,120,60,0.6);border-radius:30px;padding:7px 20px;font-family:'Cinzel',monospace;font-size:11px;font-weight:bold;color:#ffcc88;letter-spacing:1px;cursor:pointer;pointer-events:auto;z-index:35;display:none;animation:stonePulse 0.9s ease-in-out infinite alternate;touch-action:manipulation;}
+.mg-get-stones-btn{position:absolute;bottom:max(22px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:rgba(139,26,26,0.82);border:1.5px solid rgba(255,120,60,0.6);border-radius:30px;padding:7px 20px;font-family:'Cinzel',monospace;font-size:14px;font-weight:bold;color:#ffcc88;letter-spacing:1px;cursor:pointer;pointer-events:auto;z-index:35;display:none;animation:stonePulse 0.9s ease-in-out infinite alternate;touch-action:manipulation;}
 .mg-get-stones-btn.visible{display:block;}
 
 /* ========== STONE SHOP ========== */
@@ -538,7 +555,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .stone-diff-card{background:linear-gradient(160deg,rgba(26,18,38,.96),rgba(10,7,16,.98));border:1px solid rgba(201,168,76,0.28);border-radius:10px;padding:12px 18px;width:min(320px,90vw);cursor:pointer;transition:all 0.2s;text-align:left;display:flex;justify-content:space-between;align-items:center;}
 .stone-diff-card:hover{border-color:var(--gold);transform:translateX(4px);}
 .stone-diff-card .diff-label{font-size:13px;color:#e8c96a;}
-.stone-diff-card .diff-desc{font-size:10px;color:#b8a880;margin-top:2px;}
+.stone-diff-card .diff-desc{font-size:13px;color:#b8a880;margin-top:2px;}
 .stone-diff-card .diff-reward{font-size:16px;font-weight:bold;color:#ffcc44;white-space:nowrap;}
 .stone-diff-card.easy{border-left:3px solid #27ae60;}
 .stone-diff-card.medium{border-left:3px solid #e8c96a;}
@@ -560,10 +577,10 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .rank-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(201,168,76,.14),rgba(201,168,76,.06));border:1px solid rgba(201,168,76,.4);border-radius:30px;padding:8px 20px;margin:10px auto;}
 .rank-badge .rank-icon{font-size:22px;}
 .rank-badge .rank-title{font-family:'Cinzel',serif;font-size:14px;color:var(--gold2);letter-spacing:1px;}
-.rank-badge .rank-sub{font-size:10px;color:var(--parch3);margin-top:2px;}
+.rank-badge .rank-sub{font-size:13px;color:var(--parch3);margin-top:2px;}
 
 /* ========== SHARE BUTTON ========== */
-.share-btn{background:linear-gradient(135deg,#1a3a5a,#2a5a8a,#1a3a5a);border:1px solid #4488bb;color:#88ccff;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;padding:10px 22px;border-radius:6px;cursor:pointer;transition:all 0.25s;display:inline-flex;align-items:center;gap:7px;}
+.share-btn{background:linear-gradient(135deg,#1a3a5a,#2a5a8a,#1a3a5a);border:1px solid #4488bb;color:#88ccff;font-family:'Cinzel',serif;font-size:14px;letter-spacing:1px;padding:10px 22px;border-radius:6px;cursor:pointer;transition:all 0.25s;display:inline-flex;align-items:center;gap:7px;}
 .share-btn:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(68,136,187,.4);}
 </style>
 </head>
@@ -810,9 +827,30 @@ async function fsGet(epId){
 //  SOUND SYSTEM
 // ═══════════════════════════════════════════════════════════════
 const SoundFX={
-  ctx:null,enabled:true,ambientNode:null,ambientGain:null,
-  init(){if(!this.ctx&&(window.AudioContext||window.webkitAudioContext))this.ctx=new(window.AudioContext||window.webkitAudioContext)();},
-  beep(freq, duration=0.08, vol=0.12){
+  ctx:null, enabled:true,
+  _musicNodes:[], _musicGain:null, _musicScheduler:null,
+  _currentTheme:null, _musicBeat:0, _nextBeatTime:0,
+
+  init(){
+    if(!this.ctx&&(window.AudioContext||window.webkitAudioContext))
+      this.ctx=new(window.AudioContext||window.webkitAudioContext)();
+  },
+
+  // ── Master reverb-like effect (convolver simulation via delay) ─
+  _makeReverb(wet=0.22){
+    if(!this.ctx) return null;
+    try{
+      const delay=this.ctx.createDelay(0.5);
+      const fb=this.ctx.createGain(); delay.delayTime.value=0.18;
+      fb.gain.value=0.25; delay.connect(fb); fb.connect(delay);
+      const wetGain=this.ctx.createGain(); wetGain.gain.value=wet;
+      delay.connect(wetGain);
+      return{input:delay, output:wetGain};
+    }catch(e){return null;}
+  },
+
+  // ── Generic beep (unchanged) ────────────────────────────────────
+  beep(freq,duration=0.08,vol=0.12){
     if(!this.enabled||!this.ctx)return;
     try{
       const o=this.ctx.createOscillator(),g=this.ctx.createGain();
@@ -823,6 +861,8 @@ const SoundFX={
       o.start();o.stop(this.ctx.currentTime+duration);
     }catch(e){}
   },
+
+  // ── Sound effects (unchanged) ───────────────────────────────────
   play(type){
     if(!this.enabled||!this.ctx)return;
     try{
@@ -830,33 +870,264 @@ const SoundFX={
       o.connect(g);g.connect(this.ctx.destination);
       const t=this.ctx.currentTime;
       switch(type){
-        case 'correct': o.frequency.setValueAtTime(523,t);o.frequency.setValueAtTime(659,t+.1);o.frequency.setValueAtTime(784,t+.2); g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.001,t+.5); o.start(t);o.stop(t+.5);break;
-        case 'wrong': o.type='sawtooth';o.frequency.setValueAtTime(220,t);o.frequency.exponentialRampToValueAtTime(110,t+.3); g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.35); o.start(t);o.stop(t+.35);break;
-        case 'streak': [523,659,784,1047].forEach((f,i)=>{const oo=this.ctx.createOscillator(),gg=this.ctx.createGain();oo.connect(gg);gg.connect(this.ctx.destination);oo.frequency.value=f;gg.gain.setValueAtTime(.15,t+i*.08);gg.gain.exponentialRampToValueAtTime(.001,t+i*.08+.2);oo.start(t+i*.08);oo.stop(t+i*.08+.2);});return;
-        case 'throw': o.frequency.value=700;g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.start(t);o.stop(t+.25);break;
-        case 'hit': o.frequency.setValueAtTime(500,t);o.frequency.exponentialRampToValueAtTime(200,t+.4);g.gain.setValueAtTime(.3,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);o.start(t);o.stop(t+.5);break;
-        case 'hurt': o.type='sawtooth';o.frequency.setValueAtTime(180,t);g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);o.start(t);o.stop(t+.5);break;
-        case 'powerup': o.frequency.setValueAtTime(880,t);o.frequency.setValueAtTime(1047,t+.1);o.frequency.setValueAtTime(1319,t+.2);g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.4);o.start(t);o.stop(t+.4);break;
-        case 'dodge': o.frequency.setValueAtTime(440,t);o.frequency.exponentialRampToValueAtTime(880,t+.15);g.gain.setValueAtTime(.1,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);o.start(t);o.stop(t+.2);break;
-        case 'victory': [523,659,784,659,784,1047].forEach((f,i)=>{const oo=this.ctx.createOscillator(),gg=this.ctx.createGain();oo.connect(gg);gg.connect(this.ctx.destination);oo.frequency.value=f;gg.gain.setValueAtTime(.2,t+i*.12);gg.gain.exponentialRampToValueAtTime(.001,t+i*.12+.25);oo.start(t+i*.12);oo.stop(t+i*.12+.3);});return;
-        case 'armoured': o.type='square';o.frequency.value=150;g.gain.setValueAtTime(.1,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);o.start(t);o.stop(t+.3);break;
+        case 'correct': o.frequency.setValueAtTime(523,t);o.frequency.setValueAtTime(659,t+.1);o.frequency.setValueAtTime(784,t+.2);g.gain.setValueAtTime(.22,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);o.start(t);o.stop(t+.5);break;
+        case 'wrong': o.type='sawtooth';o.frequency.setValueAtTime(220,t);o.frequency.exponentialRampToValueAtTime(110,t+.3);g.gain.setValueAtTime(.16,t);g.gain.exponentialRampToValueAtTime(.001,t+.35);o.start(t);o.stop(t+.35);break;
+        case 'streak': [523,659,784,1047].forEach((f,i)=>{const oo=this.ctx.createOscillator(),gg=this.ctx.createGain();oo.connect(gg);gg.connect(this.ctx.destination);oo.frequency.value=f;gg.gain.setValueAtTime(.18,t+i*.08);gg.gain.exponentialRampToValueAtTime(.001,t+i*.08+.2);oo.start(t+i*.08);oo.stop(t+i*.08+.2);});return;
+        case 'throw': o.frequency.value=700;g.gain.setValueAtTime(.18,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.start(t);o.stop(t+.25);break;
+        case 'hit': o.frequency.setValueAtTime(500,t);o.frequency.exponentialRampToValueAtTime(200,t+.4);g.gain.setValueAtTime(.32,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);o.start(t);o.stop(t+.5);break;
+        case 'hurt': o.type='sawtooth';o.frequency.setValueAtTime(180,t);g.gain.setValueAtTime(.22,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);o.start(t);o.stop(t+.5);break;
+        case 'powerup': o.frequency.setValueAtTime(880,t);o.frequency.setValueAtTime(1047,t+.1);o.frequency.setValueAtTime(1319,t+.2);g.gain.setValueAtTime(.18,t);g.gain.exponentialRampToValueAtTime(.001,t+.4);o.start(t);o.stop(t+.4);break;
+        case 'dodge': o.frequency.setValueAtTime(440,t);o.frequency.exponentialRampToValueAtTime(880,t+.15);g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);o.start(t);o.stop(t+.2);break;
+        case 'victory': [523,659,784,659,784,1047].forEach((f,i)=>{const oo=this.ctx.createOscillator(),gg=this.ctx.createGain();oo.connect(gg);gg.connect(this.ctx.destination);oo.frequency.value=f;gg.gain.setValueAtTime(.22,t+i*.12);gg.gain.exponentialRampToValueAtTime(.001,t+i*.12+.25);oo.start(t+i*.12);oo.stop(t+i*.12+.3);});return;
+        case 'armoured': o.type='square';o.frequency.value=150;g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);o.start(t);o.stop(t+.3);break;
       }
     }catch(e){}
   },
-  startAmbient(type){
-    this.stopAmbient();
-    if(!this.enabled||!this.ctx)return;
+
+  // ══════════════════════════════════════════════════════════════
+  //  BIBLICAL MUSIC THEMES
+  //  All synthesised — no files, no copyright, works offline
+  // ══════════════════════════════════════════════════════════════
+
+  // ── Play one organ-like sustained chord ───────────────────────
+  _chord(freqs, startTime, duration, vol=0.09, waveform='triangle'){
+    if(!this.ctx||!this._musicGain)return;
+    freqs.forEach(freq=>{
+      try{
+        const o=this.ctx.createOscillator();
+        const g=this.ctx.createGain();
+        o.type=waveform; o.frequency.value=freq;
+        // Gentle organ-like envelope
+        g.gain.setValueAtTime(0, startTime);
+        g.gain.linearRampToValueAtTime(vol, startTime+0.06);
+        g.gain.setValueAtTime(vol, startTime+duration-0.15);
+        g.gain.linearRampToValueAtTime(0, startTime+duration);
+        o.connect(g); g.connect(this._musicGain);
+        o.start(startTime); o.stop(startTime+duration+0.05);
+        this._musicNodes.push(o,g);
+      }catch(e){}
+    });
+  },
+
+  // ── Play a plucked harp-like note ─────────────────────────────
+  _pluck(freq, startTime, vol=0.11){
+    if(!this.ctx||!this._musicGain)return;
     try{
-      this.ambientGain=this.ctx.createGain();this.ambientGain.gain.value=0.04;this.ambientGain.connect(this.ctx.destination);
-      this.ambientNode=this.ctx.createOscillator();this.ambientNode.type='sine';
-      const freqs={battle:60,daniel:80,moses:55,'default':65};
-      this.ambientNode.frequency.value=freqs[type]||freqs.default;
-      this.ambientNode.connect(this.ambientGain);this.ambientNode.start();
+      const o=this.ctx.createOscillator();
+      const g=this.ctx.createGain();
+      o.type='sine'; o.frequency.value=freq;
+      g.gain.setValueAtTime(vol, startTime);
+      g.gain.exponentialRampToValueAtTime(0.001, startTime+1.2);
+      o.connect(g); g.connect(this._musicGain);
+      o.start(startTime); o.stop(startTime+1.3);
+      this._musicNodes.push(o,g);
     }catch(e){}
   },
-  stopAmbient(){try{if(this.ambientNode){this.ambientNode.stop();this.ambientNode=null;}if(this.ambientGain){this.ambientGain.disconnect();this.ambientGain=null;}}catch(e){}},
-  toggle(){this.enabled=!this.enabled;if(!this.enabled)this.stopAmbient();return this.enabled;}
+
+  // ── Percussion (drum-like noise burst) ───────────────────────
+  _drum(startTime, vol=0.14, pitch=80){
+    if(!this.ctx||!this._musicGain)return;
+    try{
+      const o=this.ctx.createOscillator();
+      const g=this.ctx.createGain();
+      o.type='sine'; o.frequency.setValueAtTime(pitch*2, startTime);
+      o.frequency.exponentialRampToValueAtTime(pitch*0.5, startTime+0.12);
+      g.gain.setValueAtTime(vol, startTime);
+      g.gain.exponentialRampToValueAtTime(0.001, startTime+0.18);
+      o.connect(g); g.connect(this._musicGain);
+      o.start(startTime); o.stop(startTime+0.2);
+      this._musicNodes.push(o,g);
+    }catch(e){}
+  },
+
+  // ── Theme definitions ─────────────────────────────────────────
+  // Each theme is an array of pattern functions called every measure
+  THEMES:{
+    // TITLE: Majestic, slow hymn — C major with gentle melody
+    // ~52 BPM, 4 beats per measure, 1.15s per beat
+    title:{
+      bpm:52, beats:4,
+      // Chord progressions: C - F - Am - G (classic hymn)
+      chords:[
+        [261.6,329.6,392.0,523.2],  // C major
+        [349.2,440.0,523.2,698.5],  // F major
+        [220.0,261.6,329.6,440.0],  // Am
+        [196.0,246.9,293.7,392.0],  // G major
+      ],
+      // Melody notes on top (pentatonic feel)
+      melody:[523.2,587.3,659.3,698.5,784.0,880.0,784.0,659.3],
+      vol:0.07, melVol:0.10
+    },
+    // QUIZ: Contemplative, harp arpeggios — wisdom/study feel
+    quiz:{
+      bpm:58, beats:4,
+      chords:[
+        [261.6,329.6,392.0],       // C
+        [293.7,369.9,440.0],       // Dm7 (no 5th)
+        [261.6,329.6,392.0],       // C
+        [349.2,440.0,523.2],       // F
+      ],
+      arpeggios:[
+        [261.6,329.6,392.0,523.2,392.0,329.6],
+        [293.7,369.9,440.0,523.2,440.0,369.9],
+        [261.6,329.6,392.0,523.2,659.3,523.2],
+        [349.2,440.0,523.2,698.5,523.2,440.0],
+      ],
+      vol:0.05, arpVol:0.09
+    },
+    // BATTLE L1: Valley of Elah — driving tension, heroic
+    battle:{
+      bpm:110, beats:4,
+      chords:[
+        [146.8,220.0,293.7],       // Dm
+        [174.6,220.0,261.6],       // F
+        [146.8,196.0,246.9],       // Gm
+        [174.6,220.0,277.2],       // F/A
+      ],
+      melody:[293.7,329.6,349.2,293.7,261.6,220.0,246.9,220.0],
+      drumBeats:[1,0,1,1],        // which beats get a drum hit
+      vol:0.07, melVol:0.12, drumVol:0.16
+    },
+    // BATTLE L3 (Night): Dark, mysterious — minor feel
+    night:{
+      bpm:88, beats:4,
+      chords:[
+        [138.6,174.6,220.0],      // Cm
+        [123.5,155.6,185.0],      // Bb
+        [138.6,164.8,207.7],      // Cm/Eb
+        [130.8,164.8,196.0],      // C (modal)
+      ],
+      melody:[261.6,246.9,220.0,207.7,196.0,207.7,220.0,246.9],
+      drumBeats:[1,0,0,1],
+      vol:0.07, melVol:0.10, drumVol:0.14
+    },
+    // BATTLE L4 (Army of God): Epic, triumphant intensity
+    epic:{
+      bpm:132, beats:4,
+      chords:[
+        [146.8,220.0,293.7],      // Dm
+        [196.0,246.9,293.7],      // G
+        [174.6,220.0,261.6],      // F
+        [220.0,277.2,329.6],      // A7
+      ],
+      melody:[440.0,493.9,523.2,587.3,523.2,493.9,440.0,392.0],
+      drumBeats:[1,1,1,1],
+      vol:0.08, melVol:0.13, drumVol:0.18
+    },
+    // LEADERBOARD: Celebratory, warm
+    leaderboard:{
+      bpm:72, beats:4,
+      chords:[
+        [261.6,329.6,392.0,523.2],
+        [349.2,440.0,523.2,698.5],
+        [293.7,369.9,440.0,587.3],
+        [261.6,329.6,392.0,523.2],
+      ],
+      melody:[523.2,659.3,784.0,880.0,784.0,659.3,523.2,440.0],
+      vol:0.07, melVol:0.10
+    },
+  },
+
+  // ── Main music scheduler ──────────────────────────────────────
+  startMusic(themeName){
+    if(!this.enabled) return;
+    this.init();
+    if(!this.ctx) return;
+    if(this._currentTheme===themeName) return; // already playing
+    this.stopMusic();
+    this._currentTheme=themeName;
+    const theme=this.THEMES[themeName];
+    if(!theme) return;
+
+    // Master music gain
+    this._musicGain=this.ctx.createGain();
+    this._musicGain.gain.value=0;
+    this._musicGain.connect(this.ctx.destination);
+    // Fade in music gently
+    this._musicGain.gain.linearRampToValueAtTime(1.0, this.ctx.currentTime+2.0);
+
+    const beatDur = 60/theme.bpm;
+    const measureDur = beatDur * theme.beats;
+    let measure = 0;
+    const scheduleAhead = 0.2; // seconds to schedule ahead
+
+    const tick = () => {
+      if(!this.ctx||this._currentTheme!==themeName) return;
+      const now=this.ctx.currentTime;
+      if(this._nextBeatTime<now+scheduleAhead){
+        const t=this._nextBeatTime;
+        const ci=measure%theme.chords.length;
+        const mi=measure%((theme.melody||theme.arpeggios||[]).length);
+
+        // Play chord (organ-style sustained)
+        if(theme.chords && theme.chords[ci]){
+          this._chord(theme.chords[ci], t, measureDur*0.92, theme.vol);
+        }
+
+        // Play melody note (one per measure)
+        if(theme.melody && theme.melody[mi]){
+          const melNote=theme.melody[mi];
+          this._chord([melNote], t+beatDur*0.5, beatDur*0.85, theme.melVol, 'sine');
+        }
+
+        // Play arpeggios (quiz theme)
+        if(theme.arpeggios && theme.arpeggios[ci]){
+          theme.arpeggios[ci].forEach((f,i)=>{
+            this._pluck(f, t+i*beatDur*0.33, theme.arpVol*0.8);
+          });
+        }
+
+        // Drum hits (battle themes)
+        if(theme.drumBeats){
+          theme.drumBeats.forEach((hit,b)=>{
+            if(hit) this._drum(t+b*beatDur, theme.drumVol);
+          });
+          // Snare on beats 2&4
+          if(themeName==='battle'||themeName==='epic'||themeName==='night'){
+            [1,3].forEach(b=>this._drum(t+b*beatDur, (theme.drumVol||0.14)*0.7, 200));
+          }
+        }
+
+        this._nextBeatTime += measureDur;
+        measure++;
+        // Clean up old nodes periodically
+        if(measure%4===0) this._musicNodes=this._musicNodes.filter(n=>{try{n.disconnect();return false;}catch(e){return false;}});
+      }
+      this._musicScheduler=setTimeout(tick, 80);
+    };
+
+    this._nextBeatTime = this.ctx.currentTime + 0.1;
+    tick();
+  },
+
+  stopMusic(){
+    if(this._musicScheduler){clearTimeout(this._musicScheduler);this._musicScheduler=null;}
+    this._currentTheme=null;
+    if(this._musicGain){
+      try{
+        this._musicGain.gain.linearRampToValueAtTime(0, this.ctx.currentTime+0.8);
+        setTimeout(()=>{try{this._musicGain.disconnect();}catch(e){}this._musicGain=null;},900);
+      }catch(e){this._musicGain=null;}
+    }
+    this._musicNodes.forEach(n=>{try{n.disconnect();}catch(e){}});
+    this._musicNodes=[];
+  },
+
+  // Legacy ambient (kept for backward compat — redirects to music)
+  startAmbient(type){
+    const map={battle:'battle',daniel:'quiz',moses:'quiz',default:'quiz'};
+    this.startMusic(map[type]||'quiz');
+  },
+  stopAmbient(){ this.stopMusic(); },
+
+  toggle(){
+    this.enabled=!this.enabled;
+    if(!this.enabled) this.stopMusic();
+    else if(this._currentTheme) this.startMusic(this._currentTheme);
+    return this.enabled;
+  }
 };
+
 function updateSoundBtn(){const btns=document.querySelectorAll('[onclick*="SoundFX.toggle"]');btns.forEach(b=>b.textContent=SoundFX.enabled?'🔊 Sound':'🔇 Sound');}
 
 // ═══════════════════════════════════════════════════════════════
@@ -990,7 +1261,7 @@ function startEp(id){
     return;
   }
   const ep=EPS.find(e=>e.id===id);if(!ep)return;
-  SoundFX.init();SoundFX.startAmbient(ep.ambient||'default');
+  SoundFX.init();SoundFX.startMusic('quiz');
   clearInterval(G.timer);clearTimeout(G.lineTimer);
   G={ep,scene:0,phase:'story',lives:3,score:0,qIdx:0,correct:0,timer:null,timeLeft:0,timeTotal:0,correctPts:0,speedPts:0,answered:false,lineIdx:0,lineTimer:null,pendingSave:null,saved:false,streak:0,bestStreak:0,hintUsed:false,lastSavedScore:null};
   document.getElementById('hep').textContent=ep.num;document.getElementById('httl').textContent=ep.title;
@@ -1001,7 +1272,7 @@ function startEp(id){
 function renderLives(){document.getElementById('liveswrap').innerHTML=[1,2,3].map(i=>`<span class="life ${i>G.lives?'lost':''}">🕯️</span>`).join('');}
 function setPhase(ph){G.phase=ph;const idx=['story','challenge','verdict'].indexOf(ph);['ph0','ph1','ph2'].forEach((id,i)=>{const el=document.getElementById(id);if(!el)return;el.className='pstep';if(i<idx)el.classList.add('done');else if(i===idx)el.classList.add('active');});}
 function confirmQuit(){const ov=document.createElement('div');ov.className='modal-ov';ov.innerHTML=`<div class="modal-bx"><div class="mttl">⚠️ Quit Episode?</div><div class="msub2">Your current progress will be lost.</div><div class="mrow"><button class="bgold" onclick="doQuit()">Yes, Quit</button><button class="bghost" onclick="this.closest('.modal-ov').remove()">Keep Playing</button></div></div>`;document.body.appendChild(ov);}
-function doQuit(){clearInterval(G.timer);clearTimeout(G.lineTimer);SoundFX.stopAmbient();document.querySelector('.modal-ov')?.remove();document.getElementById('atm').style.background='transparent';if(isFullscreen())exitFullscreen();showScreen('s-title');}
+function doQuit(){clearInterval(G.timer);clearTimeout(G.lineTimer);SoundFX.stopMusic();document.querySelector('.modal-ov')?.remove();document.getElementById('atm').style.background='transparent';if(isFullscreen())exitFullscreen();showScreen('s-title');}
 function renderScene(){const area=document.getElementById('game-area');if(!area){setTimeout(()=>renderScene(),80);return;}const sc=G.ep.scenes[G.scene];clearTimeout(G.lineTimer);G.lineIdx=0;const total=G.ep.scenes.length;const dots=G.ep.scenes.map((_,i)=>`<span class="sdot ${i<G.scene?'done':i===G.scene?'active':''}"></span>`).join('');area.innerHTML=`<div class="spanel"><div class="shdr"><span class="sico">${sc.icon}</span><div><div class="slbl">Scene ${G.scene+1} of ${total}</div><div class="snm">${sc.name}</div></div></div><div class="sbody"><div id="stlines"></div>${sc.scripture?`<div class="screv" id="screv"><div class="sclbl">📖 Scripture</div><div class="sctxt">"${sc.scripture.text}"</div><div class="scref">— ${sc.scripture.ref}</div></div>`:''}</div><div class="snav"><div class="sdots">${dots}</div><div style="display:flex;align-items:center;gap:12px;"><span class="sklnk" onclick="skipAll()">Skip</span><button class="bcont" id="btnnext" onclick="nextScene()" style="display:none;">${G.scene<total-1?'Next Scene →':'Begin Challenge →'}</button></div></div></div>`;revealLines(sc);}
 function revealLines(sc){const c=document.getElementById('stlines');if(!c)return;if(G.lineIdx>=sc.lines.length){const r=document.getElementById('screv');if(r)setTimeout(()=>r.classList.add('vis'),400);setTimeout(()=>{const b=document.getElementById('btnnext');if(b)b.style.display='inline-flex';},r?1400:500);return;}const l=sc.lines[G.lineIdx];const d=document.createElement('div');d.className=`stline ${l.t}`;d.textContent=l.text;c.appendChild(d);requestAnimationFrame(()=>setTimeout(()=>d.classList.add('vis'),30));G.lineIdx++;const delay=l.t==='dramatic'?1200:l.t==='whisper'?950:720;G.lineTimer=setTimeout(()=>revealLines(sc),delay);}
 function skipAll(){clearTimeout(G.lineTimer);const c=document.getElementById('stlines');if(!c)return;const sc=G.ep.scenes[G.scene];while(G.lineIdx<sc.lines.length){const l=sc.lines[G.lineIdx];if(!c.children[G.lineIdx]){const d=document.createElement('div');d.className=`stline ${l.t} vis`;d.textContent=l.text;c.appendChild(d);}G.lineIdx++;}const r=document.getElementById('screv');if(r)r.classList.add('vis');const b=document.getElementById('btnnext');if(b)b.style.display='inline-flex';}
@@ -1025,7 +1296,7 @@ function spawn(em,n){for(let i=0;i<n;i++)setTimeout(()=>{const p=document.create
 function spawnConfetti(){const cols=['#ffd700','#c9a84c','#ff6b6b','#4ecdc4','#45b7d1','#96ceb4','#ffeaa7'];for(let i=0;i<80;i++){setTimeout(()=>{const p=document.createElement('div');p.className='confetti-piece';p.style.left=Math.random()*100+'%';p.style.top='-10px';p.style.background=cols[Math.floor(Math.random()*cols.length)];p.style.transform=`rotate(${Math.random()*360}deg)`;p.style.animationDuration=(2+Math.random()*3)+'s';p.style.animationDelay=(Math.random()*1)+'s';document.body.appendChild(p);setTimeout(()=>p.remove(),5000);},i*30);}}
 const RANKS=[{min:0,name:'Novice',crown:'📖',cls:'novice',sub:'Keep reading — every scripture is a step forward.'},{min:40,name:'Scribe',crown:'✍️',cls:'scribe',sub:'You know the stories well. The Word is taking root.'},{min:70,name:'Prophet',crown:'🌟',cls:'prophet',sub:'Remarkable! The Spirit is teaching you.'},{min:90,name:'Apostle',crown:'👑',cls:'apostle',sub:'Extraordinary! You have hidden His Word in your heart.'}];
 const VVERSES=[{text:'"I have hidden your word in my heart that I might not sin against you."',ref:'Psalm 119:11'},{text:'"Your word is a lamp to my feet and a light to my path."',ref:'Psalm 119:105'},{text:'"Faith comes from hearing the message, and the message is heard through the word about Christ."',ref:'Romans 10:17'},{text:'"Do not merely listen to the word. Do what it says."',ref:'James 1:22'}];
-function showVerdict(){clearInterval(G.timer);SoundFX.stopAmbient();setPhase('verdict');const tot=G.ep.questions.length;const pct=tot>0?Math.round(G.correct/tot*100):0;const rank=RANKS.slice().reverse().find(r=>pct>=r.min)||RANKS[0];const v=VVERSES[Math.floor(Math.random()*VVERSES.length)];G.pendingSave={score:G.score,epId:G.ep.id,rank:rank.name,correct:G.correct,total:tot,speedPts:G.speedPts,streak:G.bestStreak};document.getElementById('vcrown').textContent=rank.crown;document.getElementById('vplayer').textContent='👤 '+getUsername();document.getElementById('vrank').textContent=rank.name;document.getElementById('vrank').className=`vrank ${rank.cls}`;document.getElementById('vsub').textContent=rank.sub;document.getElementById('vscore').textContent=G.score;document.getElementById('vcor').textContent=G.correct+'/'+tot;document.getElementById('vtot').textContent=pct+'%';document.getElementById('vspd').textContent=G.speedPts;document.getElementById('vstr').textContent=G.bestStreak;document.getElementById('vverse').innerHTML=`"${v.text}"<cite>— ${v.ref}</cite>`;completedEpisodes.add(G.ep.id);localStorage.setItem('bc_completed',JSON.stringify([...completedEpisodes]));if(pct>=90){spawn('✨',8);spawnConfetti();}else if(pct>=70)spawn('🌟',5);showScreen('s-verdict');
+function showVerdict(){clearInterval(G.timer);SoundFX.startMusic('leaderboard');setPhase('verdict');const tot=G.ep.questions.length;const pct=tot>0?Math.round(G.correct/tot*100):0;const rank=RANKS.slice().reverse().find(r=>pct>=r.min)||RANKS[0];const v=VVERSES[Math.floor(Math.random()*VVERSES.length)];G.pendingSave={score:G.score,epId:G.ep.id,rank:rank.name,correct:G.correct,total:tot,speedPts:G.speedPts,streak:G.bestStreak};document.getElementById('vcrown').textContent=rank.crown;document.getElementById('vplayer').textContent='👤 '+getUsername();document.getElementById('vrank').textContent=rank.name;document.getElementById('vrank').className=`vrank ${rank.cls}`;document.getElementById('vsub').textContent=rank.sub;document.getElementById('vscore').textContent=G.score;document.getElementById('vcor').textContent=G.correct+'/'+tot;document.getElementById('vtot').textContent=pct+'%';document.getElementById('vspd').textContent=G.speedPts;document.getElementById('vstr').textContent=G.bestStreak;document.getElementById('vverse').innerHTML=`"${v.text}"<cite>— ${v.ref}</cite>`;completedEpisodes.add(G.ep.id);localStorage.setItem('bc_completed',JSON.stringify([...completedEpisodes]));if(pct>=90){spawn('✨',8);spawnConfetti();}else if(pct>=70)spawn('🌟',5);showScreen('s-verdict');
   // Show battle button only for David & Goliath episode
   const battleWrap=document.getElementById('battle-btn-wrap');
   if(battleWrap)battleWrap.style.display=G.ep.id==='david-goliath'?'block':'none';
@@ -1065,7 +1336,22 @@ function setTab(el){document.querySelectorAll('.lbtab').forEach(t=>t.classList.r
 function formatTs(ts){if(!ts||!ts.seconds)return'';const d=new Date(ts.seconds*1000),now=new Date();const diffDays=Math.floor((now-d)/(1000*60*60*24));if(diffDays===0)return'Today';if(diffDays===1)return'Yesterday';if(diffDays<7)return`${diffDays}d ago`;return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});}
 async function loadLB(epId){const list=document.getElementById('lblist');if(!list)return;list.innerHTML='<div class="lbload">📜 Loading Hall of Prophets...</div>';if(!db){list.innerHTML='<div class="lbload">Firebase not connected.</div>';return;}const scores=await fsGet(epId);if(!scores.length){list.innerHTML='<div class="lbload">No scores yet — be the first!</div>';return;}const medals=['🥇','🥈','🥉'];const myName=getUsername().toLowerCase();const myScore=G.lastSavedScore?.score||null;list.innerHTML=scores.map((s,i)=>{const isMe=s.name?.toLowerCase()===myName&&(myScore===null||s.score===myScore);const rn=i<3?`<span class="lbrn t${i+1}">${medals[i]}</span>`:`<span class="lbrn">${i+1}</span>`;return `<div class="lbrow ${isMe?'my-score':''}">${rn}<div class="lbinfo"><div class="lbname">${esc(s.name)}${isMe?' ⭐ You':''}</div><div class="lbep">${esc(s.episodeTitle||s.episodeId)}</div></div><div><div class="lbsc">⭐ ${s.score}</div><div class="lbbd">${esc(s.rank)} · ${s.correct}/${s.total}</div><div class="lbts">${formatTs(s.ts)}</div></div></div>`;}).join('');}
 function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id);
+  if(el)el.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  // Music theme per screen
+  SoundFX.init();
+  switch(id){
+    case 's-title':       SoundFX.startMusic('title');       break;
+    case 's-game':        SoundFX.startMusic('quiz');        break;
+    case 's-verdict':     SoundFX.startMusic('leaderboard'); break;
+    case 's-leaderboard': SoundFX.startMusic('leaderboard'); break;
+    case 's-minigame':    /* mini-game controls its own music */ break;
+    case 's-loading':     SoundFX.stopMusic();               break;
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════
 //  MINI-GAME (Android Optimized with Touch-Drag)
@@ -1324,6 +1610,7 @@ function exitMiniGame() {
   mgAnimationId = null;
   if (isFullscreen()) exitFullscreen();
   setBodyScrollLock(false);
+  SoundFX.stopMusic();
   showScreen('s-title');
 }
 
@@ -1361,6 +1648,7 @@ function showMGOverlay(type) {
       resetMG();
       mgPhase = 'play';
       updateMGUI();
+      SoundFX.startMusic('battle');
       if (mgAnimationId) cancelAnimationFrame(mgAnimationId);
       mgLastTimestamp = 0;
       mgAnimationId = requestAnimationFrame(mgGameLoop);
@@ -1947,7 +2235,7 @@ function drawMG() {
   mgCtx.fillText(g.rage ? '⚡ GOLIATH ⚡' : 'GOLIATH', g.x + g.w / 2, g.y - 10);
   
   mgCtx.fillStyle = 'rgba(255,200,100,0.7)';
-  mgCtx.font = '9px "Cinzel", monospace';
+  mgCtx.font = '13px "Cinzel", monospace';
   mgCtx.fillText('▲ AIM HERE', g.x + g.w / 2, g.y + 1);
 
   for (let j of mgJavelins) {
@@ -2064,6 +2352,50 @@ function mgGameLoop(now) {
 }
 
 setTimeout(() => { showScreen('s-title'); renderEpisodes(); checkCompleteBadge(); document.getElementById('username-inp').focus(); }, 2200);
+
+// ── PWA: Register Service Worker ──────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('✅ SW registered:', reg.scope))
+      .catch(err => console.warn('SW registration failed:', err));
+  });
+}
+
+// ── PWA: Install prompt (Android) ─────────────────────────────
+let _deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _deferredInstallPrompt = e;
+  // Show subtle install nudge on title screen after 8 seconds
+  setTimeout(() => {
+    const el = document.getElementById('s-title');
+    if (!el || !el.classList.contains('active')) return;
+    if (document.getElementById('pwaInstallBanner')) return;
+    const banner = document.createElement('div');
+    banner.id = 'pwaInstallBanner';
+    banner.style.cssText = 'background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.08));border:1px solid rgba(201,168,76,.35);border-radius:8px;padding:10px 18px;margin:8px auto;max-width:400px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:"Cinzel",serif;';
+    banner.innerHTML = `
+      <span style="font-size:12px;color:#c9a84c;">📱 Install for offline play</span>
+      <button onclick="installPWA()" style="background:linear-gradient(135deg,#a07828,#e8c96a);color:#1a0f00;border:none;border-radius:4px;padding:6px 14px;font-family:'Cinzel',serif;font-size:11px;font-weight:bold;cursor:pointer;">Install App</button>
+      <button onclick="document.getElementById('pwaInstallBanner').remove()" style="background:none;border:none;color:#6b5a28;font-size:16px;cursor:pointer;">✕</button>
+    `;
+    const epGrid = document.getElementById('ep-grid');
+    if (epGrid) epGrid.parentNode.insertBefore(banner, epGrid);
+  }, 8000);
+});
+
+function installPWA() {
+  if (!_deferredInstallPrompt) return;
+  _deferredInstallPrompt.prompt();
+  _deferredInstallPrompt.userChoice.then(choice => {
+    if (choice.outcome === 'accepted') {
+      document.getElementById('pwaInstallBanner')?.remove();
+      console.log('PWA installed');
+    }
+    _deferredInstallPrompt = null;
+  });
+}
 
 // ═══════════════════════════════════════════════════════════════
 //  LEVEL 2 — THE SHIELD BEARER
@@ -2569,7 +2901,7 @@ function drawMG2() {
   mgCtx.fillStyle = g.rage ? 'rgba(255,80,80,0.9)' : 'rgba(255,100,80,0.9)';
   mgCtx.font = 'bold 11px "Cinzel",monospace'; mgCtx.textAlign = 'center';
   mgCtx.fillText(g.rage ? '⚡ GOLIATH ⚡' : 'GOLIATH', g.x+g.w/2, g.y-10);
-  mgCtx.fillStyle = 'rgba(255,200,100,0.7)'; mgCtx.font = '9px "Cinzel",monospace';
+  mgCtx.fillStyle = 'rgba(255,200,100,0.7)'; mgCtx.font = '13px "Cinzel",monospace';
   mgCtx.fillText('▲ AIM HERE', g.x+g.w/2, g.y+1);
 
   // ── Javelins ─────────────────────────────────────────────────
@@ -2703,6 +3035,7 @@ function showMG2Overlay(type) {
     document.getElementById('mg2StartBtn').onclick = () => {
       ov.remove();
       resetMG2(); mg2Phase = 'play'; updateMG2UI();
+      SoundFX.startMusic('battle');
       if (mg2AnimationId) cancelAnimationFrame(mg2AnimationId);
       mg2LastTimestamp = 0;
       mg2AnimationId = requestAnimationFrame(mgGameLoop2);
@@ -3178,7 +3511,7 @@ function drawMG3() {
     tg8.addColorStop(0,'rgba(255,200,60,0.95)'); tg8.addColorStop(0.3,'rgba(255,100,10,0.7)'); tg8.addColorStop(1,'rgba(255,60,0,0)');
     mgCtx.fillStyle=tg8; mgCtx.beginPath(); mgCtx.arc(t.x,t.y,30*flk8,0,Math.PI*2); mgCtx.fill();
     mgCtx.fillStyle='rgba(255,220,100,0.95)'; mgCtx.beginPath(); mgCtx.arc(t.x,t.y,6*flk8,0,Math.PI*2); mgCtx.fill();
-    mgCtx.fillStyle='rgba(255,200,60,0.85)'; mgCtx.font='9px "Cinzel",monospace'; mgCtx.textAlign='center';
+    mgCtx.fillStyle='rgba(255,200,60,0.85)'; mgCtx.font='13px "Cinzel",monospace'; mgCtx.textAlign='center';
     mgCtx.fillText('🔥 TORCH',t.x,t.y-35);
   }
 
@@ -3286,7 +3619,7 @@ function drawMG3() {
   mgCtx.fillStyle=g7.rage?'rgba(255,60,60,0.95)':'rgba(255,80,60,0.85)';
   mgCtx.font='bold 11px "Cinzel",monospace'; mgCtx.textAlign='center';
   mgCtx.fillText(g7.rage?'⚡ GOLIATH ⚡':'GOLIATH',g7.x+g7.w/2,g7.y-10);
-  mgCtx.fillStyle='rgba(255,200,100,0.7)'; mgCtx.font='9px "Cinzel",monospace';
+  mgCtx.fillStyle='rgba(255,200,100,0.7)'; mgCtx.font='13px "Cinzel",monospace';
   mgCtx.fillText('▲ AIM HERE',g7.x+g7.w/2,g7.y+1);
 
   // Javelins
@@ -3383,6 +3716,7 @@ function showMG3Overlay(type) {
     document.body.appendChild(ov);
     document.getElementById('mg3StartBtn').onclick=()=>{
       ov.remove(); resetMG3(); mg3Phase='play'; updateMG3UI();
+      SoundFX.startMusic('night');
       if(mg3AnimationId)cancelAnimationFrame(mg3AnimationId);
       mg3LastTimestamp=0; mg3AnimationId=requestAnimationFrame(mgGameLoop3);
     };
@@ -3942,7 +4276,7 @@ function drawMG4() {
     mgCtx.fillStyle=sg4; mgCtx.beginPath(); mgCtx.arc(sc.x,sc.y,30+Math.sin(sc.pulse)*5,0,Math.PI*2); mgCtx.fill();
     mgCtx.fillStyle='rgba(255,230,100,0.95)'; mgCtx.font='bold 20px serif'; mgCtx.textAlign='center';
     mgCtx.fillText('✝️',sc.x,sc.y+7);
-    mgCtx.fillStyle='rgba(255,230,100,0.8)'; mgCtx.font='8px "Cinzel",monospace';
+    mgCtx.fillStyle='rgba(255,230,100,0.8)'; mgCtx.font='13px "Cinzel",monospace';
     mgCtx.fillText('BLESSING',sc.x,sc.y+24);
   }
 
@@ -3977,7 +4311,7 @@ function drawMG4() {
     // Label
     mgCtx.fillStyle='rgba(200,150,255,0.9)'; mgCtx.font='bold 11px "Cinzel",monospace'; mgCtx.textAlign='center';
     mgCtx.fillText(ch.state==='STUNNED'?'💫 CHAMPION 💫':'⚔️ CHAMPION',ch.x+ch.w/2,ch.y-10);
-    mgCtx.fillStyle='rgba(255,200,100,0.7)'; mgCtx.font='9px "Cinzel",monospace';
+    mgCtx.fillStyle='rgba(255,200,100,0.7)'; mgCtx.font='13px "Cinzel",monospace';
     mgCtx.fillText('▲ AIM HERE',ch.x+ch.w/2,ch.y+1);
     // Heavy spear weapon
     mgCtx.strokeStyle='#c090e0'; mgCtx.lineWidth=3;
@@ -4044,7 +4378,7 @@ function drawMG4() {
     mgCtx.fillStyle=mg4Wave===3?'rgba(255,40,40,0.95)':'rgba(255,80,60,0.9)';
     mgCtx.font='bold 11px "Cinzel",monospace'; mgCtx.textAlign='center';
     mgCtx.fillText(mg4Wave===3?'⚡⚡ GOLIATH ⚡⚡':'⚡ GOLIATH ⚡',g.x+g.w/2,g.y-10);
-    mgCtx.fillStyle='rgba(255,200,100,0.7)'; mgCtx.font='9px "Cinzel",monospace';
+    mgCtx.fillStyle='rgba(255,200,100,0.7)'; mgCtx.font='13px "Cinzel",monospace';
     mgCtx.fillText('▲ AIM HERE',g.x+g.w/2,g.y+1);
   }
 
@@ -4172,6 +4506,7 @@ function showMG4Overlay(type) {
     document.body.appendChild(ov);
     document.getElementById('mg4StartBtn').onclick=()=>{
       ov.remove(); resetMG4(); mg4WavePhase='play'; updateMG4UI();
+      SoundFX.startMusic('epic');
       if(mg4AnimationId) cancelAnimationFrame(mg4AnimationId);
       mg4LastTimestamp=0; mg4AnimationId=requestAnimationFrame(mgGameLoop4);
     };
@@ -4301,23 +4636,40 @@ const MG_GRACE_MS = 2200; // 2.2 seconds — enough to move David to safety
 function pauseGameForOverlay()  { _shopPaused = true; }
 function resumeGameFromOverlay(){
   _shopPaused = false;
-  mgGraceTimer = MG_GRACE_MS; // start invincibility window
-  // Clear any projectiles that are dangerously close to David
-  // (within 80px) so they don't hit the instant game resumes
-  const dangerZone = 80;
-  mgJavelins = mgJavelins.filter(j =>
-    Math.hypot(j.x - (mgDavid.x + mgDavid.w/2), j.y - (mgDavid.y + mgDavid.h/2)) > dangerZone
-  );
-  if (typeof mg2Shields !== 'undefined') {
-    mg2Shields = mg2Shields.filter(s =>
-      Math.hypot(s.x - (mgDavid.x + mgDavid.w/2), s.y - (mgDavid.y + mgDavid.h/2)) > dangerZone
-    );
+  mgGraceTimer = MG_GRACE_MS; // 2.2s invincibility
+
+  // ── Clear ALL in-flight projectiles ──────────────────────────
+  // David gets a completely clear field to move into
+  mgJavelins = [];
+  if (typeof mg2Shields !== 'undefined')      mg2Shields = [];
+  if (typeof mg3SoldierStones !== 'undefined') mg3SoldierStones = [];
+
+  // ── Freeze enemy firing for the full grace period ─────────────
+  // Reset all batch/fire cooldowns so no new projectiles spawn
+  // for at least MG_GRACE_MS milliseconds
+  const FIRE_DELAY = MG_GRACE_MS + 500; // slightly longer than grace
+
+  // Level 1
+  mgBatchSize = 0; mgBatchCooldown = FIRE_DELAY;
+
+  // Level 2
+  mg2BatchSize = 0; mg2BatchCooldown = FIRE_DELAY;
+  mg2SbBatch   = 0; mg2SbCooldown   = FIRE_DELAY;
+
+  // Level 3
+  mg3BatchSize     = 0; mg3BatchCooldown  = FIRE_DELAY;
+  mg3SbCooldown    = FIRE_DELAY;
+  mg3SoldierCooldown = FIRE_DELAY;
+
+  // Level 4 (uses _batchCD and _throwCD on enemy objects)
+  if (typeof mg4Champion !== 'undefined' && mg4Champion)
+    mg4Champion.batchCooldown = FIRE_DELAY;
+  if (typeof mgGoliath !== 'undefined' && mgGoliath) {
+    mgGoliath._batchSize = 0;
+    mgGoliath._batchCD   = FIRE_DELAY;
   }
-  if (typeof mg3SoldierStones !== 'undefined') {
-    mg3SoldierStones = mg3SoldierStones.filter(ss =>
-      Math.hypot(ss.x - (mgDavid.x + mgDavid.w/2), ss.y - (mgDavid.y + mgDavid.h/2)) > dangerZone
-    );
-  }
+  if (typeof mg2ShieldBearer !== 'undefined' && mg2ShieldBearer)
+    mg2ShieldBearer._throwCD = FIRE_DELAY;
 }
 
 // ── Remove any existing shop/question overlay ─────────────────
