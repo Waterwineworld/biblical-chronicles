@@ -1,0 +1,36 @@
+{
+  "name": "The Biblical Chronicles",
+  "short_name": "BC Chronicles",
+  "description": "Stories of Faith — Trials of Knowledge. Explore Bible stories through quizzes and battles.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#080608",
+  "theme_color": "#c9a84c",
+  "categories": ["games", "education", "lifestyle"],
+  "lang": "en",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "David & Goliath",
+      "short_name": "Episode I",
+      "description": "Play the David and Goliath episode",
+      "url": "/?episode=david-goliath",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
