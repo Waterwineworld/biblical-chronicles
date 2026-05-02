@@ -885,218 +885,220 @@ const SoundFX={
   },
 
   // ══════════════════════════════════════════════════════════════
-  //  BIBLICAL MUSIC THEMES
-  //  All synthesised — no files, no copyright, works offline
+  //  BIBLICAL MUSIC THEMES — Fast, driving, game-appropriate
+  //  Step-sequencer: 16th-note resolution. No files, no copyright.
   // ══════════════════════════════════════════════════════════════
 
-  // ── Play one organ-like sustained chord ───────────────────────
-  _chord(freqs, startTime, duration, vol=0.09, waveform='triangle'){
-    if(!this.ctx||!this._musicGain)return;
-    freqs.forEach(freq=>{
-      try{
-        const o=this.ctx.createOscillator();
-        const g=this.ctx.createGain();
-        o.type=waveform; o.frequency.value=freq;
-        // Gentle organ-like envelope
-        g.gain.setValueAtTime(0, startTime);
-        g.gain.linearRampToValueAtTime(vol, startTime+0.06);
-        g.gain.setValueAtTime(vol, startTime+duration-0.15);
-        g.gain.linearRampToValueAtTime(0, startTime+duration);
-        o.connect(g); g.connect(this._musicGain);
-        o.start(startTime); o.stop(startTime+duration+0.05);
-        this._musicNodes.push(o,g);
-      }catch(e){}
-    });
+  // ── Note with gate envelope ───────────────────────────────────
+  _note(freq, startTime, duration, vol=0.14, wave='square'){
+    if(!this.ctx||!this._musicGain) return;
+    try {
+      const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+      const f=this.ctx.createBiquadFilter();
+      f.type='lowpass'; f.frequency.value=1800;
+      o.type=wave; o.frequency.value=freq;
+      g.gain.setValueAtTime(0,startTime);
+      g.gain.linearRampToValueAtTime(vol,startTime+0.01);
+      g.gain.setValueAtTime(vol*0.85,startTime+duration*0.5);
+      g.gain.linearRampToValueAtTime(0.001,startTime+duration);
+      o.connect(f); f.connect(g); g.connect(this._musicGain);
+      o.start(startTime); o.stop(startTime+duration+0.02);
+      this._musicNodes.push(o,g,f);
+    }catch(e){}
   },
 
-  // ── Play a plucked harp-like note ─────────────────────────────
-  _pluck(freq, startTime, vol=0.11){
-    if(!this.ctx||!this._musicGain)return;
+  // ── Bass drum ─────────────────────────────────────────────────
+  _kick(t,vol=0.22){
+    if(!this.ctx||!this._musicGain) return;
     try{
-      const o=this.ctx.createOscillator();
-      const g=this.ctx.createGain();
-      o.type='sine'; o.frequency.value=freq;
-      g.gain.setValueAtTime(vol, startTime);
-      g.gain.exponentialRampToValueAtTime(0.001, startTime+1.2);
-      o.connect(g); g.connect(this._musicGain);
-      o.start(startTime); o.stop(startTime+1.3);
+      const o=this.ctx.createOscillator(),g=this.ctx.createGain();
+      o.type='sine';
+      o.frequency.setValueAtTime(160,t); o.frequency.exponentialRampToValueAtTime(40,t+0.12);
+      g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.22);
+      o.connect(g); g.connect(this._musicGain); o.start(t); o.stop(t+0.25);
       this._musicNodes.push(o,g);
     }catch(e){}
   },
 
-  // ── Percussion (drum-like noise burst) ───────────────────────
-  _drum(startTime, vol=0.14, pitch=80){
-    if(!this.ctx||!this._musicGain)return;
+  // ── Snare (noise burst) ───────────────────────────────────────
+  _snare(t,vol=0.16){
+    if(!this.ctx||!this._musicGain) return;
     try{
-      const o=this.ctx.createOscillator();
-      const g=this.ctx.createGain();
-      o.type='sine'; o.frequency.setValueAtTime(pitch*2, startTime);
-      o.frequency.exponentialRampToValueAtTime(pitch*0.5, startTime+0.12);
-      g.gain.setValueAtTime(vol, startTime);
-      g.gain.exponentialRampToValueAtTime(0.001, startTime+0.18);
-      o.connect(g); g.connect(this._musicGain);
-      o.start(startTime); o.stop(startTime+0.2);
-      this._musicNodes.push(o,g);
+      const buf=this.ctx.createBuffer(1,Math.floor(this.ctx.sampleRate*0.12),this.ctx.sampleRate);
+      const d=buf.getChannelData(0);
+      for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length);
+      const src=this.ctx.createBufferSource(), g=this.ctx.createGain();
+      const f=this.ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=2200; f.Q.value=0.8;
+      src.buffer=buf; g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.1);
+      src.connect(f); f.connect(g); g.connect(this._musicGain); src.start(t); src.stop(t+0.13);
+      this._musicNodes.push(src,g,f);
     }catch(e){}
   },
 
-  // ── Theme definitions ─────────────────────────────────────────
-  // Each theme is an array of pattern functions called every measure
+  // ── Hi-hat ────────────────────────────────────────────────────
+  _hihat(t,vol=0.08){
+    if(!this.ctx||!this._musicGain) return;
+    try{
+      const buf=this.ctx.createBuffer(1,Math.floor(this.ctx.sampleRate*0.04),this.ctx.sampleRate);
+      const d=buf.getChannelData(0);
+      for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length);
+      const src=this.ctx.createBufferSource(), g=this.ctx.createGain();
+      const f=this.ctx.createBiquadFilter(); f.type='highpass'; f.frequency.value=7000;
+      src.buffer=buf; g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.04);
+      src.connect(f); f.connect(g); g.connect(this._musicGain); src.start(t); src.stop(t+0.05);
+      this._musicNodes.push(src,g,f);
+    }catch(e){}
+  },
+
+  // ── Theme data ─────────────────────────────────────────────────
+  // melody: [[freq, durationSteps, volScale], ...] — 16th-note steps
+  // bass/drums/snare/hihat: array of 16 values (1=play, 0=skip)
   THEMES:{
-    // TITLE: Majestic, slow hymn — C major with gentle melody
-    // ~52 BPM, 4 beats per measure, 1.15s per beat
+
+    // TITLE — Majestic hymn overture, 90 BPM
     title:{
-      bpm:52, beats:4,
-      // Chord progressions: C - F - Am - G (classic hymn)
-      chords:[
-        [261.6,329.6,392.0,523.2],  // C major
-        [349.2,440.0,523.2,698.5],  // F major
-        [220.0,261.6,329.6,440.0],  // Am
-        [196.0,246.9,293.7,392.0],  // G major
-      ],
-      // Melody notes on top (pentatonic feel)
-      melody:[523.2,587.3,659.3,698.5,784.0,880.0,784.0,659.3],
-      vol:0.07, melVol:0.10
+      bpm:90, steps:16,
+      melody:[[392,2,1.0],[440,1,0.8],[494,1,0.8],[523,2,1.0],[440,1,0.7],
+              [392,1,0.7],[349,2,1.0],[330,1,0.7],[294,1,0.7],[262,4,1.1]],
+      bass:  [131,0,131,0,175,0,175,0,147,0,147,0,131,0,131,0],
+      drums: [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],
+      hihat: [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+      melVol:0.15,bassVol:0.12,drumVol:0.16,hihatVol:0.06
     },
-    // QUIZ: Contemplative, harp arpeggios — wisdom/study feel
+
+    // QUIZ — Thoughtful, rhythmic, 100 BPM
     quiz:{
-      bpm:58, beats:4,
-      chords:[
-        [261.6,329.6,392.0],       // C
-        [293.7,369.9,440.0],       // Dm7 (no 5th)
-        [261.6,329.6,392.0],       // C
-        [349.2,440.0,523.2],       // F
-      ],
-      arpeggios:[
-        [261.6,329.6,392.0,523.2,392.0,329.6],
-        [293.7,369.9,440.0,523.2,440.0,369.9],
-        [261.6,329.6,392.0,523.2,659.3,523.2],
-        [349.2,440.0,523.2,698.5,523.2,440.0],
-      ],
-      vol:0.05, arpVol:0.09
+      bpm:100, steps:16,
+      melody:[[523,1,1.0],[494,1,0.8],[440,2,0.9],[392,1,1.0],[440,1,0.8],
+              [494,2,0.9],[523,2,1.0],[587,1,0.9],[659,1,0.9],[587,2,0.9],[523,2,1.0]],
+      bass:  [131,0,131,0,147,0,147,0,175,0,175,0,147,0,147,0],
+      drums: [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],
+      snare: [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+      hihat: [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+      melVol:0.13,bassVol:0.11,drumVol:0.15,snareVol:0.14,hihatVol:0.07
     },
-    // BATTLE L1: Valley of Elah — driving tension, heroic
+
+    // BATTLE (L1 & L2) — Fast urgent chase music, 148 BPM
     battle:{
-      bpm:110, beats:4,
-      chords:[
-        [146.8,220.0,293.7],       // Dm
-        [174.6,220.0,261.6],       // F
-        [146.8,196.0,246.9],       // Gm
-        [174.6,220.0,277.2],       // F/A
-      ],
-      melody:[293.7,329.6,349.2,293.7,261.6,220.0,246.9,220.0],
-      drumBeats:[1,0,1,1],        // which beats get a drum hit
-      vol:0.07, melVol:0.12, drumVol:0.16
+      bpm:148, steps:16,
+      melody:[[587,1,1.0],[659,1,1.0],[699,1,1.0],[587,1,0.9],[523,1,1.0],[494,1,0.9],
+              [440,2,1.0],[494,1,1.0],[523,1,1.0],[587,1,1.0],[659,1,1.0],[699,2,1.1],
+              [587,1,0.9],[523,1,0.9]],
+      bass:  [147,0,147,0,175,0,175,0,196,0,196,0,175,0,175,0],
+      drums: [1,0,0,1,0,1,0,0,1,0,0,1,0,1,0,0],
+      snare: [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+      hihat: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      melVol:0.16,bassVol:0.14,drumVol:0.20,snareVol:0.18,hihatVol:0.08
     },
-    // BATTLE L3 (Night): Dark, mysterious — minor feel
+
+    // NIGHT (L3) — Dark tense minor, 130 BPM
     night:{
-      bpm:88, beats:4,
-      chords:[
-        [138.6,174.6,220.0],      // Cm
-        [123.5,155.6,185.0],      // Bb
-        [138.6,164.8,207.7],      // Cm/Eb
-        [130.8,164.8,196.0],      // C (modal)
-      ],
-      melody:[261.6,246.9,220.0,207.7,196.0,207.7,220.0,246.9],
-      drumBeats:[1,0,0,1],
-      vol:0.07, melVol:0.10, drumVol:0.14
+      bpm:130, steps:16,
+      melody:[[294,1,1.0],[277,1,0.9],[262,2,1.0],[247,1,0.9],[262,1,0.8],
+              [277,1,0.9],[294,1,1.0],[311,2,1.1],[294,1,0.9],[277,1,0.8],
+              [262,2,1.0],[247,2,0.9]],
+      bass:  [87,0,87,0,93,0,93,0,98,0,98,0,93,0,93,0],
+      drums: [1,0,1,0,0,1,0,0,1,0,1,0,0,1,0,0],
+      snare: [0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1],
+      hihat: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      melVol:0.14,bassVol:0.13,drumVol:0.18,snareVol:0.16,hihatVol:0.07
     },
-    // BATTLE L4 (Army of God): Epic, triumphant intensity
+
+    // EPIC (L4) — Maximum intensity final boss, 162 BPM
     epic:{
-      bpm:132, beats:4,
-      chords:[
-        [146.8,220.0,293.7],      // Dm
-        [196.0,246.9,293.7],      // G
-        [174.6,220.0,261.6],      // F
-        [220.0,277.2,329.6],      // A7
-      ],
-      melody:[440.0,493.9,523.2,587.3,523.2,493.9,440.0,392.0],
-      drumBeats:[1,1,1,1],
-      vol:0.08, melVol:0.13, drumVol:0.18
+      bpm:162, steps:16,
+      melody:[[880,1,1.1],[784,1,1.0],[699,1,1.0],[784,1,1.0],[880,1,1.1],[988,1,1.0],
+              [1047,2,1.2],[988,1,1.0],[880,1,1.0],[784,1,1.0],[699,1,1.0],
+              [659,2,1.1],[699,1,1.0],[784,1,1.0]],
+      bass:  [110,0,110,0,124,0,124,0,147,0,147,0,124,0,124,0],
+      drums: [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+      snare: [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+      hihat: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      melVol:0.18,bassVol:0.16,drumVol:0.22,snareVol:0.20,hihatVol:0.09
     },
-    // LEADERBOARD: Celebratory, warm
+
+    // LEADERBOARD — Triumphant celebratory, 118 BPM
     leaderboard:{
-      bpm:72, beats:4,
-      chords:[
-        [261.6,329.6,392.0,523.2],
-        [349.2,440.0,523.2,698.5],
-        [293.7,369.9,440.0,587.3],
-        [261.6,329.6,392.0,523.2],
-      ],
-      melody:[523.2,659.3,784.0,880.0,784.0,659.3,523.2,440.0],
-      vol:0.07, melVol:0.10
+      bpm:118, steps:16,
+      melody:[[659,1,1.0],[699,1,1.0],[784,2,1.1],[699,1,1.0],[659,1,0.9],
+              [587,2,1.0],[659,1,1.0],[784,1,1.0],[880,2,1.2],
+              [784,2,1.0],[659,2,1.0]],
+      bass:  [165,0,165,0,175,0,175,0,196,0,196,0,175,0,175,0],
+      drums: [1,0,0,1,0,0,1,0,1,0,0,1,0,0,1,0],
+      snare: [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+      hihat: [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+      melVol:0.15,bassVol:0.13,drumVol:0.18,snareVol:0.16,hihatVol:0.07
     },
   },
-
-  // ── Main music scheduler ──────────────────────────────────────
+  // ── Step-sequencer scheduler ──────────────────────────────────
   startMusic(themeName){
     if(!this.enabled) return;
     this.init();
     if(!this.ctx) return;
-    if(this._currentTheme===themeName) return; // already playing
+    if(this._currentTheme===themeName) return;
     this.stopMusic();
     this._currentTheme=themeName;
     const theme=this.THEMES[themeName];
     if(!theme) return;
 
-    // Master music gain
     this._musicGain=this.ctx.createGain();
-    this._musicGain.gain.value=0;
+    this._musicGain.gain.setValueAtTime(0,this.ctx.currentTime);
+    this._musicGain.gain.linearRampToValueAtTime(0.85,this.ctx.currentTime+1.2);
     this._musicGain.connect(this.ctx.destination);
-    // Fade in music gently
-    this._musicGain.gain.linearRampToValueAtTime(1.0, this.ctx.currentTime+2.0);
 
-    const beatDur = 60/theme.bpm;
-    const measureDur = beatDur * theme.beats;
-    let measure = 0;
-    const scheduleAhead = 0.2; // seconds to schedule ahead
+    const stepDur = (60/theme.bpm)/4; // 16th-note duration
+    let stepIdx=0, melIdx=0, melStepsLeft=0;
 
-    const tick = () => {
+    const tick=()=>{
       if(!this.ctx||this._currentTheme!==themeName) return;
       const now=this.ctx.currentTime;
-      if(this._nextBeatTime<now+scheduleAhead){
+
+      while(this._nextBeatTime < now+0.25){
         const t=this._nextBeatTime;
-        const ci=measure%theme.chords.length;
-        const mi=measure%((theme.melody||theme.arpeggios||[]).length);
+        const s=stepIdx % theme.steps;
 
-        // Play chord (organ-style sustained)
-        if(theme.chords && theme.chords[ci]){
-          this._chord(theme.chords[ci], t, measureDur*0.92, theme.vol);
-        }
+        // Bass
+        if(theme.bass&&theme.bass[s])
+          this._note(theme.bass[s],t,stepDur*1.85,theme.bassVol||0.12,'triangle');
 
-        // Play melody note (one per measure)
-        if(theme.melody && theme.melody[mi]){
-          const melNote=theme.melody[mi];
-          this._chord([melNote], t+beatDur*0.5, beatDur*0.85, theme.melVol, 'sine');
-        }
+        // Kick
+        if(theme.drums&&theme.drums[s])
+          this._kick(t,theme.drumVol||0.18);
 
-        // Play arpeggios (quiz theme)
-        if(theme.arpeggios && theme.arpeggios[ci]){
-          theme.arpeggios[ci].forEach((f,i)=>{
-            this._pluck(f, t+i*beatDur*0.33, theme.arpVol*0.8);
-          });
-        }
+        // Snare
+        if(theme.snare&&theme.snare[s])
+          this._snare(t,theme.snareVol||0.15);
 
-        // Drum hits (battle themes)
-        if(theme.drumBeats){
-          theme.drumBeats.forEach((hit,b)=>{
-            if(hit) this._drum(t+b*beatDur, theme.drumVol);
-          });
-          // Snare on beats 2&4
-          if(themeName==='battle'||themeName==='epic'||themeName==='night'){
-            [1,3].forEach(b=>this._drum(t+b*beatDur, (theme.drumVol||0.14)*0.7, 200));
+        // Hi-hat
+        if(theme.hihat&&theme.hihat[s])
+          this._hihat(t,theme.hihatVol||0.07);
+
+        // Melody — advance through note list, each note lasts mel[1] steps
+        if(theme.melody&&theme.melody.length>0){
+          if(melStepsLeft===0){
+            const mel=theme.melody[melIdx%theme.melody.length];
+            if(mel&&mel[0]>0){
+              const dur=stepDur*(mel[1]||1)*0.88;
+              const vol=(theme.melVol||0.14)*(mel[2]||1.0);
+              this._note(mel[0],t,dur,vol,'square');
+            }
+            melStepsLeft=(mel&&mel[1]?mel[1]:1)-1;
+            melIdx++;
+          } else {
+            melStepsLeft--;
           }
         }
 
-        this._nextBeatTime += measureDur;
-        measure++;
-        // Clean up old nodes periodically
-        if(measure%4===0) this._musicNodes=this._musicNodes.filter(n=>{try{n.disconnect();return false;}catch(e){return false;}});
+        this._nextBeatTime+=stepDur;
+        stepIdx++;
+        if(stepIdx%96===0){
+          this._musicNodes=this._musicNodes.filter(n=>{try{n.disconnect();return false;}catch(e){return false;}});
+        }
       }
-      this._musicScheduler=setTimeout(tick, 80);
+      this._musicScheduler=setTimeout(tick,55);
     };
 
-    this._nextBeatTime = this.ctx.currentTime + 0.1;
+    this._nextBeatTime=this.ctx.currentTime+0.05;
     tick();
   },
 
@@ -1496,6 +1498,12 @@ function _launchMiniGame() {
 // ========== NEW initializeMiniGame FUNCTION (OUTSIDE startMiniGame) ==========
 function initializeMiniGame() {
   setBodyScrollLock(true);
+
+  // ── Request fullscreen FIRST before anything else ────────────
+  requestFullscreen();
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape').catch(() => {});
+  }
 
   mgCanvas = document.getElementById('mgCanvas');
   if (!mgCanvas) { console.error("Canvas not found!"); return; }
