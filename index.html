@@ -1035,7 +1035,12 @@ const SoundFX={
     if(!this.enabled) return;
     this.init();
     if(!this.ctx) return;
-    if(this._currentTheme===themeName) return;
+    // Wake AudioContext if suspended (mobile browsers suspend until user gesture)
+    if(this.ctx.state === 'suspended') this.ctx.resume();
+    if(this._currentTheme===themeName){
+      // Already playing — just make sure context is running
+      return;
+    }
     this.stopMusic();
     this._currentTheme=themeName;
     const theme=this.THEMES[themeName];
@@ -2360,6 +2365,13 @@ function mgGameLoop(now) {
 }
 
 setTimeout(() => { showScreen('s-title'); renderEpisodes(); checkCompleteBadge(); document.getElementById('username-inp').focus(); }, 2200);
+
+// ── AudioContext: Resume when tab comes back to foreground ──────
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && SoundFX.ctx) {
+    if (SoundFX.ctx.state === 'suspended') SoundFX.ctx.resume();
+  }
+});
 
 // ── PWA: Register Service Worker ──────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -4641,7 +4653,21 @@ function updateStoneUI() {
 let mgGraceTimer = 0; // ms of post-resume invincibility (set on resume)
 const MG_GRACE_MS = 2200; // 2.2 seconds — enough to move David to safety
 
-function pauseGameForOverlay()  { _shopPaused = true; }
+function pauseGameForOverlay() {
+  _shopPaused = true;
+  // Pause music during any overlay — stone shop, questions, life restore
+  if (SoundFX._musicScheduler) {
+    clearTimeout(SoundFX._musicScheduler);
+    SoundFX._musicScheduler = null;
+  }
+  // Fade music down (not full stop — so it resumes at same position)
+  if (SoundFX._musicGain && SoundFX.ctx) {
+    try {
+      SoundFX._musicGain.gain.cancelScheduledValues(SoundFX.ctx.currentTime);
+      SoundFX._musicGain.gain.linearRampToValueAtTime(0, SoundFX.ctx.currentTime + 0.3);
+    } catch(e) {}
+  }
+}
 function resumeGameFromOverlay(){
   _shopPaused = false;
   mgGraceTimer = MG_GRACE_MS; // 2.2s invincibility
@@ -4651,6 +4677,22 @@ function resumeGameFromOverlay(){
   mgJavelins = [];
   if (typeof mg2Shields !== 'undefined')      mg2Shields = [];
   if (typeof mg3SoldierStones !== 'undefined') mg3SoldierStones = [];
+
+  // ── Restart music ────────────────────────────────────────────
+  if (SoundFX.enabled && SoundFX._currentTheme && SoundFX.ctx) {
+    const theme = SoundFX._currentTheme;
+    if (SoundFX._musicGain) {
+      try {
+        SoundFX._musicGain.gain.cancelScheduledValues(SoundFX.ctx.currentTime);
+        SoundFX._musicGain.gain.linearRampToValueAtTime(0.85, SoundFX.ctx.currentTime + 0.4);
+      } catch(e) {}
+    }
+    // Restart scheduler if it was stopped
+    if (!SoundFX._musicScheduler) {
+      SoundFX._currentTheme = null; // force restart
+      SoundFX.startMusic(theme);
+    }
+  }
 
   // ── Freeze enemy firing for the full grace period ─────────────
   // Reset all batch/fire cooldowns so no new projectiles spawn
@@ -4876,8 +4918,8 @@ function showStoneShop() {
 
 // ── STONE QUESTION — separate overlay on top of shop ─────────
 function showStoneQuestionOverlay(q, reward, onDone) {
-  // This overlays ON TOP of the shop overlay (z-index one higher)
   document.getElementById('mgQOverlay')?.remove();
+  pauseGameForOverlay(); // ensure game is paused while question is showing
 
   const ov = document.createElement('div');
   ov.id = 'mgQOverlay';
