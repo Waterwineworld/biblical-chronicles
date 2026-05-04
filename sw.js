@@ -5,6 +5,15 @@ const CACHE_NAME = 'biblical-chronicles-v1';
 const ASSETS = [
   '/',
   '/index.html',
+  '/js/data.js',
+  '/js/core.js',
+  '/js/user.js',
+  '/js/quiz.js',
+  '/js/minigame.js',
+  '/js/level1.js',
+  '/js/level2.js',
+  '/js/level3.js',
+  '/js/level4.js',
   'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600;700;900&display=swap',
   'https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js',
   'https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js',
@@ -16,7 +25,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       // Cache local assets immediately, external ones best-effort
-      const local = ['/'];
+      const local = ['/', '/index.html', '/js/data.js', '/js/core.js', '/js/user.js', '/js/quiz.js', '/js/minigame.js', '/js/level1.js', '/js/level2.js', '/js/level3.js', '/js/level4.js'];
       const external = ASSETS.filter(u => u.startsWith('http'));
       return Promise.allSettled([
         cache.addAll(local),
