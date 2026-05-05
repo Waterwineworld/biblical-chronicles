@@ -30,7 +30,6 @@ function onNameType() {
   const g = document.getElementById('ugreet');
   g.className = 'ugreet';
   if (v.length > 1) {
-    // Check if returning player
     const saved = localStorage.getItem('bc_username');
     if (saved && saved.toLowerCase() === v.toLowerCase()) {
       g.textContent = `Welcome back, ${v}! 🙏 Your progress is remembered.`;
@@ -40,6 +39,7 @@ function onNameType() {
   } else {
     g.textContent = '';
   }
+  updateLetsGoBtn();
 }
 function getUsername() { return username.trim() || 'Anonymous'; }
 function renderEpisodes() {
@@ -77,9 +77,45 @@ function renderLives() { document.getElementById('liveswrap').innerHTML = [1, 2,
 function setPhase(ph) { G.phase = ph; const idx = ['story', 'challenge', 'verdict'].indexOf(ph); ['ph0', 'ph1', 'ph2'].forEach((id, i) => { const el = document.getElementById(id); if (!el) return; el.className = 'pstep'; if (i < idx) el.classList.add('done'); else if (i === idx) el.classList.add('active'); }); }
 function confirmQuit() { const ov = document.createElement('div'); ov.className = 'modal-ov'; ov.innerHTML = `<div class="modal-bx"><div class="mttl">⚠️ Quit Episode?</div><div class="msub2">Your current progress will be lost.</div><div class="mrow"><button class="bgold" onclick="doQuit()">Yes, Quit</button><button class="bghost" onclick="this.closest('.modal-ov').remove()">Keep Playing</button></div></div>`; document.body.appendChild(ov); }
 function doQuit() { clearInterval(G.timer); clearTimeout(G.lineTimer); SoundFX.stopMusic(); document.querySelector('.modal-ov')?.remove(); document.getElementById('atm').style.background = 'transparent'; if (isFullscreen()) exitFullscreen(); showScreen('s-title'); }
-function renderScene() { const area = document.getElementById('game-area'); if (!area) { setTimeout(() => renderScene(), 80); return; } const sc = G.ep.scenes[G.scene]; clearTimeout(G.lineTimer); G.lineIdx = 0; const total = G.ep.scenes.length; const dots = G.ep.scenes.map((_, i) => `<span class="sdot ${i < G.scene ? 'done' : i === G.scene ? 'active' : ''}"></span>`).join(''); area.innerHTML = `<div class="spanel"><div class="shdr"><span class="sico">${sc.icon}</span><div><div class="slbl">Scene ${G.scene + 1} of ${total}</div><div class="snm">${sc.name}</div></div></div><div class="sbody"><div id="stlines"></div>${sc.scripture ? `<div class="screv" id="screv"><div class="sclbl">📖 Scripture</div><div class="sctxt">"${sc.scripture.text}"</div><div class="scref">— ${sc.scripture.ref}</div></div>` : ''}</div><div class="snav"><div class="sdots">${dots}</div><div style="display:flex;align-items:center;gap:12px;"><span class="sklnk" onclick="skipAll()">Skip</span><button class="bcont" id="btnnext" onclick="nextScene()" style="display:none;">${G.scene < total - 1 ? 'Next Scene →' : 'Begin Challenge →'}</button></div></div></div>`; revealLines(sc); }
+function renderScene() {
+  const area = document.getElementById('game-area');
+  if (!area) { setTimeout(() => renderScene(), 80); return; }
+  const sc = G.ep.scenes[G.scene];
+  clearTimeout(G.lineTimer);
+  G.lineIdx = 0;
+  const total = G.ep.scenes.length;
+  const dots = G.ep.scenes.map((_, i) => `<span class="sdot ${i < G.scene ? 'done' : i === G.scene ? 'active' : ''}"></span>`).join('');
+  area.innerHTML = `<div class="spanel"><div class="shdr"><span class="sico">${sc.icon}</span><div><div class="slbl">Scene ${G.scene + 1} of ${total}</div><div class="snm">${sc.name}</div></div></div><div class="sbody" id="sbody" style="cursor:pointer;" title="Tap to reveal all"><div id="stlines"></div>${sc.scripture ? `<div class="screv" id="screv"><div class="sclbl">📖 Scripture</div><div class="sctxt">"${sc.scripture.text}"</div><div class="scref">— ${sc.scripture.ref}</div></div>` : ''}</div><div class="snav"><div class="sdots">${dots}</div><div style="display:flex;align-items:center;gap:12px;"><span class="sklnk" onclick="skipAll()">Skip</span><button class="bcont" id="btnnext" onclick="nextScene()" style="display:none;">${G.scene < total - 1 ? 'Next Scene →' : 'Begin Challenge →'}</button></div></div></div>`;
+  // Tap anywhere on the story body to reveal all lines immediately
+  document.getElementById('sbody').addEventListener('click', () => {
+    if (G.lineIdx < sc.lines.length) skipAll();
+  });
+  revealLines(sc);
+}
 function revealLines(sc) { const c = document.getElementById('stlines'); if (!c) return; if (G.lineIdx >= sc.lines.length) { const r = document.getElementById('screv'); if (r) setTimeout(() => r.classList.add('vis'), 400); setTimeout(() => { const b = document.getElementById('btnnext'); if (b) b.style.display = 'inline-flex'; }, r ? 1400 : 500); return; } const l = sc.lines[G.lineIdx]; const d = document.createElement('div'); d.className = `stline ${l.t}`; d.textContent = l.text; c.appendChild(d); requestAnimationFrame(() => setTimeout(() => d.classList.add('vis'), 30)); G.lineIdx++; const delay = l.t === 'dramatic' ? 1200 : l.t === 'whisper' ? 950 : 720; G.lineTimer = setTimeout(() => revealLines(sc), delay); }
-function skipAll() { clearTimeout(G.lineTimer); const c = document.getElementById('stlines'); if (!c) return; const sc = G.ep.scenes[G.scene]; while (G.lineIdx < sc.lines.length) { const l = sc.lines[G.lineIdx]; if (!c.children[G.lineIdx]) { const d = document.createElement('div'); d.className = `stline ${l.t} vis`; d.textContent = l.text; c.appendChild(d); } G.lineIdx++; } const r = document.getElementById('screv'); if (r) r.classList.add('vis'); const b = document.getElementById('btnnext'); if (b) b.style.display = 'inline-flex'; }
+function skipAll() {
+  clearTimeout(G.lineTimer);
+  const c = document.getElementById('stlines');
+  if (!c) return;
+  const sc = G.ep.scenes[G.scene];
+  // Force-show lines already in the DOM (rAF+30ms callback may not have fired yet)
+  Array.from(c.children).forEach(el => el.classList.add('vis'));
+  // Append any lines not yet added
+  while (G.lineIdx < sc.lines.length) {
+    if (!c.children[G.lineIdx]) {
+      const l = sc.lines[G.lineIdx];
+      const d = document.createElement('div');
+      d.className = `stline ${l.t} vis`;
+      d.textContent = l.text;
+      c.appendChild(d);
+    }
+    G.lineIdx++;
+  }
+  const r = document.getElementById('screv');
+  if (r) r.classList.add('vis');
+  const b = document.getElementById('btnnext');
+  if (b) b.style.display = 'inline-flex';
+}
 function nextScene() { clearTimeout(G.lineTimer); G.scene++; if (G.scene >= G.ep.scenes.length) { setPhase('challenge'); G.qIdx = 0; renderChallenge(); } else renderScene(); }
 
 // ═══════════════════════════════════════════════════════════════

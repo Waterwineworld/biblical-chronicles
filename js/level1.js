@@ -11,7 +11,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 function resetMG() {
-  mgDavid   = { x: 100, y: mgHeight / 2, w: 40, h: 60, speed: 6 };
+  mgDavid   = { x: 100, y: mgHeight / 2, w: 40, h: 60, speed: 9 };
   mgGoliath = { x: Math.min(mgWidth - 120, 600), y: mgHeight - 180, w: 70, h: 110, speed: 0.8, walkDir: 1, rage: false, state: 'GUARDING', stateTimer: 5000 };
   mgStone   = { active: false, x: 0, y: 0, vx: 0, vy: 0, charge: 0, trail: [] };
   mgJavelins  = [];
@@ -123,8 +123,9 @@ function updateMG(delta) {
   let moveY = mgJoyVY !== 0 ? mgJoyVY : (mgMoveDown ? 1 : mgMoveUp ? -1 : 0);
   // Normalize diagonal keyboard movement
   if (moveX !== 0 && moveY !== 0 && mgJoyVX === 0) { moveX *= 0.707; moveY *= 0.707; }
-  mgDavid.x = Math.max(40, Math.min(mgWidth  - mgDavid.w - 40, mgDavid.x + moveX * mgDavid.speed));
-  mgDavid.y = Math.max(60, Math.min(mgHeight - mgDavid.h - 60, mgDavid.y + moveY * mgDavid.speed));
+  const kbMult1 = mgJoyActive ? 1.0 : 1.2;
+  mgDavid.x = Math.max(40, Math.min(mgWidth  - mgDavid.w - 40, mgDavid.x + moveX * mgDavid.speed * kbMult1));
+  mgDavid.y = Math.max(60, Math.min(mgHeight - mgDavid.h - 60, mgDavid.y + moveY * mgDavid.speed * kbMult1));
 
   // Grace timer tick
   if (mgGraceTimer > 0) mgGraceTimer -= delta;

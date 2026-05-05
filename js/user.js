@@ -43,12 +43,13 @@ function onEmailType() {
   if (val && valid) {
     greet.style.color = '#5ddb8e';
     greet.textContent = '✅ Email saved — progress syncs across devices';
-    // Auto-restore on valid email entry
     restoreUserProfile(val);
+    saveUserProfile(); // also backfills existing scores with email
   } else if (val) {
     greet.style.color = '#e87070';
     greet.textContent = 'Please enter a valid email address';
   } else { greet.textContent = ''; }
+  updateLetsGoBtn();
 }
 
 // ── Save / restore profile ────────────────────────────────────
@@ -60,6 +61,13 @@ async function saveUserProfile() {
       email, username: getUsername(),
       lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
     }, { merge:true });
+    // Silently backfill email on any existing scores for this username
+    db.collection('bc_scores').where('name', '==', getUsername()).get()
+      .then(snapshot => {
+        snapshot.forEach(doc => {
+          if (!doc.data().email) doc.ref.update({ email }).catch(() => {});
+        });
+      }).catch(() => {});
   } catch(e) {}
 }
 
@@ -90,6 +98,7 @@ async function tryAutoRestore() {
   const savedName  = localStorage.getItem('bc_username');
   if (savedEmail) { currentUserEmail = savedEmail; const inp = document.getElementById('email-inp'); if(inp) inp.value = savedEmail; await restoreUserProfile(savedEmail); }
   if (savedName)  { username = savedName; const inp = document.getElementById('username-inp'); if(inp) inp.value = savedName; }
+  updateLetsGoBtn();
 }
 
 // ── Daily bonus ───────────────────────────────────────────────
@@ -116,10 +125,9 @@ function checkAndShowDailyBonus() {
 function initiatePayment(onSuccess) {
   const email = getEmail();
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showScreen('s-title');
-    document.getElementById('email-inp')?.focus();
-    const greet = document.getElementById('egreet');
-    if (greet) { greet.style.color='#e87070'; greet.textContent='⚠️ Enter your email first to unlock premium'; }
+    // Email should have been captured by upgrade prompt — guard only
+    const fb = document.getElementById('upgEmailFb');
+    if (fb) { fb.style.color='#e87070'; fb.textContent='⚠️ Please enter your email first'; }
     return;
   }
   if (typeof PaystackPop === 'undefined' || PAYSTACK_PUBLIC_KEY === 'pk_test_YOUR_PAYSTACK_KEY_HERE') { _devBypassPayment(onSuccess); return; }
@@ -136,6 +144,12 @@ function initiatePayment(onSuccess) {
         );
       } catch(e) {}
       unlockPremium();
+      // Link any existing anonymous scores to the new email-identified account
+      if (db && getEmail()) {
+        db.collection('bc_scores').where('name', '==', getUsername()).get()
+          .then(snapshot => { snapshot.forEach(doc => { doc.ref.update({ email: getEmail() }).catch(()=>{}); }); })
+          .catch(()=>{});
+      }
       if (onSuccess) onSuccess();
     },
     onClose:()=>{}
@@ -148,7 +162,16 @@ function _devBypassPayment(onSuccess) {
   ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-family:"Cinzel",serif;color:#e8c96a;';
   ov.innerHTML=`<div style="font-size:28px;">🛠️</div><div style="font-size:13px;">DEV MODE: Payment Bypass</div><div style="font-size:11px;color:#888;">Paystack key not set — for testing only</div><button id="devPayY" style="background:linear-gradient(135deg,#7a5800,#e8c96a);color:#1a0f00;border:none;padding:12px 28px;border-radius:6px;font-family:'Cinzel',serif;font-weight:bold;cursor:pointer;">✅ Simulate Payment Success</button><button id="devPayN" style="background:#333;color:#888;border:none;padding:10px 24px;border-radius:6px;cursor:pointer;">✕ Cancel</button>`;
   document.body.appendChild(ov);
-  ov.querySelector('#devPayY').onclick=()=>{ ov.remove(); unlockPremium(); if(onSuccess)onSuccess(); };
+  ov.querySelector('#devPayY').onclick=()=>{
+    ov.remove();
+    unlockPremium();
+    if (db && getEmail()) {
+      db.collection('bc_scores').where('name', '==', getUsername()).get()
+        .then(snapshot => { snapshot.forEach(doc => { doc.ref.update({ email: getEmail() }).catch(()=>{}); }); })
+        .catch(()=>{});
+    }
+    if(onSuccess)onSuccess();
+  };
   ov.querySelector('#devPayN').onclick=()=>ov.remove();
 }
 
@@ -176,11 +199,62 @@ function showRewardedVideoAd(rewardCallback) {
   ov.querySelector('#rvNo').onclick =()=>{ ov.remove(); rewardCallback(0); };
 }
 
+// ── Upgrade email input handler (inside upgrade overlay) ──────
+function onUpgradeEmailType() {
+  const inp = document.getElementById('upgEmailInp');
+  const fb  = document.getElementById('upgEmailFb');
+  const btn = document.getElementById('upgPayBtn');
+  if (!inp || !btn) return;
+  const val   = inp.value.trim().toLowerCase();
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+  if (valid) {
+    currentUserEmail = val;
+    localStorage.setItem('bc_email', val);
+    const titleInp = document.getElementById('email-inp');
+    if (titleInp) titleInp.value = val;
+    btn.disabled          = false;
+    btn.style.opacity     = '1';
+    btn.style.cursor      = 'pointer';
+    if (fb) { fb.style.color = '#5ddb8e'; fb.textContent = '✅ Email ready'; }
+  } else {
+    btn.disabled          = true;
+    btn.style.opacity     = '0.55';
+    btn.style.cursor      = 'not-allowed';
+    if (fb) { fb.style.color = val ? '#e87070' : ''; fb.textContent = val ? 'Please enter a valid email' : ''; }
+  }
+}
+
 // ── Upgrade prompt ────────────────────────────────────────────
 function showUpgradePrompt(fromLevel) {
   let ov=document.querySelector('.mg-full-overlay'); if(ov)ov.remove();
   ov=document.createElement('div'); ov.className='mg-full-overlay';
-  ov.innerHTML=`<div style="font-size:48px;margin-bottom:4px;">✨</div><h2 style="color:#e8c96a;margin-bottom:6px;">Unlock Premium</h2><div style="max-width:300px;font-size:13px;line-height:1.9;color:#d4c4a0;margin-bottom:14px;"><div>✅ Level 3 + Level 4 unlocked</div><div>✅ Zero ads — ever</div><div>✅ +2 free stones every day</div><div>✅ 1 free life restore per day</div><div>✅ Hard Bible questions (+3 stones)</div><div>✅ Access from any device with email</div></div><div class="sub-gate-price"><div class="sub-gate-amount">$2.99</div><div class="sub-gate-label">One-Time · Yours Forever</div></div><button class="sub-pay-btn" id="upgPayBtn">🙏 Unlock Now — $2.99</button><div style="margin-top:10px;font-size:11px;color:#888;">Already premium? <span onclick="showRestoreAccess()" style="color:#c9a84c;cursor:pointer;text-decoration:underline;">Restore access</span></div><button onclick="document.querySelector('.mg-full-overlay')?.remove();resumeGameFromOverlay&&resumeGameFromOverlay();" style="margin-top:8px;background:#2a2a2a;color:#888;border:none;padding:8px 20px;border-radius:5px;cursor:pointer;font-size:11px;">✕ Maybe later</button>`;
+
+  const hasEmail = currentUserEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentUserEmail.trim());
+
+  const emailHtml = hasEmail ? '' : `
+    <div style="width:min(300px,88vw);">
+      <p style="font-size:11px;color:#d4c4a0;text-align:center;line-height:1.6;margin-bottom:6px;">
+        Your email activates and protects your premium access<br>across all your devices
+      </p>
+      <input id="upgEmailInp" type="email" placeholder="your@email.com"
+        style="width:100%;background:rgba(14,10,20,.95);border:1px solid rgba(201,168,76,.4);border-radius:7px;padding:11px 14px;color:#e8c96a;font-family:'Playfair Display',serif;font-size:14px;outline:none;text-align:center;box-sizing:border-box;"
+        oninput="onUpgradeEmailType()">
+      <div id="upgEmailFb" style="font-size:11px;min-height:16px;color:#b8a880;margin-top:4px;text-align:center;"></div>
+    </div>`;
+
+  ov.innerHTML=`<div style="font-size:48px;margin-bottom:4px;">✨</div>
+    <h2 style="color:#e8c96a;margin-bottom:6px;">Unlock Premium</h2>
+    <div style="max-width:300px;font-size:13px;line-height:1.9;color:#d4c4a0;margin-bottom:14px;">
+      <div>✅ Level 3 + Level 4 unlocked</div><div>✅ Zero ads — ever</div>
+      <div>✅ +2 free stones every day</div><div>✅ 1 free life restore per day</div>
+      <div>✅ Hard Bible questions (+3 stones)</div><div>✅ Access from any device with email</div>
+    </div>
+    <div class="sub-gate-price"><div class="sub-gate-amount">$2.99</div><div class="sub-gate-label">One-Time · Yours Forever</div></div>
+    ${emailHtml}
+    <button class="sub-pay-btn" id="upgPayBtn" ${hasEmail ? '' : 'disabled'}
+      style="${hasEmail ? '' : 'opacity:0.55;cursor:not-allowed;'}">🙏 Unlock Now — $2.99</button>
+    <div style="margin-top:10px;font-size:11px;color:#888;">Already premium? <span onclick="showRestoreAccess()" style="color:#c9a84c;cursor:pointer;text-decoration:underline;">Restore access</span></div>
+    <button onclick="document.querySelector('.mg-full-overlay')?.remove();resumeGameFromOverlay&&resumeGameFromOverlay();" style="margin-top:8px;background:#2a2a2a;color:#888;border:none;padding:8px 20px;border-radius:5px;cursor:pointer;font-size:11px;">✕ Maybe later</button>`;
   document.body.appendChild(ov);
   ov.querySelector('#upgPayBtn').onclick=()=>{
     initiatePayment(()=>{
@@ -192,6 +266,22 @@ function showUpgradePrompt(fromLevel) {
       checkAndShowDailyBonus();
     });
   };
+}
+
+// ── Let's Play button helpers ─────────────────────────────────
+function updateLetsGoBtn() {
+  const btn = document.getElementById('lets-go-btn');
+  if (!btn) return;
+  const name  = (document.getElementById('username-inp')?.value || '').trim();
+  const email = (document.getElementById('email-inp')?.value || '').trim();
+  const ok = name.length >= 2 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  btn.style.display = ok ? 'inline-flex' : 'none';
+}
+
+function onLetsGo() {
+  saveUserProfile();
+  const epGrid = document.getElementById('ep-grid');
+  if (epGrid) epGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ── Helpers for life overlay video/daily buttons ─────────────

@@ -26,7 +26,7 @@ let mg4Sparks        = [];   // Visual only: screen spark effects on wave clear
 function markLevel3Beaten2(){ markLevel3Beaten(); } // alias already defined above
 
 function resetMG4() {
-  mgDavid   = { x: 70, y: mgHeight/2, w:40, h:60, speed:6 };
+  mgDavid   = { x: 70, y: mgHeight/2, w:40, h:60, speed:9 };
   mgStone   = { active:false, x:0, y:0, vx:0, vy:0, charge:0, trail:[] };
   mgJavelins= []; mg2Shields=[];
 
@@ -145,8 +145,9 @@ function updateMG4(delta) {
     let mx=mgJoyVX!==0?mgJoyVX:(mgMoveRight?1:mgMoveLeft?-1:0);
     let my=mgJoyVY!==0?mgJoyVY:(mgMoveDown?1:mgMoveUp?-1:0);
     if(mx!==0&&my!==0&&mgJoyVX===0){mx*=0.707;my*=0.707;}
-    mgDavid.x=Math.max(40,Math.min(mgWidth-mgDavid.w-40,mgDavid.x+mx*mgDavid.speed));
-    mgDavid.y=Math.max(60,Math.min(mgHeight-mgDavid.h-60,mgDavid.y+my*mgDavid.speed));
+    const kbMult4i = mgJoyActive ? 1.0 : 1.2;
+    mgDavid.x=Math.max(40,Math.min(mgWidth-mgDavid.w-40,mgDavid.x+mx*mgDavid.speed*kbMult4i));
+    mgDavid.y=Math.max(60,Math.min(mgHeight-mgDavid.h-60,mgDavid.y+my*mgDavid.speed*kbMult4i));
 
     if (mg4IntTimer <= 0) {
       const nextWave = mg4Wave + 1;
@@ -172,8 +173,9 @@ function updateMG4(delta) {
   let moveX=mgJoyVX!==0?mgJoyVX:(mgMoveRight?1:mgMoveLeft?-1:0);
   let moveY=mgJoyVY!==0?mgJoyVY:(mgMoveDown?1:mgMoveUp?-1:0);
   if(moveX!==0&&moveY!==0&&mgJoyVX===0){moveX*=0.707;moveY*=0.707;}
-  mgDavid.x=Math.max(40,Math.min(mgWidth-mgDavid.w-40,mgDavid.x+moveX*mgDavid.speed));
-  mgDavid.y=Math.max(60,Math.min(mgHeight-mgDavid.h-60,mgDavid.y+moveY*mgDavid.speed));
+  const kbMult4 = mgJoyActive ? 1.0 : 1.2;
+  mgDavid.x=Math.max(40,Math.min(mgWidth-mgDavid.w-40,mgDavid.x+moveX*mgDavid.speed*kbMult4));
+  mgDavid.y=Math.max(60,Math.min(mgHeight-mgDavid.h-60,mgDavid.y+moveY*mgDavid.speed*kbMult4));
   if(mgGraceTimer>0) mgGraceTimer-=delta;
 
   if(mgChargeActive&&!mgStone.active) mgStone.charge=Math.min(60,(mgStone.charge||0)+1.5);

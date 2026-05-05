@@ -19,7 +19,7 @@ let mgAnimationId   = null;
 let mgLastTimestamp = 0;
 
 // ── Level 1 game state (shared globals read by level1.js) ─────
-let mgDavid   = { x: 100, y: 200, w: 40, h: 60, speed: 6 };
+let mgDavid   = { x: 100, y: 200, w: 40, h: 60, speed: 9 };
 let mgGoliath = { x: 600, y: 200, w: 70, h: 110, speed: 0.8, walkDir: 1, rage: false, state: 'GUARDING', stateTimer: 5000 };
 let mgStone   = { active: false, x: 0, y: 0, vx: 0, vy: 0, charge: 0, trail: [] };
 let mgJavelins  = [];
@@ -316,7 +316,7 @@ function bindMGButtons() {
     const ky     = Math.sin(ang) * clamped;
     joystickKnob.style.left = (50 + (kx / JOYSTICK_RADIUS) * 44) + '%';
     joystickKnob.style.top  = (50 + (ky / JOYSTICK_RADIUS) * 44) + '%';
-    const norm = dist > 5 ? Math.min(1, (clamped / JOYSTICK_RADIUS) * 1.2) : 0;
+    const norm = dist > 5 ? Math.min(1, clamped / (JOYSTICK_RADIUS * 0.6)) : 0;
     mgJoyVX = Math.cos(ang) * norm;
     mgJoyVY = Math.sin(ang) * norm;
   }

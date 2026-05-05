@@ -35,7 +35,7 @@ let mg3LastTimestamp    = 0;
 //  resetMG3
 // ═══════════════════════════════════════════════════════════════
 function resetMG3() {
-  mgDavid   = { x: 70, y: mgHeight / 2, w: 40, h: 60, speed: 6 };
+  mgDavid   = { x: 70, y: mgHeight / 2, w: 40, h: 60, speed: 9 };
   mgGoliath = { x: Math.min(mgWidth - 130, 560), y: mgHeight - 180, w: 70, h: 110,
                 speed: 1.5, walkDir: 1, rage: false, state: 'GUARDING', stateTimer: 3500 };
   mgStone   = { active: false, x: 0, y: 0, vx: 0, vy: 0, charge: 0, trail: [] };
@@ -110,8 +110,9 @@ function updateMG3(delta) {
   let moveX = mgJoyVX !== 0 ? mgJoyVX : (mgMoveRight ? 1 : mgMoveLeft ? -1 : 0);
   let moveY = mgJoyVY !== 0 ? mgJoyVY : (mgMoveDown  ? 1 : mgMoveUp   ? -1 : 0);
   if (moveX !== 0 && moveY !== 0 && mgJoyVX === 0) { moveX *= 0.707; moveY *= 0.707; }
-  mgDavid.x = Math.max(40, Math.min(mgWidth - mgDavid.w - 40, mgDavid.x + moveX * mgDavid.speed));
-  mgDavid.y = Math.max(60, Math.min(mgHeight - mgDavid.h - 60, mgDavid.y + moveY * mgDavid.speed));
+  const kbMult3 = mgJoyActive ? 1.0 : 1.2;
+  mgDavid.x = Math.max(40, Math.min(mgWidth - mgDavid.w - 40, mgDavid.x + moveX * mgDavid.speed * kbMult3));
+  mgDavid.y = Math.max(60, Math.min(mgHeight - mgDavid.h - 60, mgDavid.y + moveY * mgDavid.speed * kbMult3));
   if (mgGraceTimer > 0) mgGraceTimer -= delta;
 
   if (mgChargeActive && !mgStone.active)
