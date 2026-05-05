@@ -132,7 +132,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .cpanel{background:linear-gradient(170deg,rgba(18,12,26,.97),rgba(8,5,14,.99));border:1px solid rgba(201,168,76,.25);border-radius:10px;overflow:hidden;margin-bottom:14px;animation:sIn .4s ease;}
 .chdr{background:linear-gradient(135deg,rgba(139,26,26,.3),rgba(8,5,14,0));padding:16px 20px 12px;border-bottom:1px solid rgba(201,168,76,.12);}
 .ctype{font-family:'Cinzel',serif;font-size:13px;letter-spacing:4px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:4px;}
-.cq{font-family:'Playfair Display',serif;font-size:clamp(14px,3.5vw,19px);color:var(--white);font-weight:700;line-height:1.4;}
+.cq{font-family:'Playfair Display',serif;font-size:clamp(13px,3.5vw,17px);color:var(--white);font-weight:700;line-height:1.4;}
 .chint-btn{background:transparent;border:1px solid rgba(201,168,76,.2);color:var(--gold-dim);font-family:'Cinzel',serif;font-size:13px;letter-spacing:1px;padding:4px 12px;border-radius:4px;cursor:pointer;margin-top:6px;transition:all .3s;}
 .chint-btn:hover{border-color:var(--gold);color:var(--gold);}
 .chint-txt{font-size:12px;color:var(--parch3);font-style:italic;margin-top:6px;display:none;}
@@ -564,7 +564,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .stone-diff-card.medium{border-left:3px solid #e8c96a;}
 .stone-diff-card.hard{border-left:3px solid #c0392b;}
 .stone-q-panel{background:linear-gradient(160deg,rgba(26,18,38,.97),rgba(10,7,16,.99));border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:18px 20px;width:min(360px,92vw);text-align:left;}
-.stone-q-text{font-family:'Playfair Display',serif;font-size:clamp(14px,3vw,17px);color:#fff;line-height:1.5;margin-bottom:14px;}
+.stone-q-text{font-family:'Playfair Display',serif;font-size:clamp(13px,3.5vw,17px);color:#fff;line-height:1.5;margin-bottom:14px;}
 .stone-q-opts{display:flex;flex-direction:column;gap:8px;}
 .stone-q-opt{background:rgba(26,18,38,.9);border:1px solid rgba(201,168,76,0.22);border-radius:7px;padding:10px 14px;cursor:pointer;color:#e8c96a;font-family:'Libre Baskerville',serif;font-size:13px;display:flex;gap:10px;align-items:center;transition:all 0.2s;}
 .stone-q-opt:hover:not(:disabled){border-color:var(--gold);background:rgba(201,168,76,.1);}
@@ -585,6 +585,28 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 /* ========== SHARE BUTTON ========== */
 .share-btn{background:linear-gradient(135deg,#1a3a5a,#2a5a8a,#1a3a5a);border:1px solid #4488bb;color:#88ccff;font-family:'Cinzel',serif;font-size:14px;letter-spacing:1px;padding:10px 22px;border-radius:6px;cursor:pointer;transition:all 0.25s;display:inline-flex;align-items:center;gap:7px;}
 .share-btn:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(68,136,187,.4);}
+
+/* ========== MOBILE QUIZ FIT ========== */
+@media (max-width:430px){
+  .chdr{padding:10px 14px 8px;}
+  .twrap{margin-top:6px;}
+  .owrap{padding:10px 14px 12px;gap:6px;}
+  .obtn{font-size:clamp(12px,2.8vw,14px);line-height:1.35;}
+  .stone-q-panel{padding:12px 14px;}
+  .stone-q-text{margin-bottom:8px;}
+}
+@media (max-width:400px){
+  .obtn{padding:8px 12px;}
+  .stone-q-opt{padding:8px 12px;}
+}
+@media (max-height:700px){
+  .stone-q-panel{max-height:72dvh;overflow-y:auto;}
+}
+@media (max-height:650px){
+  #s-game{padding-top:6px;}
+  .ghdr{padding:6px 10px;margin-bottom:8px;}
+  .pbar{margin-bottom:8px;}
+}
 </style>
 </head>
 <body>
@@ -614,9 +636,10 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   <div class="ubox">
     <div class="ubox-ttl">Who Are You, Servant of God?</div>
     <input class="uinp" id="username-inp" placeholder="Enter your name..." maxlength="25" autocomplete="off" oninput="onNameType()">
-    <input class="uinp" id="email-inp" type="email" placeholder="Your email (saves progress + premium access)" maxlength="80" autocomplete="email" oninput="onEmailType()" style="margin-top:8px;font-size:13px;">
+    <input class="uinp" id="email-inp" type="email" placeholder="Email (optional — needed for premium access)" maxlength="80" autocomplete="email" oninput="onEmailType()" style="margin-top:8px;font-size:13px;">
     <div class="ugreet" id="ugreet"></div>
     <div class="ugreet" id="egreet" style="font-size:11px;margin-top:2px;"></div>
+    <button class="bgold" id="lets-go-btn" style="display:none;margin-top:14px;width:100%;font-size:14px;letter-spacing:2px;" onclick="onLetsGo()">⚔️ Let's Play!</button>
   </div>
   <div class="ep-lbl">Choose Your Episode</div>
   <div class="ep-grid" id="ep-grid"></div>
