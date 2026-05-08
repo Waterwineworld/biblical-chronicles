@@ -30,7 +30,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <style>
 /* ========== BASE STYLES ========== */
-:root{--bg:#080608;--bg2:#100d14;--gold:#c9a84c;--gold2:#e8c96a;--gold3:#f5e0a0;--gold-dim:#6b5a28;--red2:#c0392b;--ember:#d4541a;--parch:#f0e4c8;--parch2:#d4c4a0;--parch3:#b8a880;--blue2:#2e6da4;--green2:#27ae60;--white:#fff8f0;}
+:root{--bg:#fdf6e8;--bg2:#fefaf0;--gold:#8b6914;--gold2:#b8820a;--gold3:#d4a017;--gold-dim:#6b4e10;--red2:#c0392b;--ember:#d4541a;--parch:#3d1f0a;--parch2:#5a3820;--parch3:#7a5838;--blue2:#2e6da4;--green2:#27ae60;--white:#1c2b4a;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);font-family:'Libre Baskerville',serif;color:var(--parch);min-height:100vh;overflow-x:hidden;}
 /* Prevent body scroll when mini-game is active */
@@ -607,6 +607,122 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   .ghdr{padding:6px 10px;margin-bottom:8px;}
   .pbar{margin-bottom:8px;}
 }
+
+/* ========== PARCHMENT PANEL OVERRIDES ========== */
+/* Remap dark rgba panel backgrounds to warm parchment tones */
+.ubox{background:linear-gradient(160deg,rgba(253,240,215,.85),rgba(248,230,200,.9))!important;border-color:rgba(139,105,20,.28)!important;}
+.uinp{background:rgba(255,250,238,.95)!important;color:var(--parch)!important;}
+.uinp::placeholder{color:rgba(107,78,16,.4)!important;}
+.ep-card{background:linear-gradient(160deg,rgba(253,240,215,.82),rgba(248,228,198,.9))!important;border-color:rgba(139,105,20,.2)!important;}
+.ep-card:hover{box-shadow:0 12px 40px rgba(139,105,20,.15)!important;}
+.special-card{background:linear-gradient(160deg,rgba(255,240,220,.85),rgba(248,228,198,.9))!important;}
+.ghdr{background:rgba(250,238,210,.8)!important;border-color:rgba(139,105,20,.2)!important;}
+.spanel{background:linear-gradient(170deg,rgba(253,242,218,.97),rgba(248,234,208,.99))!important;border-color:rgba(139,105,20,.2)!important;}
+.cpanel{background:linear-gradient(170deg,rgba(253,242,218,.97),rgba(248,234,208,.99))!important;border-color:rgba(139,105,20,.25)!important;}
+.chdr{background:linear-gradient(135deg,rgba(180,83,9,.07),rgba(253,242,218,0))!important;}
+.obtn{background:linear-gradient(135deg,rgba(253,240,215,.9),rgba(248,228,198,.95))!important;border-color:rgba(139,105,20,.22)!important;}
+.obtn:hover:not(:disabled){background:linear-gradient(135deg,rgba(139,105,20,.1),rgba(248,228,198,.95))!important;}
+.finp{background:rgba(255,250,238,.95)!important;color:var(--parch)!important;}
+.stpill{background:rgba(253,240,215,.8)!important;border-color:rgba(139,105,20,.2)!important;}
+.lblist{background:linear-gradient(170deg,rgba(253,242,218,.97),rgba(248,234,208,.99))!important;border-color:rgba(139,105,20,.2)!important;}
+.lbrow{border-bottom-color:rgba(139,105,20,.12)!important;}
+.modal-bx{background:linear-gradient(160deg,rgba(253,240,215,.98),rgba(248,228,198,.99))!important;}
+.ttrack{background:rgba(139,105,20,.12)!important;}
+/* Restore mini-game portrait warning to dark theme */
+.portrait-warning{background:#080608!important;color:#e8c96a!important;}
+.portrait-warning small{color:#b8a880!important;}
+
+/* ========== SCRIPTURE LOCATOR CSS ========== */
+/* Welcome — mode cards */
+.sl-mode-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:0 0 16px;}
+.sl-mode-card{background:linear-gradient(160deg,rgba(253,240,215,.85),rgba(248,228,198,.92));border:1px solid rgba(139,105,20,.25);border-radius:10px;padding:18px 16px;cursor:pointer;transition:all .25s;text-align:center;}
+.sl-mode-card:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 8px 24px rgba(139,105,20,.15);}
+.sl-mc-icon{font-size:28px;margin-bottom:8px;}
+.sl-mc-title{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--gold);margin-bottom:6px;letter-spacing:1px;}
+.sl-mc-desc{font-size:12px;color:var(--parch2);line-height:1.5;}
+/* Setup */
+.setup-section{margin-bottom:14px;}
+.setup-label{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:6px;}
+.setup-row{display:flex;gap:6px;flex-wrap:wrap;}
+.setup-opt{background:transparent;border:1px solid rgba(139,105,20,.3);color:var(--parch2);font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px;padding:6px 14px;border-radius:4px;cursor:pointer;transition:all .2s;}
+.setup-opt:hover,.setup-opt.active{border-color:var(--gold);color:var(--gold);background:rgba(139,105,20,.1);}
+.pool-note{font-size:12px;color:var(--parch3);font-style:italic;text-align:center;margin-top:8px;}
+.pool-note.warn{color:var(--ember);}
+/* Quiz */
+.sl-quiz-hdr{padding:10px 0 0;}
+.stage-pip{display:inline-block;width:28px;height:4px;border-radius:2px;background:rgba(139,105,20,.18);transition:all .3s;margin-right:5px;}
+.stage-pip.done{background:var(--gold);}
+.stage-pip.active{background:var(--gold2);box-shadow:0 0 6px var(--gold2);}
+#sl-streak-tag.glow{box-shadow:0 0 10px rgba(180,83,9,.35);}
+.verse-card{background:linear-gradient(160deg,rgba(253,240,215,.88),rgba(248,228,198,.93));border:1px solid rgba(139,105,20,.25);border-radius:10px;padding:18px 20px;margin-bottom:4px;}
+.vc-lbl{font-family:'Cinzel',serif;font-size:10px;letter-spacing:4px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:6px;}
+.vc-text{font-style:italic;font-size:clamp(13px,3vw,16px);line-height:1.85;color:var(--parch);}
+.ans-pill{display:inline-flex;gap:5px;background:rgba(139,105,20,.08);border:1px solid rgba(139,105,20,.2);border-radius:20px;padding:3px 10px;font-family:'Cinzel',serif;font-size:11px;}
+.ap-label{color:var(--gold-dim);text-transform:capitalize;}
+.ap-val{color:var(--parch);}
+/* Options */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.opts.solo{grid-template-columns:1fr;}
+.opt{background:linear-gradient(135deg,rgba(253,240,215,.9),rgba(248,228,198,.95));border:1.5px solid rgba(139,105,20,.2);border-radius:8px;padding:12px 14px;cursor:pointer;font-family:'Playfair Display',serif;font-size:clamp(12px,2.5vw,15px);color:var(--parch);text-align:left;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:all .2s;line-height:1.3;width:100%;}
+.opt:hover:not(.sel){border-color:var(--gold);background:rgba(139,105,20,.08);transform:translateY(-1px);}
+.opt.sel{border-color:var(--gold);background:rgba(139,105,20,.15);cursor:default;}
+.opt-kbd{font-family:'Cinzel',serif;font-size:10px;color:var(--gold-dim);background:rgba(139,105,20,.1);border-radius:3px;padding:2px 5px;flex-shrink:0;}
+/* Small button */
+.sl-sm-btn{background:transparent;border:1px solid rgba(139,105,20,.25);color:var(--parch3);font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;padding:5px 12px;border-radius:4px;cursor:pointer;transition:all .2s;}
+.sl-sm-btn:hover:not(:disabled){border-color:var(--gold);color:var(--gold);}
+.sl-sm-btn:disabled{opacity:.4;cursor:default;}
+/* Shared light panel */
+.sl-panel{background:linear-gradient(160deg,rgba(253,240,215,.88),rgba(248,228,198,.93));border:1px solid rgba(139,105,20,.2);border-radius:10px;padding:18px 20px;}
+/* Question result rows */
+.rr{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(139,105,20,.1);font-size:13px;}
+.rr:last-child{border-bottom:none;}
+.rr-lbl{font-family:'Cinzel',serif;font-size:11px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:1px;min-width:72px;padding-top:1px;}
+.rr-vals{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+.cv{color:#15803d;font-weight:600;}
+.wv{color:#c0392b;}
+/* Stats grid */
+.sl-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;}
+.stat-box{background:linear-gradient(160deg,rgba(253,240,215,.88),rgba(248,228,198,.93));border:1px solid rgba(139,105,20,.2);border-radius:8px;padding:12px 14px;text-align:center;}
+.stat-box.full-col{grid-column:1/-1;}
+.sb-name{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:4px;}
+.sb-num{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--gold2);line-height:1;}
+.sb-pct{font-size:11px;color:var(--parch3);margin-top:2px;}
+/* Challenge breakdown */
+.bd-head{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(139,105,20,.15);}
+.cq-card{background:linear-gradient(160deg,rgba(253,240,215,.88),rgba(248,228,198,.9));border:1px solid rgba(139,105,20,.18);border-radius:8px;padding:12px 14px;margin-bottom:8px;}
+.cq-num{font-family:'Cinzel',serif;font-size:12px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:4px;}
+.cq-verse{font-style:italic;font-size:13px;color:var(--parch2);line-height:1.5;margin-bottom:6px;}
+.cq-row{font-size:12px;color:var(--parch2);margin-bottom:3px;display:flex;gap:5px;flex-wrap:wrap;}
+.cq-stage{color:var(--gold-dim);text-transform:capitalize;min-width:58px;}
+/* Achievements */
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;}
+.ach-card{background:linear-gradient(160deg,rgba(253,240,215,.88),rgba(248,228,198,.93));border:1px solid rgba(139,105,20,.22);border-radius:8px;padding:12px;text-align:center;}
+.ach-card.locked{opacity:.4;filter:grayscale(.8);}
+.ach-card.new-ach{border-color:var(--gold);box-shadow:0 0 12px rgba(139,105,20,.25);animation:cpop .4s ease;}
+.ach-icon{font-size:24px;margin-bottom:4px;}
+.ach-name{font-family:'Cinzel',serif;font-size:12px;color:var(--gold);letter-spacing:.5px;margin-bottom:2px;}
+.ach-desc{font-size:11px;color:var(--parch3);line-height:1.4;}
+.ach-count{font-weight:normal;color:var(--parch3);}
+/* Stage accuracy bars */
+.stage-row{margin-bottom:10px;}
+.stage-row-head{display:flex;justify-content:space-between;margin-bottom:4px;}
+.stage-row-name{font-family:'Cinzel',serif;font-size:12px;color:var(--parch);text-transform:capitalize;letter-spacing:1px;}
+.stage-row-pct{font-size:12px;color:var(--gold-dim);}
+.acc-bar-wrap{height:6px;background:rgba(139,105,20,.15);border-radius:3px;overflow:hidden;}
+.acc-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:3px;transition:width .6s ease;}
+/* Study mode */
+.study-card{background:linear-gradient(160deg,rgba(253,240,215,.88),rgba(248,228,198,.93));border:1px solid rgba(139,105,20,.25);border-radius:10px;padding:20px;}
+.blur-wrap.blurred{filter:blur(5px);pointer-events:none;user-select:none;}
+.sc-badge{background:rgba(139,105,20,.1);border:1px solid rgba(139,105,20,.22);border-radius:10px;padding:2px 8px;font-size:11px;font-family:'Cinzel',serif;margin-left:8px;color:var(--gold-dim);}
+.diff-badge{border-radius:10px;padding:2px 8px;font-size:11px;font-family:'Cinzel',serif;margin-left:4px;}
+.diff-badge.diff-easy{background:rgba(39,174,96,.1);border:1px solid rgba(39,174,96,.3);color:#15803d;}
+.diff-badge.diff-medium{background:rgba(139,105,20,.1);border:1px solid rgba(139,105,20,.28);color:var(--gold);}
+.diff-badge.diff-hard{background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.3);color:var(--red2);}
+.tog{background:transparent;border:1px solid rgba(139,105,20,.25);color:var(--parch3);font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;padding:5px 12px;border-radius:4px;cursor:pointer;transition:all .2s;}
+.tog.on{border-color:var(--gold);color:var(--gold);background:rgba(139,105,20,.08);}
+.learn-btn{background:transparent;border:1px solid rgba(139,105,20,.3);color:var(--parch2);font-family:'Cinzel',serif;font-size:12px;padding:7px 14px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.learn-btn:hover{border-color:var(--gold);color:var(--gold);}
+.learn-btn.done{border-color:#27ae60;color:#15803d;background:rgba(39,174,96,.08);}
 </style>
 </head>
 <body>
@@ -728,6 +844,228 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   <div class="brow"><button class="bgold" onclick="showScreen('s-title')">← Back</button></div>
 </div>
 
+<!-- SCRIPTURE LOCATOR: Welcome -->
+<div id="sl-welcome" class="screen">
+  <div style="text-align:center;padding-top:28px;">
+    <span style="font-size:52px;display:block;margin-bottom:8px;">📍</span>
+    <div class="mtitle" style="font-size:clamp(18px,5vw,30px);">Scripture Locator</div>
+    <div class="msub" style="margin-bottom:8px;">Identify the testament · book · chapter · verse</div>
+    <div id="sl-w-daily-badge" style="display:inline-block;background:rgba(139,105,20,.1);border:1px solid rgba(139,105,20,.28);border-radius:20px;padding:4px 14px;font-family:'Cinzel',serif;font-size:12px;color:var(--gold);margin-bottom:20px;letter-spacing:1px;"></div>
+  </div>
+  <div class="sl-mode-cards">
+    <div class="sl-mode-card" onclick="slOpenSetup('learning')">
+      <div class="sl-mc-icon">📖</div>
+      <div class="sl-mc-title">Learning Mode</div>
+      <div class="sl-mc-desc">Feedback after each verse. Build knowledge gradually.</div>
+    </div>
+    <div class="sl-mode-card" onclick="slOpenSetup('challenge')">
+      <div class="sl-mc-icon">⚡</div>
+      <div class="sl-mc-title">Challenge Mode</div>
+      <div class="sl-mc-desc">Answer all, then review. Tests true recall under pressure.</div>
+    </div>
+    <div class="sl-mode-card" onclick="slOpenDaily()">
+      <div class="sl-mc-icon">📅</div>
+      <div class="sl-mc-title">Daily Challenge</div>
+      <div class="sl-mc-desc">5 verses, same for everyone. Build a streak. Resets at midnight.</div>
+    </div>
+    <div class="sl-mode-card" onclick="slStartStudy()">
+      <div class="sl-mc-icon">🔍</div>
+      <div class="sl-mc-title">Study Mode</div>
+      <div class="sl-mc-desc">Browse all 100 verses with context. Self-test with blurred answers.</div>
+    </div>
+  </div>
+  <div class="brow" style="margin-top:6px;">
+    <button class="bghost" onclick="slOpenStats()">📊 Stats &amp; Achievements</button>
+    <button class="bghost" onclick="showScreen('s-title')">← Chronicles</button>
+  </div>
+</div>
+
+<!-- SCRIPTURE LOCATOR: Setup -->
+<div id="sl-setup" class="screen">
+  <div style="text-align:center;padding:24px 0 16px;">
+    <div class="mtitle" style="font-size:clamp(18px,4vw,24px);" id="sl-setup-title">Learning Mode — Setup</div>
+  </div>
+  <div class="ubox" style="max-width:500px;">
+    <div class="setup-section">
+      <div class="setup-label">Difficulty</div>
+      <div class="setup-row">
+        <button class="setup-opt" data-g="diff" data-v="easy" onclick="slSetSetup(this)">Easy</button>
+        <button class="setup-opt active" data-g="diff" data-v="medium" onclick="slSetSetup(this)">Medium</button>
+        <button class="setup-opt" data-g="diff" data-v="hard" onclick="slSetSetup(this)">Hard</button>
+      </div>
+    </div>
+    <div class="setup-section">
+      <div class="setup-label">Testament</div>
+      <div class="setup-row">
+        <button class="setup-opt active" data-g="test" data-v="all" onclick="slSetSetup(this)">Both</button>
+        <button class="setup-opt" data-g="test" data-v="old" onclick="slSetSetup(this)">Old Testament</button>
+        <button class="setup-opt" data-g="test" data-v="new" onclick="slSetSetup(this)">New Testament</button>
+      </div>
+    </div>
+    <div class="setup-section">
+      <div class="setup-label">Questions</div>
+      <div class="setup-row">
+        <button class="setup-opt" data-g="numQ" data-v="5" onclick="slSetSetup(this)">5</button>
+        <button class="setup-opt" data-g="numQ" data-v="10" onclick="slSetSetup(this)">10</button>
+        <button class="setup-opt active" data-g="numQ" data-v="15" onclick="slSetSetup(this)">15</button>
+        <button class="setup-opt" data-g="numQ" data-v="20" onclick="slSetSetup(this)">20</button>
+      </div>
+    </div>
+    <div id="sl-pool-note" class="pool-note"></div>
+    <div class="brow" style="margin:16px 0 0;">
+      <button class="bgold" id="sl-start-btn" onclick="slStartGameWithSettings()">Begin →</button>
+      <button class="bghost" onclick="slGoHome()">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPTURE LOCATOR: Daily -->
+<div id="sl-daily" class="screen">
+  <div style="text-align:center;padding:24px 0 12px;">
+    <span style="font-size:40px;display:block;margin-bottom:6px;">📅</span>
+    <div class="mtitle" style="font-size:clamp(18px,4vw,24px);">Daily Challenge</div>
+    <div id="sl-daily-date-lbl" style="font-family:'Cinzel',serif;font-size:12px;color:var(--gold-dim);letter-spacing:2px;margin-bottom:16px;"></div>
+  </div>
+  <div class="ubox" style="max-width:440px;">
+    <div class="strow" style="margin-bottom:14px;">
+      <div class="stpill"><div class="stn" id="sl-d-streak">0</div><div class="stl">🔥 Streak</div></div>
+      <div class="stpill"><div class="stn" id="sl-d-best">0</div><div class="stl">Best</div></div>
+      <div class="stpill"><div class="stn" id="sl-d-total">0</div><div class="stl">Days Played</div></div>
+    </div>
+    <div id="sl-daily-done-card" style="display:none;background:rgba(39,174,96,.1);border:1px solid rgba(39,174,96,.3);border-radius:8px;padding:12px;text-align:center;margin-bottom:12px;">
+      <div style="font-family:'Cinzel',serif;font-size:13px;color:#15803d;letter-spacing:1px;">Today's Challenge Complete ✓</div>
+      <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--parch);margin:4px 0;" id="sl-daily-done-score">—%</div>
+      <div style="font-size:12px;color:var(--parch3);">Come back tomorrow for a new set!</div>
+    </div>
+    <p style="font-size:13px;color:var(--parch2);text-align:center;margin-bottom:14px;line-height:1.7;">5 verses · same for all players today · difficulty: medium</p>
+    <div class="brow" style="margin:0;">
+      <button class="bgold" id="sl-daily-start-btn" onclick="slStartDailyChallenge()">Begin Today's Challenge →</button>
+    </div>
+  </div>
+  <div class="brow"><button class="bghost" onclick="slGoHome()">← Back</button></div>
+</div>
+
+<!-- SCRIPTURE LOCATOR: Quiz -->
+<div id="sl-quiz" class="screen">
+  <div class="sl-quiz-hdr">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span id="sl-q-progress" style="font-family:'Cinzel',serif;font-size:12px;color:var(--gold-dim);letter-spacing:1px;"></span>
+      <span id="sl-q-score" style="font-family:'Cinzel',serif;font-size:13px;color:var(--gold2);font-weight:700;"></span>
+    </div>
+    <div style="margin-bottom:8px;">
+      <div class="stage-pip"></div><div class="stage-pip"></div><div class="stage-pip"></div><div class="stage-pip"></div>
+    </div>
+    <div id="sl-streak-tag" style="display:none;align-items:center;gap:5px;margin-bottom:6px;">
+      <span style="font-size:14px;">🔥</span>
+      <span id="sl-streak-num" style="font-family:'Cinzel',serif;font-size:13px;color:#b45309;font-weight:700;"></span>
+      <span style="font-size:11px;color:var(--parch3);">streak</span>
+    </div>
+  </div>
+  <div class="verse-card">
+    <div class="vc-lbl">Verse</div>
+    <div id="sl-q-verse" class="vc-text"></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;">
+      <button class="sl-sm-btn" onclick="slReadVerse()">🔊 Read</button>
+      <button id="sl-ch-reveal-btn" class="sl-sm-btn" style="display:none;" onclick="slChallengeReveal()">📍 Peek at reference</button>
+    </div>
+    <div id="sl-reveal-banner" style="display:none;font-family:'Cinzel',serif;font-size:12px;color:var(--gold-dim);letter-spacing:1px;margin-top:8px;padding:6px 10px;background:rgba(139,105,20,.1);border-radius:4px;"></div>
+    <div id="sl-q-pills" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;"></div>
+    <div id="sl-bonus-pop" style="display:none;font-family:'Cinzel',serif;font-size:13px;color:#b45309;font-weight:700;margin-top:6px;animation:cpop .3s ease;">+5 Bonus! 🔥</div>
+  </div>
+  <div id="sl-stage-lbl" style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;margin:14px 0 8px;text-align:center;"></div>
+  <div id="sl-opts" class="opts"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap;gap:8px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button id="sl-hint-btn" class="sl-sm-btn" onclick="slUseHint()">💡 Use Hint (3 left)</button>
+      <span id="sl-hint-count-lbl" style="font-size:11px;color:var(--parch3);"></span>
+    </div>
+    <button class="sl-sm-btn" style="color:var(--parch3);" onclick="slSkipQuestion()">Skip →</button>
+  </div>
+  <span id="sl-hint-badge" style="display:none;"></span>
+</div>
+
+<!-- SCRIPTURE LOCATOR: Question Result (Learning Mode) -->
+<div id="sl-qresult" class="screen">
+  <div style="text-align:center;padding:20px 0 10px;">
+    <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:12px;">Question Result</div>
+  </div>
+  <div class="sl-panel">
+    <div id="sl-qr-verse" style="font-style:italic;font-size:15px;line-height:1.8;color:var(--parch);margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(139,105,20,.15);"></div>
+    <div id="sl-qr-rc"></div>
+    <div id="sl-qr-expl" style="font-size:13px;color:var(--parch2);font-style:italic;margin-top:12px;line-height:1.6;"></div>
+    <div id="sl-qr-meta" style="font-family:'Cinzel',serif;font-size:12px;color:var(--gold-dim);margin-top:8px;letter-spacing:1px;"></div>
+  </div>
+  <div class="brow" style="margin-top:14px;">
+    <button class="bgold" id="sl-qr-next">Next Question →</button>
+    <button class="bghost" onclick="slGoHome()">Quit</button>
+  </div>
+</div>
+
+<!-- SCRIPTURE LOCATOR: Final Results -->
+<div id="sl-results" class="screen">
+  <div style="text-align:center;padding:20px 0 12px;">
+    <div id="sl-res-title" style="font-family:'Playfair Display',serif;font-size:clamp(20px,5vw,32px);font-weight:700;color:var(--gold2);margin-bottom:10px;"></div>
+    <div class="srev" style="margin-bottom:8px;">
+      <div id="sl-acc-num" style="font-family:'Playfair Display',serif;font-size:52px;font-weight:900;color:var(--gold2);line-height:1;"></div>
+      <div id="sl-acc-lbl" style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;color:var(--gold-dim);margin-top:4px;"></div>
+    </div>
+    <div id="sl-streak-summary" style="font-size:13px;color:var(--parch2);font-style:italic;min-height:18px;margin-bottom:4px;"></div>
+  </div>
+  <div id="sl-stats-grid" class="sl-stats-grid" style="margin-bottom:14px;"></div>
+  <div id="sl-new-achievements" style="display:none;margin-bottom:14px;">
+    <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:8px;">New Achievements</div>
+    <div id="sl-new-ach-list" class="ach-grid"></div>
+  </div>
+  <div id="sl-challenge-bd"></div>
+  <div class="brow">
+    <button class="bgold" id="sl-play-again-btn">Play Again</button>
+    <button class="bghost" onclick="slOpenStats()">📊 Stats</button>
+    <button class="bghost" onclick="slGoHome()">← Home</button>
+  </div>
+</div>
+
+<!-- SCRIPTURE LOCATOR: Stats & Achievements -->
+<div id="sl-stats" class="screen">
+  <div style="text-align:center;padding:20px 0 14px;">
+    <div class="lbttl">📊 Your Stats</div>
+  </div>
+  <div id="sl-ov-stats" class="sl-stats-grid" style="margin-bottom:18px;"></div>
+  <div id="sl-stage-bars" class="sl-panel" style="margin-bottom:14px;"></div>
+  <div id="sl-ach-section" class="sl-panel" style="margin-bottom:14px;"></div>
+  <div class="brow">
+    <button class="bghost" onclick="slGoHome()">← Home</button>
+    <button class="bghost" style="color:var(--red2);border-color:rgba(192,57,43,.3);" onclick="slResetStats()">Reset Stats</button>
+  </div>
+</div>
+
+<!-- SCRIPTURE LOCATOR: Study -->
+<div id="sl-study" class="screen">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0 10px;flex-wrap:wrap;gap:8px;">
+    <div id="sl-s-prog" style="font-family:'Cinzel',serif;font-size:12px;color:var(--gold-dim);letter-spacing:1px;"></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="tog" id="sl-tog-shuf" onclick="slToggleShuffle()">Shuffle: OFF</button>
+      <button class="tog" id="sl-tog-rev" onclick="slToggleReveal()">Self-Test: OFF</button>
+    </div>
+  </div>
+  <div class="study-card">
+    <div class="blur-wrap" id="sl-s-answer-wrap">
+      <div id="sl-s-ref" style="font-family:'Cinzel',serif;font-size:13px;color:var(--gold);letter-spacing:1px;margin-bottom:10px;"></div>
+    </div>
+    <button id="sl-s-reveal-btn" class="sl-sm-btn" style="display:none;margin-bottom:12px;" onclick="slRevealAnswer()">👁 Reveal Reference</button>
+    <div id="sl-s-verse" style="font-size:clamp(14px,3vw,17px);line-height:1.9;color:var(--parch);font-style:italic;margin-bottom:14px;"></div>
+    <div id="sl-s-ctx" style="font-size:13px;color:var(--parch2);line-height:1.7;border-top:1px solid rgba(139,105,20,.15);padding-top:12px;"></div>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;justify-content:space-between;align-items:center;">
+      <button id="sl-s-learn-btn" class="learn-btn" onclick="slToggleLearned()">⭐ Mark Learned</button>
+      <button class="sl-sm-btn" onclick="slReadStudyVerse()">🔊 Read Aloud</button>
+    </div>
+  </div>
+  <div class="brow" style="margin-top:12px;">
+    <button class="bgold" onclick="slNextStudyVerse()">Next Verse →</button>
+    <button class="bghost" onclick="slGoHome()">← Home</button>
+  </div>
+  <div id="sl-s-footer" style="text-align:center;font-size:11px;color:var(--parch3);margin-top:8px;font-style:italic;"></div>
+</div>
+
 <!-- MINI-GAME (Android Optimized with Touch-Drag) -->
 <div id="s-minigame" class="screen">
   <div class="portrait-warning" id="portraitWarning">
@@ -785,7 +1123,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 
 </div>
 
-<!-- JS modules — load order matters: data → core → user → quiz → minigame → level1 → level2 → level3 → level4 -->
+<!-- JS modules — load order matters: data → core → user → quiz → minigame → level1 → level2 → level3 → level4 → sl-data → scripture-locator -->
 <script src="js/data.js"></script>
 <script src="js/core.js"></script>
 <script src="js/user.js"></script>
@@ -795,5 +1133,7 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 <script src="js/level2.js"></script>
 <script src="js/level3.js"></script>
 <script src="js/level4.js"></script>
+<script src="js/sl-data.js"></script>
+<script src="js/scripture-locator.js"></script>
 </body>
 </html>
