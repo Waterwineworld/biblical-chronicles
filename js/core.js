@@ -369,7 +369,7 @@ function setBodyScrollLock(lock) {
   function resize(){W=c.width=innerWidth;H=c.height=innerHeight;}
   resize();window.addEventListener('resize',resize);
   for(let i=0;i<90;i++)pts.push({x:Math.random(),y:Math.random(),r:Math.random()*1.5+.3,spd:Math.random()*.0003+.00008,op:Math.random()*.4+.1,ph:Math.random()*6.28});
-  function draw(){ctx.clearRect(0,0,W,H);const g=ctx.createRadialGradient(W/2,H*.7,0,W/2,H*.7,H*.8);g.addColorStop(0,'rgba(25,10,5,0.25)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);pts.forEach(p=>{p.ph+=p.spd*60;ctx.beginPath();ctx.arc(p.x*W,p.y*H,p.r,0,6.28);ctx.fillStyle=`rgba(255,245,220,${p.op*(0.6+0.4*Math.sin(p.ph))})`;ctx.fill();});requestAnimationFrame(draw);}
+  function draw(){ctx.clearRect(0,0,W,H);const g=ctx.createRadialGradient(W/2,H*.6,0,W/2,H*.6,H*.85);g.addColorStop(0,'rgba(200,160,80,0.04)');g.addColorStop(1,'rgba(200,160,80,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);pts.forEach(p=>{p.ph+=p.spd*60;ctx.beginPath();ctx.arc(p.x*W,p.y*H,p.r,0,6.28);ctx.fillStyle=`rgba(139,105,20,${p.op*0.22*(0.5+0.5*Math.sin(p.ph))})`;ctx.fill();});requestAnimationFrame(draw);}
   draw();
 })();
 
