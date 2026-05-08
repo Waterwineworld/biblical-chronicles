@@ -28,6 +28,11 @@ function slPlayAgain() {
   slOpenSetup(SLG.mode);
 }
 
+function slQuit() {
+  if (!confirm('Quit this game? Your progress will be lost.')) return;
+  slGoHome();
+}
+
 // ── Verse pool + setup ────────────────────────────────────────
 function slGetVersePool() {
   let pool = [...SL_VERSES];
