@@ -737,13 +737,9 @@ function showStoneQuestionOverlay(q, reward, onDone) {
 
   const ov = document.createElement('div');
   ov.id = 'mgQOverlay';
-  ov.style.cssText = [
-    'position:fixed', 'inset:0', 'background:rgba(0,0,0,0.92)',
-    'backdrop-filter:blur(12px)', 'z-index:10001',
-    'display:flex', 'flex-direction:column', 'align-items:center',
-    'justify-content:center', 'padding:20px', 'gap:12px',
-    'font-family:"Cinzel",serif', 'text-align:center',
-  ].join(';');
+
+  // Detect landscape on short screens — needs different layout
+  const ls = window.matchMedia('(orientation:landscape) and (max-height:600px)').matches;
 
   const optsHtml = q.type === 'mcq'
     ? '<div class="stone-q-opts">' + q.opts.map((o, i) =>
@@ -753,16 +749,32 @@ function showStoneQuestionOverlay(q, reward, onDone) {
     : '<input class="stone-q-fill" id="sqFill" placeholder="Type your answer..." autocomplete="off" spellcheck="false">' +
       '<button class="shop-continue-btn" id="sqSubmit" style="width:100%;margin-top:4px;">✓ Submit Answer</button>';
 
-  ov.innerHTML = `
-    <div style="color:#e8c96a;font-size:11px;letter-spacing:2px;margin-bottom:4px;">
-      🪨 ANSWER CORRECTLY TO EARN +${reward} STONE${reward > 1 ? 'S' : ''}
-    </div>
-    <div class="stone-q-panel" style="max-height:80vh;overflow-y:auto;">
-      <div class="stone-q-text">${q.q}</div>
-      ${optsHtml}
-      <div id="sqFeedback" style="margin-top:12px;font-size:13px;min-height:20px;line-height:1.6;"></div>
-    </div>
-  `;
+  if (ls) {
+    // ── Landscape: full-screen two-column split, no scrolling needed ──
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);z-index:10001;display:flex;align-items:stretch;font-family:"Cinzel",serif;';
+    ov.innerHTML = `
+      <div id="sqLeft" style="flex:1;padding:14px 12px 14px 16px;overflow-y:auto;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(201,168,76,.2);font-family:'Playfair Display',serif;font-size:13px;color:#fff;line-height:1.5;text-align:left;">
+        ${q.q}
+      </div>
+      <div id="sqRight" style="flex:1;padding:10px 16px 10px 12px;display:flex;flex-direction:column;overflow-y:auto;text-align:left;">
+        <div style="font-size:10px;color:#e8c96a;letter-spacing:1.5px;margin-bottom:8px;text-align:center;">+${reward} 🪨 ANSWER CORRECTLY</div>
+        ${optsHtml}
+        <div id="sqFeedback" style="margin-top:8px;font-size:12px;min-height:16px;line-height:1.5;"></div>
+      </div>`;
+  } else {
+    // ── Portrait: original centred layout ──
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);z-index:10001;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:12px;font-family:"Cinzel",serif;text-align:center;';
+    ov.innerHTML = `
+      <div style="color:#e8c96a;font-size:11px;letter-spacing:2px;margin-bottom:4px;">
+        🪨 ANSWER CORRECTLY TO EARN +${reward} STONE${reward > 1 ? 'S' : ''}
+      </div>
+      <div class="stone-q-panel" style="max-height:80vh;overflow-y:auto;">
+        <div class="stone-q-text">${q.q}</div>
+        ${optsHtml}
+        <div id="sqFeedback" style="margin-top:12px;font-size:13px;min-height:20px;line-height:1.6;"></div>
+      </div>`;
+  }
+
   document.body.appendChild(ov);
 
   let answered = false;
@@ -796,7 +808,9 @@ function showStoneQuestionOverlay(q, reward, onDone) {
     continueBtn.style.width = '100%';
     continueBtn.textContent = correct ? '⚔️ Back to Battle!' : '⚔️ Continue Fighting';
     continueBtn.addEventListener('click', () => { ov.remove(); onDone(); });
-    document.querySelector('.stone-q-panel')?.appendChild(continueBtn);
+    // Append to right panel (landscape) or stone-q-panel (portrait)
+    const panelEl = document.getElementById('sqRight') || document.querySelector('.stone-q-panel');
+    panelEl?.appendChild(continueBtn);
   }
 
   if (q.type === 'mcq') {
