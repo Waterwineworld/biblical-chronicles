@@ -738,8 +738,10 @@ function showStoneQuestionOverlay(q, reward, onDone) {
   const ov = document.createElement('div');
   ov.id = 'mgQOverlay';
 
-  // Detect landscape on short screens — needs different layout
-  const ls = window.matchMedia('(orientation:landscape) and (max-height:600px)').matches;
+  // Reliable mobile landscape detection — matchMedia orientation is unreliable on some
+  // Android browsers; comparing innerHeight/innerWidth works on all devices.
+  // max-height:500px matches our CSS breakpoint (all phones in landscape, no portrait phones).
+  const ls = window.innerHeight < window.innerWidth && window.innerHeight < 500;
 
   const optsHtml = q.type === 'mcq'
     ? '<div class="stone-q-opts">' + q.opts.map((o, i) =>
@@ -854,14 +856,8 @@ function showLifeRedemptionQuestion(onRestored, onGameOver) {
   const q  = pickLifeQuestion();
   const ov = document.createElement('div');
   ov.id = 'mgLifeQOverlay';
-  ov.style.cssText = [
-    'position:fixed', 'inset:0',
-    'background:linear-gradient(160deg,rgba(8,4,16,0.97),rgba(16,6,8,0.98))',
-    'backdrop-filter:blur(14px)', 'z-index:10002',
-    'display:flex', 'flex-direction:column', 'align-items:center',
-    'justify-content:center', 'padding:20px', 'gap:10px',
-    'font-family:"Cinzel",serif', 'text-align:center', 'color:#e8c96a',
-  ].join(';');
+  // Reliable mobile landscape detection
+  const ls = window.innerHeight < window.innerWidth && window.innerHeight < 500;
 
   const optsHtml = q.type === 'mcq'
     ? '<div class="stone-q-opts">' + q.opts.map((o, i) =>
@@ -871,24 +867,50 @@ function showLifeRedemptionQuestion(onRestored, onGameOver) {
     : '<input class="stone-q-fill" id="sqLifeFill" placeholder="Type your answer..." autocomplete="off" spellcheck="false">' +
       '<button class="shop-continue-btn" id="sqLifeSubmit" style="width:100%;margin-top:4px;">✓ Submit Answer</button>';
 
-  ov.innerHTML = `
-    <div style="font-size:36px;margin-bottom:2px;">✝️</div>
-    <div style="font-size:clamp(16px,4vw,20px);color:#e8c96a;font-weight:bold;">One More Chance!</div>
-    <div style="font-size:12px;color:#d4c4a0;font-style:italic;max-width:340px;line-height:1.7;">
-      "The righteous may fall seven times, but they rise again."<br>
-      <span style="font-size:10px;color:#b8a880;">— Proverbs 24:16</span>
-    </div>
-    <div style="font-size:11px;color:#ffcc88;margin-top:2px;">
-      Answer correctly to restore ❤️ and continue the battle!
-    </div>
-    ${!isPremium() ? '<div class="stone-diff-card" onclick="handleWatchVideoForLife()" style="border-left:3px solid #4488cc;width:min(300px,88vw);margin:0 auto;"><div><div class="diff-label" style="color:#88ccff;font-size:12px;">🎬 Watch Video Instead</div><div class="diff-desc" style="font-size:11px;">Skip the question</div></div><div class="diff-reward" style="color:#88ccff;font-size:14px;">❤️ +1</div></div>' : ''}
-    ${isPremium() && hasDailyLifeAvailable() ? '<div class="stone-diff-card" onclick="handleDailyLifeClaim()" style="border-left:3px solid #5ddb8e;width:min(300px,88vw);margin:0 auto;"><div><div class="diff-label" style="color:#5ddb8e;font-size:12px;">🌟 Daily Free Life</div><div class="diff-desc" style="font-size:11px;">Premium — once per day</div></div><div class="diff-reward" style="color:#5ddb8e;font-size:14px;">❤️ +1</div></div>' : ''}
-    <div class="stone-q-panel" style="max-height:60vh;overflow-y:auto;margin-top:6px;">
-      <div class="stone-q-text">${q.q}</div>
-      ${optsHtml}
-      <div id="sqLifeFeedback" style="margin-top:12px;font-size:13px;min-height:20px;line-height:1.6;"></div>
-    </div>
-  `;
+  if (ls) {
+    // Landscape: two-column split layout — no scrolling needed
+    ov.style.cssText = 'position:fixed;inset:0;background:linear-gradient(160deg,rgba(8,4,16,0.97),rgba(16,6,8,0.98));backdrop-filter:blur(14px);z-index:10002;display:flex;align-items:stretch;font-family:"Cinzel",serif;color:#e8c96a;';
+    ov.innerHTML = `
+      <div id="sqLifeLeft" style="flex:1;padding:14px 12px 14px 16px;overflow-y:auto;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(201,168,76,.2);">
+        <div style="font-size:11px;color:#e8c96a;letter-spacing:1.5px;margin-bottom:6px;">✝️ ONE MORE CHANCE</div>
+        ${!isPremium() ? '<div class="stone-diff-card" onclick="handleWatchVideoForLife()" style="border-left:3px solid #4488cc;width:100%;margin:0 0 6px;"><div><div class="diff-label" style="color:#88ccff;font-size:11px;">🎬 Watch Video Instead</div></div><div class="diff-reward" style="color:#88ccff;font-size:13px;">❤️ +1</div></div>' : ''}
+        ${isPremium() && hasDailyLifeAvailable() ? '<div class="stone-diff-card" onclick="handleDailyLifeClaim()" style="border-left:3px solid #5ddb8e;width:100%;margin:0 0 6px;"><div><div class="diff-label" style="color:#5ddb8e;font-size:11px;">🌟 Daily Free Life</div></div><div class="diff-reward" style="color:#5ddb8e;font-size:13px;">❤️ +1</div></div>' : ''}
+        <div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;line-height:1.5;">${q.q}</div>
+      </div>
+      <div id="sqLifeRight" style="flex:1;padding:10px 16px 10px 12px;display:flex;flex-direction:column;overflow-y:auto;">
+        <div style="font-size:10px;color:#e8c96a;letter-spacing:1px;margin-bottom:8px;text-align:center;">Answer correctly to restore ❤️ and continue the battle!</div>
+        ${optsHtml}
+        <div id="sqLifeFeedback" style="margin-top:8px;font-size:12px;min-height:16px;line-height:1.5;"></div>
+      </div>`;
+  } else {
+    // Portrait: original centred stack layout
+    ov.style.cssText = [
+      'position:fixed', 'inset:0',
+      'background:linear-gradient(160deg,rgba(8,4,16,0.97),rgba(16,6,8,0.98))',
+      'backdrop-filter:blur(14px)', 'z-index:10002',
+      'display:flex', 'flex-direction:column', 'align-items:center',
+      'justify-content:center', 'padding:20px', 'gap:10px',
+      'font-family:"Cinzel",serif', 'text-align:center', 'color:#e8c96a',
+    ].join(';');
+    ov.innerHTML = `
+      <div style="font-size:36px;margin-bottom:2px;">✝️</div>
+      <div style="font-size:clamp(16px,4vw,20px);color:#e8c96a;font-weight:bold;">One More Chance!</div>
+      <div style="font-size:12px;color:#d4c4a0;font-style:italic;max-width:340px;line-height:1.7;">
+        "The righteous may fall seven times, but they rise again."<br>
+        <span style="font-size:10px;color:#b8a880;">— Proverbs 24:16</span>
+      </div>
+      <div style="font-size:11px;color:#ffcc88;margin-top:2px;">
+        Answer correctly to restore ❤️ and continue the battle!
+      </div>
+      ${!isPremium() ? '<div class="stone-diff-card" onclick="handleWatchVideoForLife()" style="border-left:3px solid #4488cc;width:min(300px,88vw);margin:0 auto;"><div><div class="diff-label" style="color:#88ccff;font-size:12px;">🎬 Watch Video Instead</div><div class="diff-desc" style="font-size:11px;">Skip the question</div></div><div class="diff-reward" style="color:#88ccff;font-size:14px;">❤️ +1</div></div>' : ''}
+      ${isPremium() && hasDailyLifeAvailable() ? '<div class="stone-diff-card" onclick="handleDailyLifeClaim()" style="border-left:3px solid #5ddb8e;width:min(300px,88vw);margin:0 auto;"><div><div class="diff-label" style="color:#5ddb8e;font-size:12px;">🌟 Daily Free Life</div><div class="diff-desc" style="font-size:11px;">Premium — once per day</div></div><div class="diff-reward" style="color:#5ddb8e;font-size:14px;">❤️ +1</div></div>' : ''}
+      <div class="stone-q-panel" style="max-height:60vh;overflow-y:auto;margin-top:6px;">
+        <div class="stone-q-text">${q.q}</div>
+        ${optsHtml}
+        <div id="sqLifeFeedback" style="margin-top:12px;font-size:13px;min-height:20px;line-height:1.6;"></div>
+      </div>
+    `;
+  }
   document.body.appendChild(ov);
 
   let answered = false;
@@ -936,7 +958,9 @@ function showLifeRedemptionQuestion(onRestored, onGameOver) {
         onGameOver();
       });
     }
-    document.querySelector('#mgLifeQOverlay .stone-q-panel')?.appendChild(continueBtn);
+    // Append to right column (landscape) or stone-q-panel (portrait)
+    const lifePanelEl = document.getElementById('sqLifeRight') || document.querySelector('#mgLifeQOverlay .stone-q-panel');
+    lifePanelEl?.appendChild(continueBtn);
   }
 
   if (q.type === 'mcq') {

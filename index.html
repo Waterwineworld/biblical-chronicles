@@ -600,52 +600,58 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   .stone-q-opt{padding:8px 12px;}
 }
 @media (max-height:700px){
-  .stone-q-panel{max-height:72dvh;overflow-y:auto;}
-}
-@media (orientation:landscape) and (max-height:600px){
-  /* Hide all header chrome — question area gets the full screen */
-  .mg-stone-shop{gap:0;padding:0;}
-  .mg-stone-shop > h3{display:none;}
-  .mg-stone-shop > .shop-sub{display:none;}
-  /* Difficulty selection: widen cards, keep centred on overlay */
-  .stone-diff-card{padding:8px 14px;width:min(540px,90vw);}
-  /* Question panel: full-screen two-column grid */
-  .stone-q-panel{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    grid-template-rows:1fr auto;
-    column-gap:14px;
-    width:100vw;
-    height:100dvh;
-    max-height:none;
-    overflow:hidden;
-    padding:12px 16px;
-    border-radius:0;
-  }
-  /* Left column: question text spanning both rows */
-  .stone-q-text{
-    grid-column:1;
-    grid-row:1/3;
-    margin-bottom:0;
-    overflow-y:auto;
-    border-right:1px solid rgba(201,168,76,.15);
-    padding-right:12px;
-    font-size:13px;
-    line-height:1.5;
-    display:flex;
-    align-items:center;
-  }
-  /* Right column top: answer options */
-  .stone-q-opts{grid-column:2;grid-row:1;overflow-y:auto;gap:6px;}
-  /* Right column bottom: continue button after answering */
-  .shop-continue-btn{grid-column:2;grid-row:2;margin-top:8px;}
-  .stone-q-opt{padding:8px 12px;font-size:12px;}
-  .stone-q-fill{padding:9px 12px;font-size:13px;margin-bottom:6px;}
+  .stone-q-panel{max-height:72svh;overflow-y:auto;}
 }
 @media (max-height:650px){
   #s-game{padding-top:6px;}
   .ghdr{padding:6px 10px;margin-bottom:8px;}
   .pbar{margin-bottom:8px;}
+}
+/* ========== LANDSCAPE MOBILE LAYOUT ========== */
+/* max-height:500px reliably triggers on all phones in landscape.
+   Portrait phones are typically 568px+ tall so this won't fire in portrait. */
+@media (max-height:500px){
+  /* Reclaim vertical space from global app wrapper */
+  #app{padding-bottom:8px;min-height:unset;}
+  /* ── Main quiz (#s-game) header compression ── */
+  #s-game{padding-top:2px;}
+  .ghdr{padding:4px 10px;margin-bottom:4px;flex-wrap:nowrap;}
+  .hep,.huser{display:none;}
+  .pbar{display:none!important;}
+  .streak-banner{display:none!important;}
+  .qctr{display:none;}
+  /* ── Two-column challenge panel ──
+     Left column: question (.chdr)
+     Right column: timer (.twrap) + options (.owrap/.fwrap) + feedback (.afb) */
+  .cpanel{
+    overflow:visible!important;
+    margin-bottom:4px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:auto 1fr auto;
+  }
+  .chdr{
+    grid-column:1;
+    grid-row:1/4;
+    border-bottom:none!important;
+    border-right:1px solid rgba(201,168,76,.15);
+    padding:10px 14px;
+    overflow-y:auto;
+    max-height:calc(100svh - 52px);
+  }
+  .chdr .cq{font-size:clamp(12px,2.5vw,14px);}
+  .chdr .ctype{font-size:10px;margin-bottom:2px;}
+  .chdr .chint-btn{font-size:10px;padding:3px 8px;margin-top:4px;}
+  .twrap{grid-column:2;grid-row:1;padding:6px 10px 2px;margin-top:0;}
+  .owrap{grid-column:2;grid-row:2;padding:4px 8px 4px;gap:5px;overflow-y:auto;}
+  .fwrap{grid-column:2;grid-row:2;padding:4px 8px;}
+  .afb{grid-column:2;grid-row:3;margin:0 6px 6px;padding:7px 10px;}
+  .obtn{padding:7px 10px;font-size:11px;gap:8px;line-height:1.3;}
+  .olet{width:22px;height:22px;font-size:11px;}
+  .finp{padding:9px 12px;font-size:14px;margin-bottom:7px;}
+  /* ── SL quiz header compression ── */
+  .sl-quiz-hdr{padding:0;}
+  .stage-pip{width:20px;margin-right:3px;}
 }
 
 /* ========== PARCHMENT PANEL OVERRIDES ========== */
@@ -673,14 +679,15 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 .portrait-warning small{color:#b8a880!important;}
 /* SL Quiz two-column landscape layout */
 .sl-quiz-body{display:flex;flex-direction:column;gap:8px;}
-@media (orientation:landscape) and (max-height:500px){
+@media (max-height:500px){
   .sl-quiz-body{flex-direction:row;align-items:flex-start;gap:10px;}
   .sl-quiz-left,.sl-quiz-right{flex:1;min-width:0;}
-  .sl-quiz-left .verse-card{max-height:calc(100dvh - 110px);overflow-y:auto;}
-  .sl-quiz-right{display:flex;flex-direction:column;gap:4px;}
+  .sl-quiz-left .verse-card{max-height:calc(100svh - 90px);overflow-y:auto;margin-bottom:0;}
+  .sl-quiz-right{display:flex;flex-direction:column;gap:4px;max-height:calc(100svh - 90px);overflow-y:auto;}
   #sl-opts.opts{grid-template-columns:1fr;}
   #sl-stage-lbl{margin-top:0!important;}
   .sl-quiz-hdr{margin-bottom:4px;}
+  .vc-text{font-size:clamp(12px,2.2vw,14px);line-height:1.6;}
 }
 
 /* ========== SCRIPTURE LOCATOR CSS ========== */
