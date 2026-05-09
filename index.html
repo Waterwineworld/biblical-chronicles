@@ -603,12 +603,47 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
   .stone-q-panel{max-height:72dvh;overflow-y:auto;}
 }
 @media (orientation:landscape) and (max-height:500px){
-  .mg-stone-shop{gap:5px;padding:8px 16px;}
-  .mg-stone-shop h3{font-size:15px;margin-bottom:0;}
+  /* Compress the entire overlay header */
+  .mg-stone-shop{gap:2px;padding:4px 10px;justify-content:flex-start;}
+  .mg-stone-shop h3{font-size:11px;margin-bottom:0;letter-spacing:0.5px;line-height:1.3;opacity:.85;}
   .mg-stone-shop .shop-sub{display:none;}
-  .stone-q-panel{display:flex;flex-direction:row;gap:14px;width:min(640px,92vw);max-height:none;overflow:visible;padding:14px 16px;}
-  .stone-q-text{flex:1;min-width:0;margin-bottom:0;max-height:calc(100dvh - 100px);overflow-y:auto;}
-  .stone-q-opts{flex:1;min-width:0;}
+  /* Difficulty selection cards: widen, shrink padding */
+  .stone-diff-card{padding:7px 12px;width:min(520px,90vw);}
+  /* Question panel: two-column grid — question left, options right */
+  .stone-q-panel{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:1fr auto;
+    column-gap:12px;
+    width:min(680px,96vw);
+    height:calc(100dvh - 30px);
+    max-height:none;
+    overflow:hidden;
+    padding:10px 14px;
+  }
+  .stone-q-text{
+    grid-column:1;
+    grid-row:1/3;
+    margin-bottom:0;
+    overflow-y:auto;
+    border-right:1px solid rgba(201,168,76,.15);
+    padding-right:10px;
+    font-size:12px;
+    line-height:1.4;
+  }
+  .stone-q-opts{
+    grid-column:2;
+    grid-row:1;
+    overflow-y:auto;
+    gap:5px;
+  }
+  .shop-continue-btn{
+    grid-column:2;
+    grid-row:2;
+    margin-top:6px;
+  }
+  .stone-q-opt{padding:7px 10px;font-size:12px;}
+  .stone-q-fill{padding:8px 10px;font-size:13px;margin-bottom:6px;}
 }
 @media (max-height:650px){
   #s-game{padding-top:6px;}
