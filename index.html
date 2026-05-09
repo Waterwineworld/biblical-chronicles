@@ -602,6 +602,14 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 @media (max-height:700px){
   .stone-q-panel{max-height:72dvh;overflow-y:auto;}
 }
+@media (orientation:landscape) and (max-height:500px){
+  .mg-stone-shop{gap:5px;padding:8px 16px;}
+  .mg-stone-shop h3{font-size:15px;margin-bottom:0;}
+  .mg-stone-shop .shop-sub{display:none;}
+  .stone-q-panel{display:flex;flex-direction:row;gap:14px;width:min(640px,92vw);max-height:none;overflow:visible;padding:14px 16px;}
+  .stone-q-text{flex:1;min-width:0;margin-bottom:0;max-height:calc(100dvh - 100px);overflow-y:auto;}
+  .stone-q-opts{flex:1;min-width:0;}
+}
 @media (max-height:650px){
   #s-game{padding-top:6px;}
   .ghdr{padding:6px 10px;margin-bottom:8px;}
