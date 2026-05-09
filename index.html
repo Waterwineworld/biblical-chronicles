@@ -602,48 +602,45 @@ body.mg-active{overflow:hidden;position:fixed;width:100%;height:100%;}
 @media (max-height:700px){
   .stone-q-panel{max-height:72dvh;overflow-y:auto;}
 }
-@media (orientation:landscape) and (max-height:500px){
-  /* Compress the entire overlay header */
-  .mg-stone-shop{gap:2px;padding:4px 10px;justify-content:flex-start;}
-  .mg-stone-shop h3{font-size:11px;margin-bottom:0;letter-spacing:0.5px;line-height:1.3;opacity:.85;}
-  .mg-stone-shop .shop-sub{display:none;}
-  /* Difficulty selection cards: widen, shrink padding */
-  .stone-diff-card{padding:7px 12px;width:min(520px,90vw);}
-  /* Question panel: two-column grid — question left, options right */
+@media (orientation:landscape) and (max-height:600px){
+  /* Hide all header chrome — question area gets the full screen */
+  .mg-stone-shop{gap:0;padding:0;}
+  .mg-stone-shop > h3{display:none;}
+  .mg-stone-shop > .shop-sub{display:none;}
+  /* Difficulty selection: widen cards, keep centred on overlay */
+  .stone-diff-card{padding:8px 14px;width:min(540px,90vw);}
+  /* Question panel: full-screen two-column grid */
   .stone-q-panel{
     display:grid;
     grid-template-columns:1fr 1fr;
     grid-template-rows:1fr auto;
-    column-gap:12px;
-    width:min(680px,96vw);
-    height:calc(100dvh - 30px);
+    column-gap:14px;
+    width:100vw;
+    height:100dvh;
     max-height:none;
     overflow:hidden;
-    padding:10px 14px;
+    padding:12px 16px;
+    border-radius:0;
   }
+  /* Left column: question text spanning both rows */
   .stone-q-text{
     grid-column:1;
     grid-row:1/3;
     margin-bottom:0;
     overflow-y:auto;
     border-right:1px solid rgba(201,168,76,.15);
-    padding-right:10px;
-    font-size:12px;
-    line-height:1.4;
+    padding-right:12px;
+    font-size:13px;
+    line-height:1.5;
+    display:flex;
+    align-items:center;
   }
-  .stone-q-opts{
-    grid-column:2;
-    grid-row:1;
-    overflow-y:auto;
-    gap:5px;
-  }
-  .shop-continue-btn{
-    grid-column:2;
-    grid-row:2;
-    margin-top:6px;
-  }
-  .stone-q-opt{padding:7px 10px;font-size:12px;}
-  .stone-q-fill{padding:8px 10px;font-size:13px;margin-bottom:6px;}
+  /* Right column top: answer options */
+  .stone-q-opts{grid-column:2;grid-row:1;overflow-y:auto;gap:6px;}
+  /* Right column bottom: continue button after answering */
+  .shop-continue-btn{grid-column:2;grid-row:2;margin-top:8px;}
+  .stone-q-opt{padding:8px 12px;font-size:12px;}
+  .stone-q-fill{padding:9px 12px;font-size:13px;margin-bottom:6px;}
 }
 @media (max-height:650px){
   #s-game{padding-top:6px;}
