@@ -618,9 +618,18 @@ function resumeGameFromOverlay() {
 }
 
 function removeShopOverlay() {
-  document.getElementById('mgShopOverlay')?.remove();
-  resumeGameFromOverlay();
-  updateStoneUI();
+  const ov    = document.getElementById('mgShopOverlay');
+  const sheet = ov?.querySelector('.mg-stone-shop');
+  if (ov && sheet) {
+    // Slide sheet back down before removing
+    sheet.style.transition = 'transform 0.26s cubic-bezier(0.32,0.72,0,1)';
+    sheet.style.transform  = 'translateY(100%)';
+    setTimeout(() => { ov.remove(); resumeGameFromOverlay(); updateStoneUI(); }, 260);
+  } else {
+    ov?.remove();
+    resumeGameFromOverlay();
+    updateStoneUI();
+  }
 }
 
 // ── Voluntary overlays (player-initiated during play) ─────────
@@ -719,10 +728,17 @@ function showStoneShop() {
   const userIsPremium = isLevel2Unlocked();
   const { easy, medium, hard } = getStoneQuestions();
 
+  // Backdrop — tapping outside the sheet also closes the shop
   const ov = document.createElement('div');
-  ov.id        = 'mgShopOverlay';
-  ov.className = 'mg-stone-shop';
-  ov.innerHTML =
+  ov.id = 'mgShopOverlay';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:9999;';
+  ov.addEventListener('click', e => { if (e.target === ov) removeShopOverlay(); });
+
+  // Bottom sheet panel
+  const sheet = document.createElement('div');
+  sheet.className = 'mg-stone-shop';
+  sheet.innerHTML =
+    '<div class="sheet-handle"></div>' +
     '<h3>🪨 Reload Your Sling</h3>' +
     '<p class="shop-sub">Choose a difficulty to answer a Bible question and earn more stones.<br>' +
     'You have <b id="shopStoneNum">' + mgStoneCount + '</b> stone' + (mgStoneCount !== 1 ? 's' : '') + ' left.</p>' +
@@ -733,6 +749,8 @@ function showStoneShop() {
     (!userIsPremium ? '<div class="stone-diff-card" id="sdVideo" style="border-left:3px solid #4488cc;margin-top:4px;"><div><div class="diff-label" style="color:#88ccff;">🎬 Watch Video</div><div class="diff-desc">30-second ad</div></div><div class="diff-reward" style="color:#88ccff;">+3 🪨</div></div>' : '') +
     (userIsPremium && hasDailyBonusAvailable() ? '<div class="stone-diff-card" id="sdDailyBonus" style="border-left:3px solid #5ddb8e;margin-top:4px;"><div><div class="diff-label" style="color:#5ddb8e;">🌟 Daily Blessing</div><div class="diff-desc">Premium — once per day</div></div><div class="diff-reward" style="color:#5ddb8e;">+2 🪨</div></div>' : '') +
     '<button id="sdQuit" style="background:transparent;border:none;color:rgba(255,255,255,.28);font-family:\'Cinzel\',serif;font-size:11px;letter-spacing:1px;padding:6px 12px;cursor:pointer;margin-top:6px;text-decoration:underline;text-underline-offset:3px;">← Quit to Home</button>';
+
+  ov.appendChild(sheet);
   document.body.appendChild(ov);
 
   ov.querySelector('#sdContinue')?.addEventListener('click', removeShopOverlay);

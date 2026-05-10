@@ -9,6 +9,19 @@
 //                        isLevel2Beaten, isLevel3Beaten)
 // ═══════════════════════════════════════════════════════════════
 
+// ── Animate a numeric value from 0 to target ──────────────────
+function animateValue(el, to, duration, fmt) {
+  if (!el || !to) return;
+  const format = fmt || (v => String(v));
+  const start  = performance.now();
+  (function tick(now) {
+    const p   = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3); // cubic ease-out
+    el.textContent = format(Math.round(to * ease));
+    if (p < 1) requestAnimationFrame(tick);
+  })(start);
+}
+
 // ── State ──────────────────────────────────────────────────────
 let username = '';
 let G = {
@@ -47,7 +60,7 @@ function renderEpisodes() {
   let html = EPS.map(ep => {
     const dots = [1, 2, 3].map(d => `<span class="ddot ${d <= ep.difficulty ? 'lit' : ''}"></span>`).join('');
     const done = completedEpisodes.has(ep.id);
-    return `<div class="ep-card ${done ? 'done-card' : ''}" onclick="startEp('${ep.id}')">${done ? '<div class="ep-done-tag">✓ Done</div>' : ''}<span class="ep-ico">${ep.icon}</span><div class="ep-num">${ep.num}</div><div class="ep-ttl">${ep.title}</div><div class="ep-bk">${ep.book}</div><div class="ep-dsc">${ep.desc}</div><div class="ep-dif">${dots}<span style="color:var(--parch3);font-size:10px;margin-left:5px;">${['', 'Easy', 'Medium', 'Hard'][ep.difficulty]}</span></div></div>`;
+    return `<div class="ep-card ${done ? 'done-card' : ''}" onclick="startEp('${ep.id}')">${done ? '<div class="ep-done-tag">✓</div>' : ''}<span class="ep-ico">${ep.icon}</span><div class="ep-num">${ep.num}</div><div class="ep-ttl">${ep.title}</div><div class="ep-bk">${ep.book}</div><div class="ep-dsc">${ep.desc}</div><div class="ep-dif">${dots}<span style="color:var(--parch3);font-size:10px;margin-left:5px;">${['', 'Easy', 'Medium', 'Hard'][ep.difficulty]}</span></div></div>`;
   }).join('');
   html += `<div class="ep-card special-card" onclick="startMiniGame()"><span class="ep-ico">⚔️</span><div class="special-badge">Mini-Game</div><div class="ep-ttl">David vs Goliath</div><div class="ep-bk">1 Samuel 17 · Full Control</div><div class="ep-dsc">Move David ANYWHERE, adjust launch ANGLE, charge power! True manual aiming. Stone flies with gravity.</div><div class="ep-dif"><span class="ddot lit"></span><span class="ddot lit"></span><span class="ddot lit"></span><span style="color:var(--ember);font-size:10px;margin-left:5px;">Skill</span></div></div>`;
   html += `<div class="ep-card" onclick="showScreen('sl-welcome')" style="border-color:rgba(139,105,20,.35);"><span class="ep-ico">📍</span><div class="ep-num" style="font-size:11px;letter-spacing:4px;color:var(--gold);">Word Game</div><div class="ep-ttl">Scripture Locator</div><div class="ep-bk" style="font-style:italic;">100 Verses · 4 Stages</div><div class="ep-dsc">Identify the testament, book, chapter, and verse of famous Bible passages.</div><div style="font-size:11px;color:var(--parch3);margin-top:4px;">Learning · Challenge · Daily · Study</div></div>`;
@@ -144,7 +157,11 @@ function showVerdict() {
   SoundFX.startMusic('leaderboard');
   showInterstitialAd(() => { setPhase('verdict'); });
 }
-function _verdictDirect() { const tot = G.ep.questions.length; const pct = tot > 0 ? Math.round(G.correct / tot * 100) : 0; const rank = RANKS.slice().reverse().find(r => pct >= r.min) || RANKS[0]; const v = VVERSES[Math.floor(Math.random() * VVERSES.length)]; G.pendingSave = { score: G.score, epId: G.ep.id, rank: rank.name, correct: G.correct, total: tot, speedPts: G.speedPts, streak: G.bestStreak }; document.getElementById('vcrown').textContent = rank.crown; document.getElementById('vplayer').textContent = '👤 ' + getUsername(); document.getElementById('vrank').textContent = rank.name; document.getElementById('vrank').className = `vrank ${rank.cls}`; document.getElementById('vsub').textContent = rank.sub; document.getElementById('vscore').textContent = G.score; document.getElementById('vcor').textContent = G.correct + '/' + tot; document.getElementById('vtot').textContent = pct + '%'; document.getElementById('vspd').textContent = G.speedPts; document.getElementById('vstr').textContent = G.bestStreak; document.getElementById('vverse').innerHTML = `"${v.text}"<cite>— ${v.ref}</cite>`; completedEpisodes.add(G.ep.id); localStorage.setItem('bc_completed', JSON.stringify([...completedEpisodes])); if (pct >= 90) { spawn('✨', 8); spawnConfetti(); } else if (pct >= 70) spawn('🌟', 5); showScreen('s-verdict');
+function _verdictDirect() { const tot = G.ep.questions.length; const pct = tot > 0 ? Math.round(G.correct / tot * 100) : 0; const rank = RANKS.slice().reverse().find(r => pct >= r.min) || RANKS[0]; const v = VVERSES[Math.floor(Math.random() * VVERSES.length)]; G.pendingSave = { score: G.score, epId: G.ep.id, rank: rank.name, correct: G.correct, total: tot, speedPts: G.speedPts, streak: G.bestStreak }; document.getElementById('vcrown').textContent = rank.crown; document.getElementById('vplayer').textContent = '👤 ' + getUsername(); document.getElementById('vrank').textContent = rank.name; document.getElementById('vrank').className = `vrank ${rank.cls}`; document.getElementById('vsub').textContent = rank.sub; animateValue(document.getElementById('vscore'), G.score,     1500);
+  animateValue(document.getElementById('vcor'),   G.correct,  900,  v => v + '/' + tot);
+  animateValue(document.getElementById('vtot'),   pct,        900,  v => v + '%');
+  animateValue(document.getElementById('vspd'),   G.speedPts, 1100);
+  animateValue(document.getElementById('vstr'),   G.bestStreak, 700); document.getElementById('vverse').innerHTML = `"${v.text}"<cite>— ${v.ref}</cite>`; completedEpisodes.add(G.ep.id); localStorage.setItem('bc_completed', JSON.stringify([...completedEpisodes])); if (pct >= 90) { spawn('✨', 8); spawnConfetti(); } else if (pct >= 70) spawn('🌟', 5); showScreen('s-verdict');
   // Show battle button only for David & Goliath episode
   const battleWrap = document.getElementById('battle-btn-wrap');
   if (battleWrap) battleWrap.style.display = G.ep.id === 'david-goliath' ? 'block' : 'none';
@@ -186,7 +203,52 @@ function replay() { if (G.ep) startEp(G.ep.id); }
 // ═══════════════════════════════════════════════════════════════
 function setTab(el) { document.querySelectorAll('.lbtab').forEach(t => t.classList.remove('act')); el.classList.add('act'); }
 function formatTs(ts) { if (!ts || !ts.seconds) return ''; const d = new Date(ts.seconds * 1000), now = new Date(); const diffDays = Math.floor((now - d) / (1000 * 60 * 60 * 24)); if (diffDays === 0) return 'Today'; if (diffDays === 1) return 'Yesterday'; if (diffDays < 7) return `${diffDays}d ago`; return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); }
-async function loadLB(epId) { const list = document.getElementById('lblist'); if (!list) return; list.innerHTML = '<div class="lbload">📜 Loading Hall of Prophets...</div>'; if (!db) { list.innerHTML = '<div class="lbload">Firebase not connected.</div>'; return; } const scores = await fsGet(epId); if (!scores.length) { list.innerHTML = '<div class="lbload">No scores yet — be the first!</div>'; return; } const medals = ['🥇', '🥈', '🥉']; const myName = getUsername().toLowerCase(); const myScore = G.lastSavedScore?.score || null; list.innerHTML = scores.map((s, i) => { const isMe = s.name?.toLowerCase() === myName && (myScore === null || s.score === myScore); const rn = i < 3 ? `<span class="lbrn t${i + 1}">${medals[i]}</span>` : `<span class="lbrn">${i + 1}</span>`; return `<div class="lbrow ${isMe ? 'my-score' : ''}">${rn}<div class="lbinfo"><div class="lbname">${esc(s.name)}${isMe ? ' ⭐ You' : ''}</div><div class="lbep">${esc(s.episodeTitle || s.episodeId)}</div></div><div><div class="lbsc">⭐ ${s.score}</div><div class="lbbd">${esc(s.rank)} · ${s.correct}/${s.total}</div><div class="lbts">${formatTs(s.ts)}</div></div></div>`; }).join(''); }
+async function loadLB(epId) {
+  const list = document.getElementById('lblist');
+  if (!list) return;
+  list.innerHTML = '<div class="lbload">📜 Loading Hall of Prophets...</div>';
+  if (!db) { list.innerHTML = '<div class="lbload">Firebase not connected.</div>'; return; }
+  const scores = await fsGet(epId);
+  if (!scores.length) { list.innerHTML = '<div class="lbload">No scores yet — be the first!</div>'; return; }
+
+  const medals  = ['🥇','🥈','🥉'];
+  const myName  = getUsername().toLowerCase();
+  const myScore = G.lastSavedScore?.score || null;
+
+  // ── Podium (top 3) ──────────────────────────────────────────
+  const top3 = scores.slice(0, Math.min(3, scores.length));
+  const rest  = scores.slice(top3.length);
+
+  function podSlot(s, pos) {
+    const isMe = s.name?.toLowerCase() === myName && (myScore === null || s.score === myScore);
+    return `<div class="lb-pod p${pos}${isMe ? ' my-pod' : ''}">
+      <div class="lb-pod-medal">${medals[pos - 1]}</div>
+      <div class="lb-pod-name">${esc(s.name)}${isMe ? ' ⭐' : ''}</div>
+      <div class="lb-pod-score">⭐ ${s.score}</div>
+      <div class="lb-pod-block">${pos}</div>
+    </div>`;
+  }
+
+  // Order: silver(2) · gold(1) · bronze(3) so gold stands tallest in centre
+  const podSlots = [];
+  if (top3[1]) podSlots.push(podSlot(top3[1], 2));
+  if (top3[0]) podSlots.push(podSlot(top3[0], 1));
+  if (top3[2]) podSlots.push(podSlot(top3[2], 3));
+
+  const podiumHtml = `<div class="lb-podium">${podSlots.join('')}</div>`;
+
+  // ── Rest of list (4th place onward) ─────────────────────────
+  const restHtml = rest.map((s, i) => {
+    const isMe = s.name?.toLowerCase() === myName && (myScore === null || s.score === myScore);
+    return `<div class="lbrow ${isMe ? 'my-score' : ''}">
+      <span class="lbrn">${i + 4}</span>
+      <div class="lbinfo"><div class="lbname">${esc(s.name)}${isMe ? ' ⭐ You' : ''}</div><div class="lbep">${esc(s.episodeTitle || s.episodeId)}</div></div>
+      <div><div class="lbsc">⭐ ${s.score}</div><div class="lbbd">${esc(s.rank)} · ${s.correct}/${s.total}</div><div class="lbts">${formatTs(s.ts)}</div></div>
+    </div>`;
+  }).join('');
+
+  list.innerHTML = podiumHtml + (restHtml ? `<div style="border-top:1px solid rgba(201,168,76,.1);margin-top:4px;">${restHtml}</div>` : '');
+}
 
 // ═══════════════════════════════════════════════════════════════
 //  SHARE CARD SYSTEM
