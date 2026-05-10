@@ -240,6 +240,34 @@ function exitMiniGame() {
   showScreen('s-title');
 }
 
+// ── Confirm and quit to home from any overlay ─────────────────
+// Call this from the stone shop, question overlay, or life overlay.
+function confirmExitMiniGame() {
+  if (document.getElementById('mgQuitConfirm')) return; // prevent double-open
+  const conf = document.createElement('div');
+  conf.id = 'mgQuitConfirm';
+  conf.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:20000;display:flex;align-items:center;justify-content:center;font-family:"Cinzel",serif;';
+  conf.innerHTML = `
+    <div style="background:linear-gradient(160deg,rgba(26,18,38,.98),rgba(10,7,16,.99));border:1px solid rgba(201,168,76,.5);border-radius:14px;padding:24px 22px;max-width:300px;width:88%;text-align:center;">
+      <div style="font-size:28px;margin-bottom:8px;">🏠</div>
+      <div style="font-size:16px;color:#e8c96a;margin-bottom:6px;letter-spacing:1px;">Quit to Home?</div>
+      <div style="font-size:12px;color:#b8a880;margin-bottom:20px;font-style:italic;line-height:1.6;">Your current battle progress will be lost.</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button id="mgQuitYes" style="background:rgba(192,57,43,.85);border:1px solid #c0392b;color:#fff;font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px;padding:9px 20px;border-radius:6px;cursor:pointer;">Yes, Quit</button>
+        <button id="mgQuitNo" style="background:transparent;border:1px solid rgba(201,168,76,.4);color:#e8c96a;font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px;padding:9px 20px;border-radius:6px;cursor:pointer;">Keep Playing</button>
+      </div>
+    </div>`;
+  document.body.appendChild(conf);
+  document.getElementById('mgQuitYes').addEventListener('click', () => {
+    conf.remove();
+    document.getElementById('mgShopOverlay')?.remove();
+    document.getElementById('mgQOverlay')?.remove();
+    document.getElementById('mgLifeQOverlay')?.remove();
+    exitMiniGame();
+  });
+  document.getElementById('mgQuitNo').addEventListener('click', () => conf.remove());
+}
+
 // ── DEV SHORTCUT — jumps directly to any level for testing ────
 function devJump(level) {
   if (mgAnimationId)  { cancelAnimationFrame(mgAnimationId);  mgAnimationId  = null; }
@@ -703,15 +731,21 @@ function showStoneShop() {
     (userIsPremium && hard.length ? '<div class="stone-diff-card hard" id="sdHard"><div><div class="diff-label">💀 Hard</div><div class="diff-desc">Scripture-specific · Premium</div></div><div class="diff-reward">+3 🪨</div></div>' : '') +
     '<button class="shop-continue-btn" id="sdContinue">⚔️ Continue with ' + mgStoneCount + ' stone' + (mgStoneCount !== 1 ? 's' : '') + '</button>' +
     (!userIsPremium ? '<div class="stone-diff-card" id="sdVideo" style="border-left:3px solid #4488cc;margin-top:4px;"><div><div class="diff-label" style="color:#88ccff;">🎬 Watch Video</div><div class="diff-desc">30-second ad</div></div><div class="diff-reward" style="color:#88ccff;">+3 🪨</div></div>' : '') +
-    (userIsPremium && hasDailyBonusAvailable() ? '<div class="stone-diff-card" id="sdDailyBonus" style="border-left:3px solid #5ddb8e;margin-top:4px;"><div><div class="diff-label" style="color:#5ddb8e;">🌟 Daily Blessing</div><div class="diff-desc">Premium — once per day</div></div><div class="diff-reward" style="color:#5ddb8e;">+2 🪨</div></div>' : '');
+    (userIsPremium && hasDailyBonusAvailable() ? '<div class="stone-diff-card" id="sdDailyBonus" style="border-left:3px solid #5ddb8e;margin-top:4px;"><div><div class="diff-label" style="color:#5ddb8e;">🌟 Daily Blessing</div><div class="diff-desc">Premium — once per day</div></div><div class="diff-reward" style="color:#5ddb8e;">+2 🪨</div></div>' : '') +
+    '<button id="sdQuit" style="background:transparent;border:none;color:rgba(255,255,255,.28);font-family:\'Cinzel\',serif;font-size:11px;letter-spacing:1px;padding:6px 12px;cursor:pointer;margin-top:6px;text-decoration:underline;text-underline-offset:3px;">← Quit to Home</button>';
   document.body.appendChild(ov);
 
   ov.querySelector('#sdContinue')?.addEventListener('click', removeShopOverlay);
+  ov.querySelector('#sdQuit')?.addEventListener('click', confirmExitMiniGame);
 
+  // Recursive so the player can skip to another question of the same difficulty
   function pickAndShow(pool, reward) {
-    const q = pickStoneQuestion(pool);
-    if (!q) return;
-    showStoneQuestionOverlay(q, reward, () => { removeShopOverlay(); });
+    function show() {
+      const q = pickStoneQuestion(pool);
+      if (!q) { removeShopOverlay(); return; } // all questions exhausted
+      showStoneQuestionOverlay(q, reward, () => { removeShopOverlay(); }, show);
+    }
+    show();
   }
 
   if (easy.length)                        ov.querySelector('#sdEasy')  ?.addEventListener('click', () => pickAndShow(easy, 1));
@@ -731,7 +765,7 @@ function showStoneShop() {
 }
 
 // ── Stone question overlay ────────────────────────────────────
-function showStoneQuestionOverlay(q, reward, onDone) {
+function showStoneQuestionOverlay(q, reward, onDone, onSkip) {
   document.getElementById('mgQOverlay')?.remove();
   pauseGameForOverlay();
 
@@ -751,6 +785,12 @@ function showStoneQuestionOverlay(q, reward, onDone) {
     : '<input class="stone-q-fill" id="sqFill" placeholder="Type your answer..." autocomplete="off" spellcheck="false">' +
       '<button class="shop-continue-btn" id="sqSubmit" style="width:100%;margin-top:4px;">✓ Submit Answer</button>';
 
+  // Build skip/quit controls (reused in both layouts)
+  const skipBtn = onSkip
+    ? `<button id="sqSkip" style="background:transparent;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.55);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;padding:4px 10px;border-radius:4px;cursor:pointer;white-space:nowrap;">Skip →</button>`
+    : '';
+  const quitBtn = `<button id="sqQuit" style="background:transparent;border:none;color:rgba(255,255,255,.28);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;padding:4px 10px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;">← Home</button>`;
+
   if (ls) {
     // ── Landscape: full-screen two-column split, no scrolling needed ──
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);z-index:10001;display:flex;align-items:stretch;font-family:"Cinzel",serif;';
@@ -759,31 +799,47 @@ function showStoneQuestionOverlay(q, reward, onDone) {
         ${q.q}
       </div>
       <div id="sqRight" style="flex:1;padding:10px 16px 10px 12px;display:flex;flex-direction:column;overflow-y:auto;text-align:left;">
-        <div style="font-size:10px;color:#e8c96a;letter-spacing:1.5px;margin-bottom:8px;text-align:center;">+${reward} 🪨 ANSWER CORRECTLY</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:6px;">
+          <div style="font-size:10px;color:#e8c96a;letter-spacing:1px;">+${reward} 🪨 EARN STONES</div>
+          <div style="display:flex;gap:6px;align-items:center;">${skipBtn}${quitBtn}</div>
+        </div>
         ${optsHtml}
         <div id="sqFeedback" style="margin-top:8px;font-size:12px;min-height:16px;line-height:1.5;"></div>
       </div>`;
   } else {
-    // ── Portrait: original centred layout ──
-    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);z-index:10001;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:12px;font-family:"Cinzel",serif;text-align:center;';
+    // ── Portrait: centred vertical layout ──
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);z-index:10001;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:8px;font-family:"Cinzel",serif;text-align:center;';
     ov.innerHTML = `
-      <div style="color:#e8c96a;font-size:11px;letter-spacing:2px;margin-bottom:4px;">
+      <div style="color:#e8c96a;font-size:11px;letter-spacing:2px;">
         🪨 ANSWER CORRECTLY TO EARN +${reward} STONE${reward > 1 ? 'S' : ''}
       </div>
-      <div class="stone-q-panel" style="max-height:80vh;overflow-y:auto;">
+      <div class="stone-q-panel" style="max-height:72vh;overflow-y:auto;">
         <div class="stone-q-text">${q.q}</div>
         ${optsHtml}
         <div id="sqFeedback" style="margin-top:12px;font-size:13px;min-height:20px;line-height:1.6;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;width:min(360px,92vw);gap:8px;">
+        ${skipBtn || '<div></div>'}
+        ${quitBtn}
       </div>`;
   }
 
   document.body.appendChild(ov);
+
+  // Wire skip and quit
+  if (onSkip) {
+    ov.querySelector('#sqSkip')?.addEventListener('click', () => { ov.remove(); onSkip(); });
+  }
+  ov.querySelector('#sqQuit')?.addEventListener('click', confirmExitMiniGame);
 
   let answered = false;
 
   function handleAnswer(correct) {
     if (answered) return;
     answered = true;
+    // Hide skip/quit once answered — continue button takes over
+    ov.querySelector('#sqSkip')?.remove();
+    ov.querySelector('#sqQuit')?.remove();
     const fb = document.getElementById('sqFeedback');
     ov.querySelectorAll('.stone-q-opt,.stone-q-fill,#sqSubmit').forEach(el => el.disabled = true);
 
@@ -876,6 +932,7 @@ function showLifeRedemptionQuestion(onRestored, onGameOver) {
         ${!isPremium() ? '<div class="stone-diff-card" onclick="handleWatchVideoForLife()" style="border-left:3px solid #4488cc;width:100%;margin:0 0 6px;"><div><div class="diff-label" style="color:#88ccff;font-size:11px;">🎬 Watch Video Instead</div></div><div class="diff-reward" style="color:#88ccff;font-size:13px;">❤️ +1</div></div>' : ''}
         ${isPremium() && hasDailyLifeAvailable() ? '<div class="stone-diff-card" onclick="handleDailyLifeClaim()" style="border-left:3px solid #5ddb8e;width:100%;margin:0 0 6px;"><div><div class="diff-label" style="color:#5ddb8e;font-size:11px;">🌟 Daily Free Life</div></div><div class="diff-reward" style="color:#5ddb8e;font-size:13px;">❤️ +1</div></div>' : ''}
         <div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;line-height:1.5;">${q.q}</div>
+        <button id="sqLifeQuit" style="background:transparent;border:none;color:rgba(255,255,255,.25);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;padding:6px 0;cursor:pointer;margin-top:10px;text-decoration:underline;text-underline-offset:3px;text-align:left;">← Quit to Home</button>
       </div>
       <div id="sqLifeRight" style="flex:1;padding:10px 16px 10px 12px;display:flex;flex-direction:column;overflow-y:auto;">
         <div style="font-size:10px;color:#e8c96a;letter-spacing:1px;margin-bottom:8px;text-align:center;">Answer correctly to restore ❤️ and continue the battle!</div>
@@ -904,14 +961,16 @@ function showLifeRedemptionQuestion(onRestored, onGameOver) {
       </div>
       ${!isPremium() ? '<div class="stone-diff-card" onclick="handleWatchVideoForLife()" style="border-left:3px solid #4488cc;width:min(300px,88vw);margin:0 auto;"><div><div class="diff-label" style="color:#88ccff;font-size:12px;">🎬 Watch Video Instead</div><div class="diff-desc" style="font-size:11px;">Skip the question</div></div><div class="diff-reward" style="color:#88ccff;font-size:14px;">❤️ +1</div></div>' : ''}
       ${isPremium() && hasDailyLifeAvailable() ? '<div class="stone-diff-card" onclick="handleDailyLifeClaim()" style="border-left:3px solid #5ddb8e;width:min(300px,88vw);margin:0 auto;"><div><div class="diff-label" style="color:#5ddb8e;font-size:12px;">🌟 Daily Free Life</div><div class="diff-desc" style="font-size:11px;">Premium — once per day</div></div><div class="diff-reward" style="color:#5ddb8e;font-size:14px;">❤️ +1</div></div>' : ''}
-      <div class="stone-q-panel" style="max-height:60vh;overflow-y:auto;margin-top:6px;">
+      <div class="stone-q-panel" style="max-height:55vh;overflow-y:auto;margin-top:6px;">
         <div class="stone-q-text">${q.q}</div>
         ${optsHtml}
         <div id="sqLifeFeedback" style="margin-top:12px;font-size:13px;min-height:20px;line-height:1.6;"></div>
       </div>
+      <button id="sqLifeQuit" style="background:transparent;border:none;color:rgba(255,255,255,.28);font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;padding:6px 12px;cursor:pointer;margin-top:4px;text-decoration:underline;text-underline-offset:3px;">← Quit to Home</button>
     `;
   }
   document.body.appendChild(ov);
+  ov.querySelector('#sqLifeQuit')?.addEventListener('click', confirmExitMiniGame);
 
   let answered = false;
 

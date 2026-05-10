@@ -29,8 +29,20 @@ function slPlayAgain() {
 }
 
 function slQuit() {
-  if (!confirm('Quit this game? Your progress will be lost.')) return;
-  slGoHome();
+  // Use a styled modal instead of browser confirm()
+  const ov = document.createElement('div');
+  ov.className = 'modal-ov';
+  ov.innerHTML = `<div class="modal-bx">
+    <div class="mttl">⚠️ Quit Scripture Locator?</div>
+    <div class="msub2">Your current progress will be lost.</div>
+    <div class="mrow">
+      <button class="bgold" id="slQuitYes">Yes, Quit</button>
+      <button class="bghost" id="slQuitNo">Keep Playing</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('slQuitYes').addEventListener('click', () => { ov.remove(); slGoHome(); });
+  document.getElementById('slQuitNo').addEventListener('click', () => ov.remove());
 }
 
 // ── Verse pool + setup ────────────────────────────────────────
